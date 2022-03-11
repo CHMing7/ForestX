@@ -1,0 +1,28 @@
+<idea-plugin>
+    <id>com.chm.plugin.idea.forestx</id>
+    <name>ForestX</name>
+    <vendor email="654849388@qq.com" url="https://gitee.com/chming7/ForestX">ForestX</vendor>
+
+    <description><![CDATA[
+    Forest Plugin
+    ]]></description>
+
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.java</depends>
+    <!-- support aliases -->
+    <depends optional="true" config-file="spring.xml">com.intellij.spring</depends>
+    <!-- support aliases -->
+    <depends optional="true" config-file="spring-boot.xml">com.intellij.spring.boot</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <!-- 在service层注入了client对象, 在这个对象进行跳转到 client 类-->
+        <codeInsight.lineMarkerProvider id="forestx.InjectionLineMarkerProvider" language="JAVA"
+                                        implementationClass="com.chm.plugin.idea.forestx.provider.InjectionLineMarkerProvider"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+</idea-plugin>
