@@ -24,66 +24,92 @@ public class Annotation implements Cloneable {
      * The constant BACKEND.
      */
     public static final Annotation BACKEND = new Annotation("@Backend", "com.dtflys.forest.annotation.Backend");
+
     /**
      * The constant HEADERS.
      */
     public static final Annotation HEADERS = new Annotation("@Headers", "com.dtflys.forest.annotation.Headers");
+
     /**
      * The constant ADDRESS.
      */
     public static final Annotation ADDRESS = new Annotation("@Address", "com.dtflys.forest.annotation.Address");
+
     /**
      * The constant REQUEST.
      */
     public static final Annotation REQUEST = new Annotation("@Request", "com.dtflys.forest.annotation.Request");
+
     /**
      * The constant GET.
      */
     public static final Annotation GET = new Annotation("@Get", "com.dtflys.forest.annotation.Get");
+
     /**
      * The constant GET_REQUEST.
      */
     public static final Annotation GET_REQUEST = new Annotation("@GetRequest", "com.dtflys.forest.annotation.GetRequest");
+
     /**
      * The constant POST.
      */
     public static final Annotation POST = new Annotation("@Post", "com.dtflys.forest.annotation.Post");
+
     /**
      * The constant POST_REQUEST.
      */
     public static final Annotation POST_REQUEST = new Annotation("@PostRequest", "com.dtflys.forest.annotation.PostRequest");
+
     /**
      * The constant PUT.
      */
     public static final Annotation PUT = new Annotation("@Put", "com.dtflys.forest.annotation.Put");
+
     /**
      * The constant PUT_REQUEST.
      */
     public static final Annotation PUT_REQUEST = new Annotation("@PutRequest", "com.dtflys.forest.annotation.PutRequest");
-    /**
-     * The constant HEAD_REQUEST.
-     */
-    public static final Annotation HEAD_REQUEST = new Annotation("@HeadRequest", "com.dtflys.forest.annotation.HeadRequest");
-    /**
-     * The constant OPTIONS.
-     */
-    public static final Annotation OPTIONS = new Annotation("@Options", "com.dtflys.forest.annotation.Options");
-    /**
-     * The constant OPTIONS_REQUEST.
-     */
-    public static final Annotation OPTIONS_REQUEST = new Annotation("@OptionsRequest", "com.dtflys.forest.annotation.OptionsRequest");
+
     /**
      * The constant PATCH.
      */
     public static final Annotation PATCH = new Annotation("@Patch", "com.dtflys.forest.annotation.Patch");
+
     /**
      * The constant PATCH_REQUEST.
      */
     public static final Annotation PATCH_REQUEST = new Annotation("@PatchRequest", "com.dtflys.forest.annotation.PatchRequest");
+
+    /**
+     * The constant HEAD_REQUEST.
+     */
+    public static final Annotation HEAD_REQUEST = new Annotation("@HeadRequest", "com.dtflys.forest.annotation.HeadRequest");
+
+    /**
+     * The constant OPTIONS.
+     */
+    public static final Annotation OPTIONS = new Annotation("@Options", "com.dtflys.forest.annotation.Options");
+
+    /**
+     * The constant OPTIONS_REQUEST.
+     */
+    public static final Annotation OPTIONS_REQUEST = new Annotation("@OptionsRequest", "com.dtflys.forest.annotation.OptionsRequest");
+
+    /**
+     * The constant DELETE.
+     */
+    public static final Annotation DELETE = new Annotation("@Delete", "com.dtflys.forest.annotation.Delete");
+
+    /**
+     * The constant DELETE_REQUEST.
+     */
+    public static final Annotation DELETE_REQUEST = new Annotation("@DeleteRequest", "com.dtflys.forest.annotation.DeleteRequest");
+
     /**
      * The constant TRACE.
      */
     public static final Annotation TRACE = new Annotation("@Trace", "com.dtflys.forest.annotation.Trace");
+
     /**
      * The constant TRACE_REQUEST.
      */
@@ -102,9 +128,9 @@ public class Annotation implements Cloneable {
     /**
      * The constant STATEMENT_SYMMETRIES.
      */
-    public static final Set<Annotation> FOREST_METHOD_ANNOTATION = ImmutableSet.of(BACKEND, HEADERS, ADDRESS, REQUEST, GET,
+    public static final Set<Annotation> FOREST_METHOD_ANNOTATION = ImmutableSet.of(REQUEST, GET,
             GET_REQUEST, POST, POST_REQUEST, PUT, PUT_REQUEST, HEAD_REQUEST, OPTIONS, OPTIONS_REQUEST, PATCH,
-            PATCH_REQUEST, TRACE, TRACE_REQUEST);
+            PATCH_REQUEST, DELETE, DELETE_REQUEST, TRACE, TRACE_REQUEST);
 
     private final String label;
 

@@ -20,7 +20,17 @@
         <!-- 在service层注入了client对象, 在这个对象进行跳转到 client 类-->
         <codeInsight.lineMarkerProvider id="forestx.InjectionLineMarkerProvider" language="JAVA"
                                         implementationClass="com.chm.plugin.idea.forestx.provider.InjectionLineMarkerProvider"/>
+
+        <codeInsight.lineMarkerProvider id="forestx.ForestMethodProvider" language="JAVA"
+                                        implementationClass="com.chm.plugin.idea.forestx.provider.ForestMethodProvider"/>
+
+
+        <toolWindow id="Forest" secondary="false" anchor="right" icon="/icons/forest-16x16.png"
+                    factoryClass="com.chm.plugin.idea.forestx.tw.RightSidebarToolWindowFactory"/>
+
+        <postStartupActivity implementation="com.chm.plugin.idea.forestx.startup.MyStartupActivity"/>
     </extensions>
+
 
     <actions>
         <!-- Add your actions here -->

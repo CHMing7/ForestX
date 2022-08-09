@@ -13,7 +13,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.6.0'
+    id 'org.jetbrains.intellij' version '0.7.3'
 }
 
 group 'com.chm.plugin.idea.forestx'
@@ -34,7 +34,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = '2019.2'
+    version = '2020.2.4'
     type 'IU' // 企业版
     plugins = ['java', 'Spring', 'SpringBoot']
 
