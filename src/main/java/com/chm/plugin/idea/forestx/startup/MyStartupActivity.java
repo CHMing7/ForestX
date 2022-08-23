@@ -1,5 +1,7 @@
 package com.chm.plugin.idea.forestx.startup;
 
+import com.intellij.ide.customize.CustomizeUIThemeStepPanel;
+import com.intellij.ide.ui.LafManager;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
@@ -9,6 +11,8 @@ import com.intellij.profile.ProfileChangeAdapter;
 import com.intellij.profile.codeInspection.ProjectInspectionProfileManager;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
 
 /**
  * @author caihongming

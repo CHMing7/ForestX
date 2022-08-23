@@ -6,7 +6,10 @@ import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.openapi.editor.SelectionModel;
+import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -20,6 +23,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiTypeParameterListOwner;
 import com.intellij.psi.util.PsiEditorUtil;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.ToolbarDecorator;
@@ -103,6 +107,7 @@ public class RightSidebarToolWindow {
                                 if (o instanceof PsiMethod || o instanceof PsiClass) {
                                     PsiElement element = (PsiElement) o;
                                     PsiFile psiFile = element.getContainingFile();
+                                    // 打开文件
                                     FileEditorManager.getInstance(element.getProject()).openFile(psiFile.getVirtualFile(), true);
                                     Editor editor = PsiEditorUtil.findEditor((PsiElement) o);
                                     if (editor == null) {
@@ -110,8 +115,12 @@ public class RightSidebarToolWindow {
                                     }
                                     SelectionModel selectionModel = editor.getSelectionModel();
                                     selectionModel.removeSelection(true);
+                                    // 移动光标
                                     CaretModel caretModel = editor.getCaretModel();
                                     caretModel.moveToOffset(((PsiElement) o).getTextOffset());
+                                    // 滚动屏幕
+                                    ScrollingModel scrollingModel = editor.getScrollingModel();
+                                    scrollingModel.scrollTo(caretModel.getLogicalPosition(), ScrollType.CENTER);
                                 }
                             }
                         }
