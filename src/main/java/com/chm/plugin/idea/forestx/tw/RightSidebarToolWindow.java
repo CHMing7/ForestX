@@ -9,13 +9,11 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.openapi.editor.SelectionModel;
-import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
@@ -23,7 +21,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
-import com.intellij.psi.PsiTypeParameterListOwner;
 import com.intellij.psi.util.PsiEditorUtil;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.ToolbarDecorator;
@@ -36,12 +33,10 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 
@@ -69,7 +64,7 @@ public class RightSidebarToolWindow {
 
     private void init() {
         Module[] modules = ModuleManager.getInstance(project).getModules();
-        DefaultMutableTreeNode root = null;
+        DefaultMutableTreeNode root;
         if (modules.length == 1 && modules[0].getName().equals(project.getName())) {
             // 没子模块的时候不显示项目节点
             root = new DefaultMutableTreeNode(modules[0]);
@@ -157,20 +152,20 @@ public class RightSidebarToolWindow {
         DefaultTreeModel rootModel = getTreeModel();
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) rootModel.getRoot();
         if (root != null) {
-            DefaultMutableTreeNode module = null;
+            DefaultMutableTreeNode module;
             if (onlyOneModule) {
                 module = root;
             } else {
                 module = TreeNodeUtil.findNodeOrNew(rootModel, root, currentModule, true);
             }
             // 若没有可用forest方法则清除接口类
-            if (!onlyOneModule && CollectionUtils.isEmpty(psiMethodList)) {
+            if (CollectionUtils.isEmpty(psiMethodList)) {
                 DefaultMutableTreeNode clazz = TreeNodeUtil.findNode(module, psiClass);
                 if (clazz != null) {
                     TreeNodeUtil.removeNode(rootModel, module, clazz);
                 }
                 // 若该模块下没有forest接口类，则清除该模块
-                if (module.getChildCount() == 0) {
+                if (!onlyOneModule && module.getChildCount() == 0) {
                     TreeNodeUtil.removeNode(rootModel, root, module);
                 }
                 return;
