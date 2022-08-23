@@ -123,7 +123,7 @@ public class TreeNodeUtil {
                                                       Object o,
                                                       int index) {
         DefaultMutableTreeNode node = findNode(parent, o);
-        if (node != null) {
+        if (node != null && parent.getChildCount() < index) {
             TreeNode child = parent.getChildAt(index);
             if (child == node) {
                 return node;
