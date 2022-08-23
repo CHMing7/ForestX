@@ -14,11 +14,9 @@ public interface Icons {
     /**
      * Forest 图标
      */
-    Icon ICON = IconLoader.getIcon("/icons/forest.png");
+    Icon ICON = IconLoader.getIcon("/icons/forest-logo-20x20.svg");
 
-    Icon ICON_12 = IconLoader.getIcon("/icons/forest-12x12.png");
-
-    Icon ICON_16 = IconLoader.getIcon("/icons/forest-16x16.png");
+    Icon ICON_16 = IconLoader.getIcon("/icons/forest-logo-16x16.svg");
 
     Icon PROJECT_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg");
 
