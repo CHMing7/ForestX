@@ -248,7 +248,7 @@ public class TreeNodeUtil {
         } else if (o instanceof Module) {
             return Icons.MODULE_16;
         } else if (o instanceof PsiClass) {
-            return Icons.ICON_16;
+            return Icons.INTERFACE_18;
         } else if (o instanceof PsiMethod) {
             PsiAnnotation[] methodAnnotations = AnnotationUtil.getAllAnnotations((PsiMethod) o, false, null);
             for (PsiAnnotation methodAnnotation : methodAnnotations) {

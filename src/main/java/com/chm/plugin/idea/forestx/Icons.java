@@ -22,6 +22,8 @@ public interface Icons {
 
     Icon MODULE_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg");
 
+    Icon INTERFACE_18 = IconLoader.getIcon("/icons/forest-logo-18x18.svg");
+
     Icon DELETE = IconLoader.getIcon("/icons/request-DELETE.svg");
 
     Icon GET = IconLoader.getIcon("/icons/request-GET.svg");
