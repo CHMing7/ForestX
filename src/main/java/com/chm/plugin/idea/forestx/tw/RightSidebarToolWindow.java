@@ -9,8 +9,10 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
@@ -30,10 +32,12 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,6 +54,8 @@ public class RightSidebarToolWindow {
 
     private Tree mainTree;
 
+    private boolean onlyOneModule = false;
+
     private DefaultTreeModel treeModel;
 
     public RightSidebarToolWindow(Project project) {
@@ -58,7 +64,15 @@ public class RightSidebarToolWindow {
     }
 
     private void init() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(this.project);
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+        DefaultMutableTreeNode root = null;
+        if (modules.length == 1 && modules[0].getName().equals(project.getName())) {
+            // 没子模块的时候不显示项目节点
+            root = new DefaultMutableTreeNode(modules[0]);
+            onlyOneModule = true;
+        } else {
+            root = new DefaultMutableTreeNode(this.project);
+        }
         this.treeModel = new DefaultTreeModel(root);
         this.mainTree = new Tree(this.treeModel);
         new TreeSpeedSearch(this.mainTree);
@@ -124,6 +138,11 @@ public class RightSidebarToolWindow {
         return this.treeModel;
     }
 
+    public void afterProcessClass() {
+        DefaultTreeModel rootModel = getTreeModel();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) rootModel.getRoot();
+    }
+
     public void processClass(PsiClass psiClass) {
         Module currentModule = ModuleUtil.findModuleForPsiElement(psiClass);
         List<PsiMethod> psiMethodList = methodsFilter(psiClass);
@@ -134,9 +153,14 @@ public class RightSidebarToolWindow {
         DefaultTreeModel rootModel = getTreeModel();
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) rootModel.getRoot();
         if (root != null) {
-            DefaultMutableTreeNode module = TreeNodeUtil.findNodeOrNew(rootModel, root, currentModule, true);
+            DefaultMutableTreeNode module = null;
+            if (onlyOneModule) {
+                module = root;
+            } else {
+                module = TreeNodeUtil.findNodeOrNew(rootModel, root, currentModule, true);
+            }
             // 若没有可用forest方法则清除接口类
-            if (CollectionUtils.isEmpty(psiMethodList)) {
+            if (!onlyOneModule && CollectionUtils.isEmpty(psiMethodList)) {
                 DefaultMutableTreeNode clazz = TreeNodeUtil.findNode(module, psiClass);
                 if (clazz != null) {
                     TreeNodeUtil.removeNode(rootModel, module, clazz);
@@ -147,6 +171,7 @@ public class RightSidebarToolWindow {
                 }
                 return;
             }
+
             DefaultMutableTreeNode clazz = TreeNodeUtil.findNodeOrNew(rootModel, module, psiClass, true);
             // 清空接口类中原先的method,先增加新子节点，再删除旧子节点
             List<DefaultMutableTreeNode> methodList = Lists.newArrayList();

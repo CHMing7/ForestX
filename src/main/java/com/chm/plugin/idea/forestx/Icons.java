@@ -20,9 +20,9 @@ public interface Icons {
 
     Icon ICON_16 = IconLoader.getIcon("/icons/forest-16x16.png");
 
-    Icon PROJECT_16 = IconLoader.getIcon("/icons/forest-module2.svg");
+    Icon PROJECT_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg");
 
-    Icon MODULE_16 = IconLoader.getIcon("/icons/forest-module2.svg");
+    Icon MODULE_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg");
 
     Icon DELETE = IconLoader.getIcon("/icons/request-DELETE.svg");
 
