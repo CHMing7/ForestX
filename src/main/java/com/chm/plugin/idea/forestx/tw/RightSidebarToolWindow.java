@@ -138,11 +138,6 @@ public class RightSidebarToolWindow {
         return this.treeModel;
     }
 
-    public void afterProcessClass() {
-        DefaultTreeModel rootModel = getTreeModel();
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) rootModel.getRoot();
-    }
-
     public void processClass(PsiClass psiClass) {
         Module currentModule = ModuleUtil.findModuleForPsiElement(psiClass);
         List<PsiMethod> psiMethodList = methodsFilter(psiClass);

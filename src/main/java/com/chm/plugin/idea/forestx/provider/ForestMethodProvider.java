@@ -27,6 +27,5 @@ public class ForestMethodProvider extends RelatedItemLineMarkerProvider {
         Project project = element.getProject();
         RightSidebarToolWindow mainForm = Constants.getRightSidebar(project);
         mainForm.processClass(psiClass);
-        mainForm.afterProcessClass();
     }
 }

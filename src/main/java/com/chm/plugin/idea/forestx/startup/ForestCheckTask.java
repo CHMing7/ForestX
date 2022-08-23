@@ -67,7 +67,6 @@ public class ForestCheckTask extends Backgroundable {
             int i = 0;
             for (PsiClass psiClass : searchedSet) {
                 mainForm.processClass(psiClass);
-                mainForm.afterProcessClass();
                 indicator.setFraction((double) (i++) / (double) searchedSet.size());
             }
         }
