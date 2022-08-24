@@ -15,6 +15,8 @@
     <!-- support aliases -->
     <depends optional="true" config-file="spring-boot.xml">com.intellij.spring.boot</depends>
 
+    <depends>com.intellij.java</depends>
+
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <!-- 在service层注入了client对象, 在这个对象进行跳转到 client 类-->
@@ -29,6 +31,8 @@
                     factoryClass="com.chm.plugin.idea.forestx.tw.RightSidebarToolWindowFactory"/>
 
         <postStartupActivity implementation="com.chm.plugin.idea.forestx.startup.MyStartupActivity"/>
+
+        <annotator language="JAVA" implementationClass="com.chm.plugin.idea.forestx.template.TemplateAnnotator"/>
     </extensions>
 
 

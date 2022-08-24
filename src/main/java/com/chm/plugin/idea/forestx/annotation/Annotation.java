@@ -9,6 +9,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -116,6 +117,11 @@ public class Annotation implements Cloneable {
     public static final Annotation TRACE_REQUEST = new Annotation("@TraceRequest", "com.dtflys.forest.annotation.TraceRequest");
 
     /**
+     * The constant TRACE_REQUEST
+     */
+    public static final Annotation BASE_REQUEST = new Annotation("@BaseRequest", "com.dtflys.forest.annotation.BaseRequest");
+
+    /**
      * The constant AUTOWIRED.
      */
     public static final Annotation AUTOWIRED = new Annotation("@Autowired", "org.springframework.beans.factory.annotation.Autowired");
@@ -130,13 +136,32 @@ public class Annotation implements Cloneable {
      */
     public static final Set<Annotation> FOREST_METHOD_ANNOTATION = ImmutableSet.of(REQUEST, GET,
             GET_REQUEST, POST, POST_REQUEST, PUT, PUT_REQUEST, HEAD_REQUEST, OPTIONS, OPTIONS_REQUEST, PATCH,
-            PATCH_REQUEST, DELETE, DELETE_REQUEST, TRACE, TRACE_REQUEST);
+            PATCH_REQUEST, DELETE, DELETE_REQUEST, TRACE, TRACE_REQUEST, ADDRESS, HEADERS);
+
+    public static final Set<Annotation> FOREST_INTERFACE_ANNOTATION = ImmutableSet.of(BASE_REQUEST);
+
+
+    public static final Set<String> FOREST_ANNOTATION_CLASSES = new HashSet<>();
+
+    static {
+        for (Annotation annotation : FOREST_INTERFACE_ANNOTATION) {
+            FOREST_ANNOTATION_CLASSES.add(annotation.getQualifiedName());
+        }
+        for (Annotation annotation : FOREST_METHOD_ANNOTATION) {
+            FOREST_ANNOTATION_CLASSES.add(annotation.getQualifiedName());
+        }
+    }
 
     private final String label;
 
     private final String qualifiedName;
 
     private Map<String, AnnotationValue> attributePairs;
+
+
+    public static boolean isForestAnnotation(String qualifiedName) {
+        return FOREST_ANNOTATION_CLASSES.contains(qualifiedName);
+    }
 
     /**
      * Instantiates a new Annotation.

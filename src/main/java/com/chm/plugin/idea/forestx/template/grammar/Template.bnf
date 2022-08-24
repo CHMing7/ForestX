@@ -1,0 +1,25 @@
+{
+  parserClass="com.chm.plugin.idea.forestx.template.grammar.TemplateParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="ForestTemplate"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.chm.plugin.idea.forestx.template.psi"
+  psiImplPackage="com.chm.plugin.idea.forestx.template.psi.impl"
+
+  elementTypeHolderClass="com.chm.plugin.idea.forestx.template.psi.TemplateTypes"
+  elementTypeClass="com.chm.plugin.idea.forestx.template.psi.TemplateElementType"
+  tokenTypeClass="com.chm.plugin.idea.forestx.template.psi.TemplateTokenType"
+}
+
+StringTemplate ::= (FT_JAVA_STRING_CHARACTERS | PropertyBlock)*
+
+PropertyBlock ::= FT_PROPERTY_BLOCK_BEGIN PropertyReference FT_BLOCK_END
+
+PropertyReferencePart ::= FT_PROPERTY_NAME_PART
+
+PropertyReference ::= PropertyReferencePart (FT_DOT PropertyReferencePart)*
+
+
+
