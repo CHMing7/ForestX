@@ -1,5 +1,5 @@
 <injection language="ForestTemplate" injector-id="java">
-    <display-name>String (java.lang)</display-name>
+    <display-name>Forest (com.dtflys.forest)</display-name>
     ...
     <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("url").withParameters("java.lang.String").definedInClass("com.dtflys.forest.http.ForestRequest")) ]]></place>
     <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("setUrl").withParameters("java.lang.String").definedInClass("com.dtflys.forest.http.ForestRequest")) ]]></place>
