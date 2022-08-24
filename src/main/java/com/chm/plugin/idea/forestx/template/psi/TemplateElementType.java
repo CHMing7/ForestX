@@ -6,6 +6,6 @@ import org.jetbrains.annotations.NotNull;
 public class TemplateElementType extends IElementType {
 
     public TemplateElementType(@NotNull String debugName) {
-        super(debugName, TemplateLanguage.INSTANCE);
+        super(debugName, ForestTemplateLanguage.INSTANCE);
     }
 }
