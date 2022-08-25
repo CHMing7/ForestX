@@ -95,7 +95,6 @@ public class ForestTemplateCompletionContributor extends CompletionContributor {
                                 List<String> keyList = new ArrayList<>();
                                 Map<String, YAMLKeyValue> keyValueMap = new HashMap<>();
                                 String[] propKeyPaths = propPrefix.split("\\.");
-                                int level = 0;
                                 for (YAMLDocument document : documents) {
                                     ConfigYamlAccessor accessor = new ConfigYamlAccessor(document, SpringBootApplicationMetaConfigKeyManager.getInstance());
                                     List<YAMLKeyValue> allKeyValues = accessor.getAllKeys();
@@ -103,8 +102,8 @@ public class ForestTemplateCompletionContributor extends CompletionContributor {
                                         keyValueMap.put(keyValue.getKeyText(), keyValue);
                                     }
                                     YAMLKeyValue keyValue = null;
-                                    while (level < propKeyPaths.length) {
-                                        String path = propKeyPaths[level];
+                                    for (int depth = 0; depth < propKeyPaths.length; depth++) {
+                                        String path = propKeyPaths[depth];
                                         keyValue = keyValueMap.get(path);
                                         if (keyValue != null) {
                                             YAMLValue value = keyValue.getValue();
@@ -115,7 +114,7 @@ public class ForestTemplateCompletionContributor extends CompletionContributor {
                                                     if (child instanceof YAMLKeyValue) {
                                                         YAMLKeyValue childKeyValue = (YAMLKeyValue) child;
                                                         keyValueMap.put(childKeyValue.getKeyText(), childKeyValue);
-                                                        if (level == propKeyPaths.length - 1) {
+                                                        if (depth == propKeyPaths.length - 1) {
                                                             for (PsiElement completionKeyValue : Objects.requireNonNull(keyValue.getValue()).getChildren()) {
                                                                 keyList.add(((YAMLKeyValue) completionKeyValue).getKeyText());
                                                             }
@@ -123,7 +122,6 @@ public class ForestTemplateCompletionContributor extends CompletionContributor {
                                                     }
                                                 }
                                             }
-                                            level++;
                                         } else {
                                             break;
                                         }
