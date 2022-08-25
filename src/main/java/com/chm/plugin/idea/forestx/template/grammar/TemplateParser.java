@@ -36,85 +36,164 @@ public class TemplateParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // FT_PROPERTY_BLOCK_BEGIN PropertyReference FT_BLOCK_END
-  public static boolean PropertyBlock(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "PropertyBlock")) return false;
-    if (!nextTokenIs(b, FT_PROPERTY_BLOCK_BEGIN)) return false;
+  // EL_BLOCK_BEGIN ElExpress EL_BLOCK_END
+  public static boolean ElBlock(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ElBlock")) return false;
+    if (!nextTokenIs(b, EL_BLOCK_BEGIN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, FT_PROPERTY_BLOCK_BEGIN);
-    r = r && PropertyReference(b, l + 1);
-    r = r && consumeToken(b, FT_BLOCK_END);
+    r = consumeToken(b, EL_BLOCK_BEGIN);
+    r = r && ElExpress(b, l + 1);
+    r = r && consumeToken(b, EL_BLOCK_END);
+    exit_section_(b, m, EL_BLOCK, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // Identity | Number
+  public static boolean ElExpress(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ElExpress")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, EL_EXPRESS, "<el express>");
+    r = Identity(b, l + 1);
+    if (!r) r = Number(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // EL_IDENTITY
+  public static boolean Identity(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Identity")) return false;
+    if (!nextTokenIs(b, EL_IDENTITY)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EL_IDENTITY);
+    exit_section_(b, m, IDENTITY, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // EL_INT | EL_DECIMAL
+  public static boolean Number(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Number")) return false;
+    if (!nextTokenIs(b, "<number>", EL_DECIMAL, EL_INT)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, NUMBER, "<number>");
+    r = consumeToken(b, EL_INT);
+    if (!r) r = consumeToken(b, EL_DECIMAL);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // PROP_BLOCK_BEGIN PropertyExpress PROP_BLOCK_END
+  public static boolean PropertyBlock(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PropertyBlock")) return false;
+    if (!nextTokenIs(b, PROP_BLOCK_BEGIN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, PROP_BLOCK_BEGIN);
+    r = r && PropertyExpress(b, l + 1);
+    r = r && consumeToken(b, PROP_BLOCK_END);
     exit_section_(b, m, PROPERTY_BLOCK, r);
     return r;
   }
 
   /* ********************************************************** */
-  // PropertyReferencePart (FT_DOT PropertyReferencePart)*
-  public static boolean PropertyReference(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "PropertyReference")) return false;
-    if (!nextTokenIs(b, FT_PROPERTY_NAME_PART)) return false;
+  // PROP_NAME_PART (PROP_DOT PROP_NAME_PART)*
+  public static boolean PropertyExpress(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PropertyExpress")) return false;
+    if (!nextTokenIs(b, PROP_NAME_PART)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = PropertyReferencePart(b, l + 1);
-    r = r && PropertyReference_1(b, l + 1);
-    exit_section_(b, m, PROPERTY_REFERENCE, r);
+    r = consumeToken(b, PROP_NAME_PART);
+    r = r && PropertyExpress_1(b, l + 1);
+    exit_section_(b, m, PROPERTY_EXPRESS, r);
     return r;
   }
 
-  // (FT_DOT PropertyReferencePart)*
-  private static boolean PropertyReference_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "PropertyReference_1")) return false;
+  // (PROP_DOT PROP_NAME_PART)*
+  private static boolean PropertyExpress_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PropertyExpress_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!PropertyReference_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "PropertyReference_1", c)) break;
+      if (!PropertyExpress_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "PropertyExpress_1", c)) break;
     }
     return true;
   }
 
-  // FT_DOT PropertyReferencePart
-  private static boolean PropertyReference_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "PropertyReference_1_0")) return false;
+  // PROP_DOT PROP_NAME_PART
+  private static boolean PropertyExpress_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PropertyExpress_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, FT_DOT);
-    r = r && PropertyReferencePart(b, l + 1);
+    r = consumeTokens(b, 0, PROP_DOT, PROP_NAME_PART);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // FT_PROPERTY_NAME_PART
-  public static boolean PropertyReferencePart(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "PropertyReferencePart")) return false;
-    if (!nextTokenIs(b, FT_PROPERTY_NAME_PART)) return false;
+  // (PropertyBlock | ElBlock) FT_JSTRING?
+  public static boolean StringBlockContent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "StringBlockContent")) return false;
+    if (!nextTokenIs(b, "<string block content>", EL_BLOCK_BEGIN, PROP_BLOCK_BEGIN)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, FT_PROPERTY_NAME_PART);
-    exit_section_(b, m, PROPERTY_REFERENCE_PART, r);
+    Marker m = enter_section_(b, l, _NONE_, STRING_BLOCK_CONTENT, "<string block content>");
+    r = StringBlockContent_0(b, l + 1);
+    r = r && StringBlockContent_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  /* ********************************************************** */
-  // (FT_JAVA_STRING_CHARACTERS | PropertyBlock)*
-  static boolean StringTemplate(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "StringTemplate")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!StringTemplate_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "StringTemplate", c)) break;
-    }
+  // PropertyBlock | ElBlock
+  private static boolean StringBlockContent_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "StringBlockContent_0")) return false;
+    boolean r;
+    r = PropertyBlock(b, l + 1);
+    if (!r) r = ElBlock(b, l + 1);
+    return r;
+  }
+
+  // FT_JSTRING?
+  private static boolean StringBlockContent_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "StringBlockContent_1")) return false;
+    consumeToken(b, FT_JSTRING);
     return true;
   }
 
-  // FT_JAVA_STRING_CHARACTERS | PropertyBlock
-  private static boolean StringTemplate_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "StringTemplate_0")) return false;
+  /* ********************************************************** */
+  // FT_DQ FT_JSTRING? StringBlockContent* FT_DQ
+  static boolean StringTemplate(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "StringTemplate")) return false;
+    if (!nextTokenIs(b, FT_DQ)) return false;
     boolean r;
-    r = consumeToken(b, FT_JAVA_STRING_CHARACTERS);
-    if (!r) r = PropertyBlock(b, l + 1);
+    Marker m = enter_section_(b);
+    r = consumeToken(b, FT_DQ);
+    r = r && StringTemplate_1(b, l + 1);
+    r = r && StringTemplate_2(b, l + 1);
+    r = r && consumeToken(b, FT_DQ);
+    exit_section_(b, m, null, r);
     return r;
+  }
+
+  // FT_JSTRING?
+  private static boolean StringTemplate_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "StringTemplate_1")) return false;
+    consumeToken(b, FT_JSTRING);
+    return true;
+  }
+
+  // StringBlockContent*
+  private static boolean StringTemplate_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "StringTemplate_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!StringBlockContent(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "StringTemplate_2", c)) break;
+    }
+    return true;
   }
 
 }

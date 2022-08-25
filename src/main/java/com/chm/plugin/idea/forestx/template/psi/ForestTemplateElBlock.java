@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ForestTemplatePropertyBlock extends PsiElement {
+public interface ForestTemplateElBlock extends PsiElement {
 
   @NotNull
-  ForestTemplatePropertyExpress getPropertyExpress();
+  ForestTemplateElExpress getElExpress();
 
 }

@@ -3,9 +3,9 @@ package com.chm.plugin.idea.forestx.template.psi;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 
-public class TemplateElementType extends IElementType {
+public class ForestTemplateElementType extends IElementType {
 
-    public TemplateElementType(@NotNull String debugName) {
+    public ForestTemplateElementType(@NotNull String debugName) {
         super(debugName, ForestTemplateLanguage.INSTANCE);
     }
 }

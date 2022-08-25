@@ -15,12 +15,12 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 
-public class TemplateParserDefinition implements ParserDefinition {
+public class ForestTemplateParserDefinition implements ParserDefinition {
     public static final IFileElementType FILE = new IFileElementType(ForestTemplateLanguage.INSTANCE);
 
     @Override
     public @NotNull Lexer createLexer(Project project) {
-        return new TemplateLexerAdapter();
+        return new ForestTemplateLexerAdapter();
     }
 
     @Override
@@ -50,6 +50,6 @@ public class TemplateParserDefinition implements ParserDefinition {
 
     @Override
     public PsiFile createFile(FileViewProvider viewProvider) {
-        return new TemplateFile(viewProvider);
+        return new ForestTemplateFile(viewProvider);
     }
 }

@@ -9,17 +9,23 @@
   psiImplPackage="com.chm.plugin.idea.forestx.template.psi.impl"
 
   elementTypeHolderClass="com.chm.plugin.idea.forestx.template.psi.TemplateTypes"
-  elementTypeClass="com.chm.plugin.idea.forestx.template.psi.TemplateElementType"
-  tokenTypeClass="com.chm.plugin.idea.forestx.template.psi.TemplateTokenType"
+  elementTypeClass="com.chm.plugin.idea.forestx.template.psi.ForestTemplateElementType"
+  tokenTypeClass="com.chm.plugin.idea.forestx.template.psi.ForestTemplateTokenType"
 }
 
-StringTemplate ::= (FT_JAVA_STRING_CHARACTERS | PropertyBlock)*
+StringTemplate ::= FT_DQ FT_JSTRING? StringBlockContent* FT_DQ
 
-PropertyBlock ::= FT_PROPERTY_BLOCK_BEGIN PropertyReference FT_BLOCK_END
+StringBlockContent ::= (PropertyBlock | ElBlock) FT_JSTRING?
 
-PropertyReferencePart ::= FT_PROPERTY_NAME_PART
+PropertyBlock ::= PROP_BLOCK_BEGIN PropertyExpress PROP_BLOCK_END
 
-PropertyReference ::= PropertyReferencePart (FT_DOT PropertyReferencePart)*
+ElBlock ::= EL_BLOCK_BEGIN ElExpress EL_BLOCK_END
 
+ElExpress ::= Identity | Number
 
+Number ::= EL_INT | EL_DECIMAL
+
+Identity ::= EL_IDENTITY
+
+PropertyExpress ::= PROP_NAME_PART (PROP_DOT PROP_NAME_PART)*
 

@@ -36,7 +36,7 @@ dependencies {
 intellij {
     version = '2020.2.4'
     type 'IU' // 企业版
-    plugins = ['java', 'Spring', 'SpringBoot']
+    plugins = ['java', 'Spring', 'SpringBoot', 'yaml']
 
     pluginName 'ForestX'
     sandboxDirectory = "${rootProject.rootDir}/idea-sandbox"

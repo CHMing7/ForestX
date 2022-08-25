@@ -1,7 +1,6 @@
 package com.chm.plugin.idea.forestx.template.psi;
 
 import com.chm.plugin.idea.forestx.Icons;
-import com.intellij.lang.Language;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.util.NlsContexts;
 import org.jetbrains.annotations.NotNull;
@@ -9,17 +8,17 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class TemplateFileType extends LanguageFileType {
+public class ForestTemplateFileType extends LanguageFileType {
 
-    public static final TemplateFileType INSTANCE = new TemplateFileType();
+    public static final ForestTemplateFileType INSTANCE = new ForestTemplateFileType();
 
-    protected TemplateFileType() {
+    protected ForestTemplateFileType() {
         super(ForestTemplateLanguage.INSTANCE);
     }
 
     @Override
     public @NotNull String getName() {
-        return "Forest File";
+        return "Forest Template File";
     }
 
     @Override
@@ -29,7 +28,7 @@ public class TemplateFileType extends LanguageFileType {
 
     @Override
     public @NotNull String getDefaultExtension() {
-        return "forest";
+        return "ft";
     }
 
     @Override

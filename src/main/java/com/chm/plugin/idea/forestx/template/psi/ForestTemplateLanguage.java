@@ -7,6 +7,6 @@ public class ForestTemplateLanguage extends Language {
     public final static ForestTemplateLanguage INSTANCE = new ForestTemplateLanguage();
 
     protected ForestTemplateLanguage() {
-        super("Forest");
+        super("ForestTemplate");
     }
 }

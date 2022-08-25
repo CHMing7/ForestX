@@ -7,15 +7,31 @@ import com.intellij.psi.PsiElement;
 
 public class ForestTemplateVisitor extends PsiElementVisitor {
 
+  public void visitElBlock(@NotNull ForestTemplateElBlock o) {
+    visitPsiElement(o);
+  }
+
+  public void visitElExpress(@NotNull ForestTemplateElExpress o) {
+    visitPsiElement(o);
+  }
+
+  public void visitIdentity(@NotNull ForestTemplateIdentity o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNumber(@NotNull ForestTemplateNumber o) {
+    visitPsiElement(o);
+  }
+
   public void visitPropertyBlock(@NotNull ForestTemplatePropertyBlock o) {
     visitPsiElement(o);
   }
 
-  public void visitPropertyReference(@NotNull ForestTemplatePropertyReference o) {
+  public void visitPropertyExpress(@NotNull ForestTemplatePropertyExpress o) {
     visitPsiElement(o);
   }
 
-  public void visitPropertyReferencePart(@NotNull ForestTemplatePropertyReferencePart o) {
+  public void visitStringBlockContent(@NotNull ForestTemplateStringBlockContent o) {
     visitPsiElement(o);
   }
 

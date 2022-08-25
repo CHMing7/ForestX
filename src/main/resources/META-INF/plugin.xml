@@ -10,10 +10,14 @@
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.properties</depends>
+    <depends>org.jetbrains.plugins.yaml</depends>
     <!-- support aliases -->
     <depends optional="true" config-file="spring.xml">com.intellij.spring</depends>
     <!-- support aliases -->
     <depends optional="true" config-file="spring-boot.xml">com.intellij.spring.boot</depends>
+    <!-- support aliases -->
+
 
     <depends>com.intellij.java</depends>
 
@@ -32,7 +36,29 @@
 
         <postStartupActivity implementation="com.chm.plugin.idea.forestx.startup.MyStartupActivity"/>
 
-        <annotator language="JAVA" implementationClass="com.chm.plugin.idea.forestx.template.TemplateAnnotator"/>
+        <!-- Forest模板语言解析器定义 -->
+        <lang.parserDefinition language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.ForestTemplateParserDefinition"/>
+
+        <!-- Forest模板语言语法荧光笔工厂 -->
+        <lang.syntaxHighlighterFactory language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.ForestTemplateSyntaxHighLighterFactory"/>
+
+        <!-- Forest模板语言代码自动补全 -->
+        <completion.contributor language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.completion.ForestTemplateCompletionContributor"/>
+
+        <!-- Forest模板跳转到Yaml配置文件 -->
+        <gotoDeclarationHandler order="first" implementation="com.chm.plugin.idea.forestx.template.search.TemplateGotoYamlDeclarationHandler" />
+
+
+        <fileType
+                name="Forest Template File"
+                implementationClass="com.chm.plugin.idea.forestx.template.psi.ForestTemplateFileType"
+                fieldName="INSTANCE"
+                language="ForestTemplate"
+                extensions="ft"/>
+
+        <!-- 把Forest模板语言注入到Java源码中 -->
+        <multiHostInjector implementation="com.chm.plugin.idea.forestx.template.ForestTemplateToJavaInjector"/>
+
     </extensions>
 
 
