@@ -13,19 +13,35 @@
   tokenTypeClass="com.chm.plugin.idea.forestx.template.psi.ForestTemplateTokenType"
 }
 
+// 字符串模板 (文法总入口)
 StringTemplate ::= FT_DQ FT_JSTRING? StringBlockContent* FT_DQ
 
+// 字符串模板的代码块
 StringBlockContent ::= (PropertyBlock | ElBlock) FT_JSTRING?
 
+// 配置属性代码块
 PropertyBlock ::= PROP_BLOCK_BEGIN PropertyExpress PROP_BLOCK_END
 
+// 配置属性表达式
+PropertyExpress ::= PropertyPart (PROP_DOT PropertyPart)*
+
+// 配置属性的单个属性部分
+PropertyPart ::= PROP_NAME_PART (PropertyArrayReference)?
+
+// 配置属性的数组引用
+PropertyArrayReference ::= PROP_LBRACE PropertyArrayIndex PROP_RBRACE
+
+// 配置属性的数组下标
+PropertyArrayIndex ::= PROP_INT
+
+// EL表达式代码块
 ElBlock ::= EL_BLOCK_BEGIN ElExpress EL_BLOCK_END
 
+// EL表达式
 ElExpress ::= Identity | Number
 
+// EL中的数字
 Number ::= EL_INT | EL_DECIMAL
 
+// EL中的标识符
 Identity ::= EL_IDENTITY
-
-PropertyExpress ::= PROP_NAME_PART (PROP_DOT PROP_NAME_PART)*
-

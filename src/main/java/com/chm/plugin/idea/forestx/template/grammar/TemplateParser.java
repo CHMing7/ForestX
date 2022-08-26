@@ -87,6 +87,32 @@ public class TemplateParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // PROP_INT
+  public static boolean PropertyArrayIndex(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PropertyArrayIndex")) return false;
+    if (!nextTokenIs(b, PROP_INT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, PROP_INT);
+    exit_section_(b, m, PROPERTY_ARRAY_INDEX, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // PROP_LBRACE PropertyArrayIndex PROP_RBRACE
+  public static boolean PropertyArrayReference(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PropertyArrayReference")) return false;
+    if (!nextTokenIs(b, PROP_LBRACE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, PROP_LBRACE);
+    r = r && PropertyArrayIndex(b, l + 1);
+    r = r && consumeToken(b, PROP_RBRACE);
+    exit_section_(b, m, PROPERTY_ARRAY_REFERENCE, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // PROP_BLOCK_BEGIN PropertyExpress PROP_BLOCK_END
   public static boolean PropertyBlock(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "PropertyBlock")) return false;
@@ -101,19 +127,19 @@ public class TemplateParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // PROP_NAME_PART (PROP_DOT PROP_NAME_PART)*
+  // PropertyPart (PROP_DOT PropertyPart)*
   public static boolean PropertyExpress(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "PropertyExpress")) return false;
     if (!nextTokenIs(b, PROP_NAME_PART)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, PROP_NAME_PART);
+    r = PropertyPart(b, l + 1);
     r = r && PropertyExpress_1(b, l + 1);
     exit_section_(b, m, PROPERTY_EXPRESS, r);
     return r;
   }
 
-  // (PROP_DOT PROP_NAME_PART)*
+  // (PROP_DOT PropertyPart)*
   private static boolean PropertyExpress_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "PropertyExpress_1")) return false;
     while (true) {
@@ -124,12 +150,43 @@ public class TemplateParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // PROP_DOT PROP_NAME_PART
+  // PROP_DOT PropertyPart
   private static boolean PropertyExpress_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "PropertyExpress_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, PROP_DOT, PROP_NAME_PART);
+    r = consumeToken(b, PROP_DOT);
+    r = r && PropertyPart(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // PROP_NAME_PART (PropertyArrayReference)?
+  public static boolean PropertyPart(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PropertyPart")) return false;
+    if (!nextTokenIs(b, PROP_NAME_PART)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, PROP_NAME_PART);
+    r = r && PropertyPart_1(b, l + 1);
+    exit_section_(b, m, PROPERTY_PART, r);
+    return r;
+  }
+
+  // (PropertyArrayReference)?
+  private static boolean PropertyPart_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PropertyPart_1")) return false;
+    PropertyPart_1_0(b, l + 1);
+    return true;
+  }
+
+  // (PropertyArrayReference)
+  private static boolean PropertyPart_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "PropertyPart_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = PropertyArrayReference(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }

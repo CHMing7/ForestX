@@ -40,7 +40,7 @@
         <lang.parserDefinition language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.ForestTemplateParserDefinition"/>
 
         <!-- Forest模板语言语法荧光笔工厂 -->
-        <lang.syntaxHighlighterFactory language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.ForestTemplateSyntaxHighLighterFactory"/>
+        <lang.syntaxHighlighterFactory language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.highlighter.ForestTemplateSyntaxHighLighterFactory"/>
 
         <!-- Forest模板语言代码自动补全 -->
         <completion.contributor language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.completion.ForestTemplateCompletionContributor"/>

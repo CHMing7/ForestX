@@ -11,14 +11,14 @@ import static com.chm.plugin.idea.forestx.template.psi.TemplateTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.chm.plugin.idea.forestx.template.psi.*;
 
-public class ForestTemplatePropertyExpressImpl extends ASTWrapperPsiElement implements ForestTemplatePropertyExpress {
+public class ForestTemplatePropertyArrayReferenceImpl extends ASTWrapperPsiElement implements ForestTemplatePropertyArrayReference {
 
-  public ForestTemplatePropertyExpressImpl(@NotNull ASTNode node) {
+  public ForestTemplatePropertyArrayReferenceImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ForestTemplateVisitor visitor) {
-    visitor.visitPropertyExpress(this);
+    visitor.visitPropertyArrayReference(this);
   }
 
   @Override
@@ -29,8 +29,8 @@ public class ForestTemplatePropertyExpressImpl extends ASTWrapperPsiElement impl
 
   @Override
   @NotNull
-  public List<ForestTemplatePropertyPart> getPropertyPartList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ForestTemplatePropertyPart.class);
+  public ForestTemplatePropertyArrayIndex getPropertyArrayIndex() {
+    return findNotNullChildByClass(ForestTemplatePropertyArrayIndex.class);
   }
 
 }

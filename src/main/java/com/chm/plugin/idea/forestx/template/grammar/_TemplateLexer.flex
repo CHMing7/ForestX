@@ -57,7 +57,10 @@ PROPERTY_NAME_PART = {IDENTIFIER}+ (\- {IDENTIFIER}+)*
 <PROP_BLOCK> {
     "}"                                         { yybegin(STRING); return PROP_BLOCK_END; }
     "."                                         { return PROP_DOT; }
+    "["                                         { return PROP_LBRACE; }
+    "]"                                         { return PROP_RBRACE; }
     {PROPERTY_NAME_PART}                        { return PROP_NAME_PART; }
+    {INT}                                       { return PROP_INT; }
 }
 
 [^] { return BAD_CHARACTER; }

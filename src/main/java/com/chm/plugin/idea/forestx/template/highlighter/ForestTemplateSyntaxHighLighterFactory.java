@@ -1,4 +1,4 @@
-package com.chm.plugin.idea.forestx.template;
+package com.chm.plugin.idea.forestx.template.highlighter;
 
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;

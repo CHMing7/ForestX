@@ -1,10 +1,10 @@
 package com.chm.plugin.idea.forestx.template.search;
 
-import a.c.P;
-import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePropertyExpress;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePropertyPart;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.microservices.config.yaml.ConfigYamlAccessor;
+import com.intellij.microservices.config.yaml.ConfigYamlUtils;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -16,12 +16,9 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.spring.boot.SpringBootConfigFileConstants;
 import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
-import com.intellij.spring.boot.application.yaml.SpringBootApplicationYamlKeyCompletionContributor;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.YAMLFileType;
-import org.jetbrains.yaml.navigation.YAMLScalarKeyDeclarationSearcher;
 import org.jetbrains.yaml.psi.YAMLDocument;
-import org.jetbrains.yaml.psi.YAMLFile;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.impl.YAMLFileImpl;
 
@@ -55,11 +52,19 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
             List<YAMLDocument> documents = yamlFile.getDocuments();
             for (YAMLDocument document : documents) {
                 ConfigYamlAccessor accessor = new ConfigYamlAccessor(document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                YAMLKeyValue keyValue = accessor.findExistingKey(propertyKey);
-                if (keyValue == null) {
-                    continue;
+                List<YAMLKeyValue> allKeyValues = accessor.getAllKeys();
+                for (YAMLKeyValue keyValue : allKeyValues) {
+                    String keyName = ConfigYamlUtils.getQualifiedConfigKeyName(keyValue);
+                    if (keyName.equals(propertyKey)) {
+                        results.add(keyValue);
+                        break;
+                    }
                 }
-                results.add(keyValue);
+//                YAMLKeyValue keyValue = accessor.findExistingKey(propertyKey);
+//                if (keyValue == null) {
+//                    continue;
+//                }
+//                results.add(keyValue);
             }
         }
         return results.toArray(new PsiElement[0]);
@@ -71,7 +76,7 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
             return false;
         }
         PsiElement parent = element.getParent();
-        if (parent instanceof ForestTemplatePropertyExpress) {
+        if (parent instanceof ForestTemplatePropertyPart) {
             return true;
         }
         return false;

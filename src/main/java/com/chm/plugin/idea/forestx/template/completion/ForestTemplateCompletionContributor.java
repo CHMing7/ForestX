@@ -8,12 +8,14 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.CompletionType;
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.icons.AllIcons;
-import com.intellij.lang.properties.references.PropertiesCompletionContributor;
-import com.intellij.lang.properties.references.PropertiesPsiCompletionUtil;
-import com.intellij.microservices.config.yaml.ConfigYamlAccessor;
-import com.intellij.navigation.DirectNavigationProvider;
+import com.intellij.codeInsight.lookup.LookupElementPresentation;
+import com.intellij.codeInsight.lookup.LookupElementRenderer;
+import com.intellij.lang.properties.PropertiesHighlighter;
+import com.intellij.microservices.config.yaml.ConfigYamlUtils;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
@@ -23,36 +25,21 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.spring.boot.SpringBootConfigFileConstants;
-import com.intellij.spring.boot.application.config.SpringBootConfigFileHighlightingUtil;
-import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
-import com.intellij.spring.boot.application.metadata.additional.SpringBootAdditionalConfigUtils;
-import com.intellij.spring.boot.application.properties.SpringBootApplicationPropertiesReplacementTokenCompletionContributor;
-import com.intellij.spring.boot.application.yaml.SpringBootApplicationYamlIconProvider;
-import com.intellij.spring.boot.application.yaml.SpringBootApplicationYamlKeyCompletionContributor;
 import com.intellij.spring.boot.library.SpringBootLibraryUtil;
-import com.intellij.spring.el.completion.SpringELKeywordCompletionContributor;
-import com.intellij.spring.model.converters.SpringCompletionContributor;
+import com.intellij.util.PlatformIcons;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLFileType;
 import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
-import org.jetbrains.yaml.psi.YAMLValue;
 import org.jetbrains.yaml.psi.impl.YAMLFileImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Stack;
 
 public class ForestTemplateCompletionContributor extends CompletionContributor {
 
@@ -76,10 +63,8 @@ public class ForestTemplateCompletionContributor extends CompletionContributor {
                         }
                         PsiElement element = parameters.getPosition();
                         String propPrefix = ForestTemplateUtil.getPropertyPrefix(element, false);
-                        System.out.println("解析Property Prefix: " + propPrefix);
                         if (SpringBootLibraryUtil.hasSpringBootLibrary(module)) {
                             Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project));
-
                             for (VirtualFile yamlVirtualFile : virtualFiles) {
                                 String[] paths = yamlVirtualFile.getName().split("[\\\\/]");
                                 String fileName = paths[paths.length - 1];
@@ -92,46 +77,15 @@ public class ForestTemplateCompletionContributor extends CompletionContributor {
                                 }
                                 YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
                                 List<YAMLDocument> documents = yamlFile.getDocuments();
-                                List<String> keyList = new ArrayList<>();
-                                Map<String, YAMLKeyValue> keyValueMap = new HashMap<>();
-                                String[] propKeyPaths = propPrefix.split("\\.");
+                                List<SearchedYAMLKeyValue> keyValueList = new ArrayList<>();
                                 for (YAMLDocument document : documents) {
-                                    ConfigYamlAccessor accessor = new ConfigYamlAccessor(document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                                    List<YAMLKeyValue> allKeyValues = accessor.getAllKeys();
-                                    for (YAMLKeyValue keyValue : allKeyValues) {
-                                        keyValueMap.put(keyValue.getKeyText(), keyValue);
-                                    }
-                                    YAMLKeyValue keyValue = null;
-                                    for (int depth = 0; depth < propKeyPaths.length; depth++) {
-                                        String path = propKeyPaths[depth];
-                                        keyValue = keyValueMap.get(path);
-                                        if (keyValue != null) {
-                                            YAMLValue value = keyValue.getValue();
-                                            keyValueMap = new HashMap<>();
-                                            PsiElement[] children = Objects.requireNonNull(value).getChildren();
-                                            if (children.length > 0) {
-                                                for (PsiElement child : children) {
-                                                    if (child instanceof YAMLKeyValue) {
-                                                        YAMLKeyValue childKeyValue = (YAMLKeyValue) child;
-                                                        keyValueMap.put(childKeyValue.getKeyText(), childKeyValue);
-                                                        if (depth == propKeyPaths.length - 1) {
-                                                            for (PsiElement completionKeyValue : Objects.requireNonNull(keyValue.getValue()).getChildren()) {
-                                                                keyList.add(((YAMLKeyValue) completionKeyValue).getKeyText());
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            break;
-                                        }
-                                    }
-
+                                    List<SearchedYAMLKeyValue> docKeyValues =
+                                            SearchedYAMLKeyValue.searchRelatedKeyValues(document, propPrefix);
+                                    keyValueList.addAll(docKeyValues);
                                 }
-
-                                for (String key : keyList) {
+                                for (SearchedYAMLKeyValue key : keyValueList) {
                                     resultSet.addElement(LookupElementBuilder.create(key)
-                                            .withIcon(AllIcons.Nodes.Property));
+                                                    .withRenderer(SearchedYAMLKeyValue.YAML_KEY_VALUE_RENDER));
                                 }
                             }
 
@@ -140,6 +94,5 @@ public class ForestTemplateCompletionContributor extends CompletionContributor {
                 }
         );
     }
-
 
 }
