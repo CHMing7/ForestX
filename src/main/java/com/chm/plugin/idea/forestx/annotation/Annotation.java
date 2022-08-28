@@ -7,9 +7,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.jgoodies.common.base.Strings;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -116,6 +118,7 @@ public class Annotation implements Cloneable {
      */
     public static final Annotation TRACE_REQUEST = new Annotation("@TraceRequest", "com.dtflys.forest.annotation.TraceRequest");
 
+
     /**
      * The constant TRACE_REQUEST
      */
@@ -160,8 +163,30 @@ public class Annotation implements Cloneable {
 
 
     public static boolean isForestAnnotation(String qualifiedName) {
-        return FOREST_ANNOTATION_CLASSES.contains(qualifiedName);
+        if (Strings.isEmpty(qualifiedName)) {
+            return false;
+        }
+        if (qualifiedName.startsWith("com.dtflys.forest")) {
+            return true;
+        }
+        try {
+            Class annotationClass = Class.forName(qualifiedName);
+            java.lang.annotation.Annotation[] parentAnnotationClass = annotationClass.getAnnotations();
+            for (java.lang.annotation.Annotation annClass : parentAnnotationClass) {
+                final String className = annClass.annotationType().getName();
+                if (className.equals("com.dtflys.forest.annotation.MethodLifeCycle") ||
+                        className.equals("com.dtflys.forest.annotation.ParamLifeCycle") ||
+                        className.equals("com.dtflys.forest.annotation.BaseLifeCycle")) {
+                    return true;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
     }
+
+
 
     /**
      * Instantiates a new Annotation.

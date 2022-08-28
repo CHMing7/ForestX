@@ -25,6 +25,7 @@ import org.jetbrains.yaml.psi.impl.YAMLBlockSequenceImpl;
 import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -126,12 +127,14 @@ public class SearchedYAMLKeyValue {
             } else if (rootValue instanceof YAMLBlockSequenceImpl) {
                 YAMLBlockSequenceImpl sequenceValue = (YAMLBlockSequenceImpl) rootValue;
                 System.out.println(sequenceValue.getTextValue());
-                int i = 0;
                 for (YAMLSequenceItem item : sequenceValue.getItems()) {
+                    if (!(item.getValue() instanceof YAMLPlainTextImpl)) {
+                        continue;
+                    }
                     String keyName = YAMLUtil.getConfigFullName(item);
                     String insertion = keyName;
                     if (StringUtils.isNotEmpty(prefix)) {
-                        if (keyName.startsWith(prefix)) {
+                        if (keyName.startsWith(prefix) && keyName.length() > prefix.length()) {
                             insertion = keyName.substring(prefix.length() + 1);
                         } else {
                             continue;
@@ -140,6 +143,9 @@ public class SearchedYAMLKeyValue {
                     results.add(new SearchedYAMLKeyValue(insertion, item));
                 }
             }
+        }
+        if (results.size() > 1) {
+            results.sort(Comparator.comparing(SearchedYAMLKeyValue::getInsertion));
         }
         return results;
     }
