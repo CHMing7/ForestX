@@ -27,10 +27,10 @@ import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class SearchedYAMLKeyValue {
 
-    private final static String[] NAMES = new String[] {"a", "b", "c"};
     public final static LookupElementRenderer<LookupElement> YAML_KEY_VALUE_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
@@ -67,6 +67,11 @@ public class SearchedYAMLKeyValue {
                 break;
             }
         }
+
+        if (keysValues.size() == 0) {
+            return Objects.requireNonNull(item.getValue()).getText();
+        }
+
         String result = StringUtil.join(
                 keysValues, (keyValue) ->
                 keyValue.getKeyText() + ": " + ConfigYamlUtils.getValuePresentationText(keyValue), ", ") +
@@ -132,7 +137,7 @@ public class SearchedYAMLKeyValue {
                             continue;
                         }
                     }
-                    results.add(new SearchedYAMLKeyValue(insertion, sequenceValue));
+                    results.add(new SearchedYAMLKeyValue(insertion, item));
                 }
             }
         }
