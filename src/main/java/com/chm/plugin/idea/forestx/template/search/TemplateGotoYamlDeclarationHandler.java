@@ -18,16 +18,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.spring.boot.SpringBootConfigFileConstants;
 import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.yaml.YAMLFileType;
 import org.jetbrains.yaml.YAMLUtil;
 import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
-import org.jetbrains.yaml.psi.YAMLPsiElement;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 import org.jetbrains.yaml.psi.YAMLValue;
 import org.jetbrains.yaml.psi.impl.YAMLBlockSequenceImpl;
@@ -81,7 +77,8 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
             } else if (psiFile instanceof PropertiesFileImpl) {
                 PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
                 for (IProperty property : propertiesFile.getProperties()) {
-                    if (property.getKey().equals(propertyKey)) {
+                    String key = property.getKey();
+                    if (StringUtils.isNotEmpty(key) && key.equals(propertyKey)) {
                         results.add(property.getPsiElement());
                     }
                 }
@@ -97,7 +94,7 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
             if (itemValue instanceof YAMLPlainTextImpl) {
                 String keyName = YAMLUtil.getConfigFullName(item);
                 if (keyName.equals(propertyKey)) {
-                    results.add(itemValue);
+                    results.add(item);
                     return;
                 }
             }
