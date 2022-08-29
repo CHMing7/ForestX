@@ -23,16 +23,8 @@ public class ForestTemplateSyntaxHighLighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey PROP_BLOCKS =
             createTextAttributesKey("PROP_BLOCKS", DefaultLanguageHighlighterColors.KEYWORD);
 
-    public static final TextAttributesKey PROP_NAME_PART =
-            createTextAttributesKey("PROP_NAME_PART", DefaultLanguageHighlighterColors.CONSTANT);
-
-    public static final TextAttributesKey PROP_BRACES =
-            createTextAttributesKey("PROP_BRACES", DefaultLanguageHighlighterColors.BRACES);
-
-    public static final TextAttributesKey PROP_NUMBER =
-            createTextAttributesKey("PROP_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
-    public static final TextAttributesKey PROP_DOT =
-            createTextAttributesKey("PROP_DOT", DefaultLanguageHighlighterColors.DOT);
+    public static final TextAttributesKey PROP_REFERENCE =
+            createTextAttributesKey("PROP_REFERENCE", DefaultLanguageHighlighterColors.CONSTANT);
 
     public static final TextAttributesKey EL_BLOCK_BEGIN =
             createTextAttributesKey("EL_BLOCK_BEGIN", DefaultLanguageHighlighterColors.KEYWORD);
@@ -44,12 +36,8 @@ public class ForestTemplateSyntaxHighLighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] JAVA_STRING_DQ_KEYS = new TextAttributesKey[]{JAVA_STRING_DQ};
     private static final TextAttributesKey[] JAVA_STRING_KEYS = new TextAttributesKey[]{JAVA_STRING};
     private static final TextAttributesKey[] PROP_BLOCK_KEYS = new TextAttributesKey[]{PROP_BLOCKS};
-    private static final TextAttributesKey[] PROP_NAME_PART_KEYS = new TextAttributesKey[]{PROP_NAME_PART};
 
-    private static final TextAttributesKey[] PROP_BRACES_KEYS = new TextAttributesKey[]{PROP_BRACES};
-
-    private static final TextAttributesKey[] PROP_NUMBER_KEYS = new TextAttributesKey[]{PROP_NUMBER};
-    private static final TextAttributesKey[] PROP_DOT_KEYS = new TextAttributesKey[]{PROP_DOT};
+    private static final TextAttributesKey[] PROP_REFERENCE_KEYS = new TextAttributesKey[]{PROP_REFERENCE};
     private static final TextAttributesKey[] EL_BLOCK_BEGIN_KEYS = new TextAttributesKey[]{EL_BLOCK_BEGIN};
     private static final TextAttributesKey[] EL_BLOCK_END_KEYS = new TextAttributesKey[]{EL_BLOCK_END};
 
@@ -73,17 +61,8 @@ public class ForestTemplateSyntaxHighLighter extends SyntaxHighlighterBase {
         if (tokenType.equals(TemplateTypes.PROP_BLOCK_BEGIN) || tokenType.equals(TemplateTypes.PROP_BLOCK_END)) {
             return PROP_BLOCK_KEYS;
         }
-        if (tokenType.equals(TemplateTypes.PROP_NAME_PART)) {
-            return PROP_NAME_PART_KEYS;
-        }
-        if (tokenType.equals(TemplateTypes.PROP_LBRACE) || tokenType.equals(TemplateTypes.PROP_RBRACE)) {
-            return PROP_BRACES_KEYS;
-        }
-        if (tokenType.equals(TemplateTypes.PROP_INT)) {
-            return PROP_NUMBER_KEYS;
-        }
-        if (tokenType.equals(TemplateTypes.PROP_DOT)) {
-            return PROP_DOT_KEYS;
+        if (tokenType.equals(TemplateTypes.PROP_REFERENCE)) {
+            return PROP_REFERENCE_KEYS;
         }
         if (tokenType.equals(TemplateTypes.EL_BLOCK_BEGIN)) {
             return EL_BLOCK_BEGIN_KEYS;

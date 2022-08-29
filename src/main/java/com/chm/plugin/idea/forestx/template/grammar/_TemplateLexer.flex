@@ -36,10 +36,14 @@ BLOCK_END = "}"
 ZERO = 0
 DIGIT = [0-9]
 NON_ZERO_DIGIT = [1-9]
+LBRACE = "["
+RBRACE = "]"
+DOT = "."
 INT = {ZERO} | {NON_ZERO_DIGIT} {DIGIT}*
-DECIMAL = {INT} "." {DIGIT}+
+DECIMAL = {INT} {DOT} {DIGIT}+
 IDENTIFIER = {CHARACTER}+ {DIGIT}*
-PROPERTY_NAME_PART = {IDENTIFIER}+ (\- {IDENTIFIER}+)*
+PROPERTY_NAME_PART = {IDENTIFIER}+ (\- {IDENTIFIER}+)* ({LBRACE} {INT} {RBRACE})?
+PROPERTY_REFERENCE = {PROPERTY_NAME_PART} ({DOT} {PROPERTY_NAME_PART})*
 
 %%
 <YYINITIAL, STRING> "\""                        { yybegin(STRING); return FT_DQ; }
@@ -56,11 +60,7 @@ PROPERTY_NAME_PART = {IDENTIFIER}+ (\- {IDENTIFIER}+)*
 }
 <PROP_BLOCK> {
     "}"                                         { yybegin(STRING); return PROP_BLOCK_END; }
-    "."                                         { return PROP_DOT; }
-    "["                                         { return PROP_LBRACE; }
-    "]"                                         { return PROP_RBRACE; }
-    {PROPERTY_NAME_PART}                        { return PROP_NAME_PART; }
-    {INT}                                       { return PROP_INT; }
+    {PROPERTY_REFERENCE}                        { return PROP_REFERENCE; }
 }
 
 [^] { return BAD_CHARACTER; }

@@ -20,19 +20,8 @@ StringTemplate ::= FT_DQ FT_JSTRING? StringBlockContent* FT_DQ
 StringBlockContent ::= (PropertyBlock | ElBlock) FT_JSTRING?
 
 // 配置属性代码块
-PropertyBlock ::= PROP_BLOCK_BEGIN PropertyExpress PROP_BLOCK_END
+PropertyBlock ::= PROP_BLOCK_BEGIN PROP_REFERENCE PROP_BLOCK_END
 
-// 配置属性表达式
-PropertyExpress ::= PropertyPart (PROP_DOT PropertyPart)*
-
-// 配置属性的单个属性部分
-PropertyPart ::= PROP_NAME_PART (PropertyArrayReference)?
-
-// 配置属性的数组引用
-PropertyArrayReference ::= PROP_LBRACE PropertyArrayIndex PROP_RBRACE
-
-// 配置属性的数组下标
-PropertyArrayIndex ::= PROP_INT
 
 // EL表达式代码块
 ElBlock ::= EL_BLOCK_BEGIN ElExpress EL_BLOCK_END

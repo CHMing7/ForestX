@@ -9,23 +9,14 @@ import com.intellij.microservices.config.yaml.ConfigYamlUtils;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
 import com.intellij.util.PlatformIcons;
 import com.intellij.util.SmartList;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLUtil;
-import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLPsiElement;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
-import org.jetbrains.yaml.psi.YAMLValue;
-import org.jetbrains.yaml.psi.impl.YAMLBlockSequenceImpl;
-import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -101,53 +92,6 @@ public class SearchedYAMLKeyValue {
     @Override
     public String toString() {
         return insertion;
-    }
-
-    public static List<SearchedYAMLKeyValue> searchRelatedKeyValues(YAMLDocument document, String prefix) {
-        List<SearchedYAMLKeyValue> results = new ArrayList<>();
-        ConfigYamlAccessor accessor = new ConfigYamlAccessor(
-                document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-        List<YAMLKeyValue> rootKeyValues = accessor.getAllKeys();
-        for (YAMLKeyValue rootKeyValue : rootKeyValues) {
-            YAMLValue rootValue = rootKeyValue.getValue();
-            if (rootValue == null) {
-                continue;
-            }
-            if (rootValue instanceof YAMLPlainTextImpl) {
-                String keyName = YAMLUtil.getConfigFullName(rootKeyValue);
-                String insertion = keyName;
-                if (StringUtils.isNotEmpty(prefix)) {
-                    if (keyName.startsWith(prefix)) {
-                        insertion = keyName.substring(prefix.length() + 1);
-                    } else {
-                        continue;
-                    }
-                }
-                results.add(new SearchedYAMLKeyValue(insertion, rootKeyValue));
-            } else if (rootValue instanceof YAMLBlockSequenceImpl) {
-                YAMLBlockSequenceImpl sequenceValue = (YAMLBlockSequenceImpl) rootValue;
-                System.out.println(sequenceValue.getTextValue());
-                for (YAMLSequenceItem item : sequenceValue.getItems()) {
-                    if (!(item.getValue() instanceof YAMLPlainTextImpl)) {
-                        continue;
-                    }
-                    String keyName = YAMLUtil.getConfigFullName(item);
-                    String insertion = keyName;
-                    if (StringUtils.isNotEmpty(prefix)) {
-                        if (keyName.startsWith(prefix) && keyName.length() > prefix.length()) {
-                            insertion = keyName.substring(prefix.length() + 1);
-                        } else {
-                            continue;
-                        }
-                    }
-                    results.add(new SearchedYAMLKeyValue(insertion, item));
-                }
-            }
-        }
-        if (results.size() > 1) {
-            results.sort(Comparator.comparing(SearchedYAMLKeyValue::getInsertion));
-        }
-        return results;
     }
 
 

@@ -27,10 +27,4 @@ public class ForestTemplatePropertyBlockImpl extends ASTWrapperPsiElement implem
     else super.accept(visitor);
   }
 
-  @Override
-  @NotNull
-  public ForestTemplatePropertyExpress getPropertyExpress() {
-    return findNotNullChildByClass(ForestTemplatePropertyExpress.class);
-  }
-
 }

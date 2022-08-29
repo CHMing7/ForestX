@@ -12,11 +12,7 @@ public interface TemplateTypes {
   IElementType EL_EXPRESS = new ForestTemplateElementType("EL_EXPRESS");
   IElementType IDENTITY = new ForestTemplateElementType("IDENTITY");
   IElementType NUMBER = new ForestTemplateElementType("NUMBER");
-  IElementType PROPERTY_ARRAY_INDEX = new ForestTemplateElementType("PROPERTY_ARRAY_INDEX");
-  IElementType PROPERTY_ARRAY_REFERENCE = new ForestTemplateElementType("PROPERTY_ARRAY_REFERENCE");
   IElementType PROPERTY_BLOCK = new ForestTemplateElementType("PROPERTY_BLOCK");
-  IElementType PROPERTY_EXPRESS = new ForestTemplateElementType("PROPERTY_EXPRESS");
-  IElementType PROPERTY_PART = new ForestTemplateElementType("PROPERTY_PART");
   IElementType STRING_BLOCK_CONTENT = new ForestTemplateElementType("STRING_BLOCK_CONTENT");
 
   IElementType EL_BLOCK_BEGIN = new ForestTemplateTokenType("EL_BLOCK_BEGIN");
@@ -28,11 +24,7 @@ public interface TemplateTypes {
   IElementType FT_JSTRING = new ForestTemplateTokenType("FT_JSTRING");
   IElementType PROP_BLOCK_BEGIN = new ForestTemplateTokenType("PROP_BLOCK_BEGIN");
   IElementType PROP_BLOCK_END = new ForestTemplateTokenType("PROP_BLOCK_END");
-  IElementType PROP_DOT = new ForestTemplateTokenType("PROP_DOT");
-  IElementType PROP_INT = new ForestTemplateTokenType("PROP_INT");
-  IElementType PROP_LBRACE = new ForestTemplateTokenType("PROP_LBRACE");
-  IElementType PROP_NAME_PART = new ForestTemplateTokenType("PROP_NAME_PART");
-  IElementType PROP_RBRACE = new ForestTemplateTokenType("PROP_RBRACE");
+  IElementType PROP_REFERENCE = new ForestTemplateTokenType("PROP_REFERENCE");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
@@ -49,20 +41,8 @@ public interface TemplateTypes {
       else if (type == NUMBER) {
         return new ForestTemplateNumberImpl(node);
       }
-      else if (type == PROPERTY_ARRAY_INDEX) {
-        return new ForestTemplatePropertyArrayIndexImpl(node);
-      }
-      else if (type == PROPERTY_ARRAY_REFERENCE) {
-        return new ForestTemplatePropertyArrayReferenceImpl(node);
-      }
       else if (type == PROPERTY_BLOCK) {
         return new ForestTemplatePropertyBlockImpl(node);
-      }
-      else if (type == PROPERTY_EXPRESS) {
-        return new ForestTemplatePropertyExpressImpl(node);
-      }
-      else if (type == PROPERTY_PART) {
-        return new ForestTemplatePropertyPartImpl(node);
       }
       else if (type == STRING_BLOCK_CONTENT) {
         return new ForestTemplateStringBlockContentImpl(node);

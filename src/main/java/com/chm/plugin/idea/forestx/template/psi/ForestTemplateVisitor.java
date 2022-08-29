@@ -23,23 +23,7 @@ public class ForestTemplateVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitPropertyArrayIndex(@NotNull ForestTemplatePropertyArrayIndex o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPropertyArrayReference(@NotNull ForestTemplatePropertyArrayReference o) {
-    visitPsiElement(o);
-  }
-
   public void visitPropertyBlock(@NotNull ForestTemplatePropertyBlock o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPropertyExpress(@NotNull ForestTemplatePropertyExpress o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPropertyPart(@NotNull ForestTemplatePropertyPart o) {
     visitPsiElement(o);
   }
 
