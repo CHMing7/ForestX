@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ForestTemplateElExpress extends PsiElement {
+public interface ForestTemplateArgumentList extends PsiElement {
 
   @NotNull
-  ForestTemplatePathExpress getPathExpress();
+  List<ForestTemplateArgumentListElement> getArgumentListElementList();
 
 }

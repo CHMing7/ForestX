@@ -11,14 +11,14 @@ import static com.chm.plugin.idea.forestx.template.psi.TemplateTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.chm.plugin.idea.forestx.template.psi.*;
 
-public class ForestTemplateElExpressImpl extends ASTWrapperPsiElement implements ForestTemplateElExpress {
+public class ForestTemplateArgumentsImpl extends ASTWrapperPsiElement implements ForestTemplateArguments {
 
-  public ForestTemplateElExpressImpl(@NotNull ASTNode node) {
+  public ForestTemplateArgumentsImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ForestTemplateVisitor visitor) {
-    visitor.visitElExpress(this);
+    visitor.visitArguments(this);
   }
 
   @Override
@@ -28,9 +28,9 @@ public class ForestTemplateElExpressImpl extends ASTWrapperPsiElement implements
   }
 
   @Override
-  @NotNull
-  public ForestTemplatePathExpress getPathExpress() {
-    return findNotNullChildByClass(ForestTemplatePathExpress.class);
+  @Nullable
+  public ForestTemplateArgumentList getArgumentList() {
+    return findChildByClass(ForestTemplateArgumentList.class);
   }
 
 }

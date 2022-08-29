@@ -7,6 +7,22 @@ import com.intellij.psi.PsiElement;
 
 public class ForestTemplateVisitor extends PsiElementVisitor {
 
+  public void visitArgumentList(@NotNull ForestTemplateArgumentList o) {
+    visitPsiElement(o);
+  }
+
+  public void visitArgumentListElement(@NotNull ForestTemplateArgumentListElement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitArguments(@NotNull ForestTemplateArguments o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDecimal(@NotNull ForestTemplateDecimal o) {
+    visitPsiElement(o);
+  }
+
   public void visitElBlock(@NotNull ForestTemplateElBlock o) {
     visitPsiElement(o);
   }
@@ -19,7 +35,23 @@ public class ForestTemplateVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitNumber(@NotNull ForestTemplateNumber o) {
+  public void visitInteger(@NotNull ForestTemplateInteger o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNamePart(@NotNull ForestTemplateNamePart o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPathElement(@NotNull ForestTemplatePathElement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPathExpress(@NotNull ForestTemplatePathExpress o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPrimary(@NotNull ForestTemplatePrimary o) {
     visitPsiElement(o);
   }
 

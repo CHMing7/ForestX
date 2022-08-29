@@ -27,10 +27,34 @@ PropertyBlock ::= PROP_BLOCK_BEGIN PROP_REFERENCE PROP_BLOCK_END
 ElBlock ::= EL_BLOCK_BEGIN ElExpress EL_BLOCK_END
 
 // EL表达式
-ElExpress ::= Identity | Number
+ElExpress ::= PathExpress
 
-// EL中的数字
-Number ::= EL_INT | EL_DECIMAL
+// 链路表达式
+PathExpress ::= Primary (PathElement)*
+
+// 链路元素: 点、名字、参数
+PathElement ::= EL_DOT NamePart | Arguments
+
+// 名字部分
+NamePart ::= Identity
+
+// 参数
+Arguments ::= EL_LPAREN ArgumentList? EL_RPAREN
+
+// 参数列表
+ArgumentList ::= ArgumentListElement (EL_COMMA ArgumentListElement)?
+
+// 参数列表元素
+ArgumentListElement ::= ElExpress
+
+// 基本计算要素
+Primary ::= Identity | Integer | Decimal
+
+// 整数
+Integer ::= EL_INT
+
+// 数值
+Decimal ::= EL_DECIMAL
 
 // EL中的标识符
 Identity ::= EL_IDENTITY
