@@ -135,14 +135,14 @@ public class TemplateParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EL_IDENTITY
-  public static boolean Identity(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Identity")) return false;
-    if (!nextTokenIs(b, EL_IDENTITY)) return false;
+  // EL_IDENTIFIER
+  public static boolean Identifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Identifier")) return false;
+    if (!nextTokenIs(b, EL_IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, EL_IDENTITY);
-    exit_section_(b, m, IDENTITY, r);
+    r = consumeToken(b, EL_IDENTIFIER);
+    exit_section_(b, m, IDENTIFIER, r);
     return r;
   }
 
@@ -159,13 +159,13 @@ public class TemplateParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Identity
+  // Identifier
   public static boolean NamePart(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "NamePart")) return false;
-    if (!nextTokenIs(b, EL_IDENTITY)) return false;
+    if (!nextTokenIs(b, EL_IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = Identity(b, l + 1);
+    r = Identifier(b, l + 1);
     exit_section_(b, m, NAME_PART, r);
     return r;
   }
@@ -228,12 +228,12 @@ public class TemplateParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Identity | Integer | Decimal
+  // Identifier | Integer | Decimal
   public static boolean Primary(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Primary")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PRIMARY, "<primary>");
-    r = Identity(b, l + 1);
+    r = Identifier(b, l + 1);
     if (!r) r = Integer(b, l + 1);
     if (!r) r = Decimal(b, l + 1);
     exit_section_(b, l, m, r, false, null);

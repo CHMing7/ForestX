@@ -524,7 +524,7 @@ public class _TemplateLexer implements FlexLexer {
             // fall through
           case 22: break;
           case 7: 
-            { return EL_IDENTITY;
+            { return EL_IDENTIFIER;
             } 
             // fall through
           case 23: break;

@@ -32,6 +32,19 @@ public class ForestTemplateSyntaxHighLighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey EL_BLOCK_END =
             createTextAttributesKey("EL_BLOCK_END", DefaultLanguageHighlighterColors.KEYWORD);
 
+    public static final TextAttributesKey EL_IDENTIFIER =
+            createTextAttributesKey("EL_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER);
+
+    public static final TextAttributesKey EL_NUMBER =
+            createTextAttributesKey("EL_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
+
+    public static final TextAttributesKey EL_DOT =
+            createTextAttributesKey("EL_DOT", DefaultLanguageHighlighterColors.DOT);
+
+    public static final TextAttributesKey EL_PARENS =
+            createTextAttributesKey("EL_PARENS", DefaultLanguageHighlighterColors.PARENTHESES);
+
+
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] JAVA_STRING_DQ_KEYS = new TextAttributesKey[]{JAVA_STRING_DQ};
     private static final TextAttributesKey[] JAVA_STRING_KEYS = new TextAttributesKey[]{JAVA_STRING};
@@ -41,6 +54,13 @@ public class ForestTemplateSyntaxHighLighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] EL_BLOCK_BEGIN_KEYS = new TextAttributesKey[]{EL_BLOCK_BEGIN};
     private static final TextAttributesKey[] EL_BLOCK_END_KEYS = new TextAttributesKey[]{EL_BLOCK_END};
 
+    private static final TextAttributesKey[] EL_IDENTIFIER_KEYS = new TextAttributesKey[]{EL_IDENTIFIER};
+
+    private static final TextAttributesKey[] EL_NUMBER_KEYS = new TextAttributesKey[]{EL_NUMBER};
+
+    private static final TextAttributesKey[] EL_DOT_KEYS = new TextAttributesKey[]{EL_DOT};
+
+    private static final TextAttributesKey[] EL_PARENS_KEYS = new TextAttributesKey[]{EL_PARENS};
 
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
@@ -69,6 +89,18 @@ public class ForestTemplateSyntaxHighLighter extends SyntaxHighlighterBase {
         }
         if (tokenType.equals(TemplateTypes.EL_BLOCK_END)) {
             return EL_BLOCK_END_KEYS;
+        }
+        if (tokenType.equals(TemplateTypes.EL_IDENTIFIER)) {
+            return EL_IDENTIFIER_KEYS;
+        }
+        if (tokenType.equals(TemplateTypes.EL_INT) || tokenType.equals(TemplateTypes.EL_DECIMAL)) {
+            return EL_NUMBER_KEYS;
+        }
+        if (tokenType.equals(TemplateTypes.EL_DOT)) {
+            return EL_DOT_KEYS;
+        }
+        if (tokenType.equals(TemplateTypes.EL_LPAREN) || tokenType.equals(TemplateTypes.EL_RPAREN)) {
+            return EL_PARENS_KEYS;
         }
         return EMPTY_KEYS;
     }

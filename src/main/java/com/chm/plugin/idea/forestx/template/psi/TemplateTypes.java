@@ -14,7 +14,7 @@ public interface TemplateTypes {
   IElementType DECIMAL = new ForestTemplateElementType("DECIMAL");
   IElementType EL_BLOCK = new ForestTemplateElementType("EL_BLOCK");
   IElementType EL_EXPRESS = new ForestTemplateElementType("EL_EXPRESS");
-  IElementType IDENTITY = new ForestTemplateElementType("IDENTITY");
+  IElementType IDENTIFIER = new ForestTemplateElementType("IDENTIFIER");
   IElementType INTEGER = new ForestTemplateElementType("INTEGER");
   IElementType NAME_PART = new ForestTemplateElementType("NAME_PART");
   IElementType PATH_ELEMENT = new ForestTemplateElementType("PATH_ELEMENT");
@@ -28,7 +28,7 @@ public interface TemplateTypes {
   IElementType EL_COMMA = new ForestTemplateTokenType("EL_COMMA");
   IElementType EL_DECIMAL = new ForestTemplateTokenType("EL_DECIMAL");
   IElementType EL_DOT = new ForestTemplateTokenType("EL_DOT");
-  IElementType EL_IDENTITY = new ForestTemplateTokenType("EL_IDENTITY");
+  IElementType EL_IDENTIFIER = new ForestTemplateTokenType("EL_IDENTIFIER");
   IElementType EL_INT = new ForestTemplateTokenType("EL_INT");
   IElementType EL_LPAREN = new ForestTemplateTokenType("EL_LPAREN");
   IElementType EL_RPAREN = new ForestTemplateTokenType("EL_RPAREN");
@@ -59,8 +59,8 @@ public interface TemplateTypes {
       else if (type == EL_EXPRESS) {
         return new ForestTemplateElExpressImpl(node);
       }
-      else if (type == IDENTITY) {
-        return new ForestTemplateIdentityImpl(node);
+      else if (type == IDENTIFIER) {
+        return new ForestTemplateIdentifierImpl(node);
       }
       else if (type == INTEGER) {
         return new ForestTemplateIntegerImpl(node);

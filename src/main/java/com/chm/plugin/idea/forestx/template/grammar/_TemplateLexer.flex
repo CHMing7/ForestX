@@ -58,7 +58,7 @@ PROPERTY_REFERENCE = {PROPERTY_NAME_PART} ({DOT} {PROPERTY_NAME_PART})*
     "("                                         { return EL_LPAREN; }
     ")"                                         { return EL_RPAREN; }
     {DOT}                                       { return EL_DOT; }
-    {IDENTIFIER}                                { return EL_IDENTITY; }
+    {IDENTIFIER}                                { return EL_IDENTIFIER; }
     {INT}                                       { return EL_INT; }
     {DECIMAL}                                   { return EL_DECIMAL; }
 }

@@ -1,10 +1,10 @@
 package com.chm.plugin.idea.forestx.template.completion;
 
+import com.chm.plugin.idea.forestx.template.utils.SearchedConfigItem;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
 import com.intellij.lang.properties.PropertiesHighlighter;
-import com.intellij.microservices.config.yaml.ConfigYamlAccessor;
 import com.intellij.microservices.config.yaml.ConfigYamlUtils;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.markup.TextAttributes;
@@ -21,17 +21,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-public class SearchedYAMLKeyValue {
+public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElement> {
 
-    public final static LookupElementRenderer<LookupElement> YAML_KEY_VALUE_RENDER = new LookupElementRenderer<LookupElement>() {
+    public final static LookupElementRenderer<LookupElement> YAML_KEY_VALUE_CONFIG_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            SearchedYAMLKeyValue searchedYAMLKeyValue = (SearchedYAMLKeyValue) element.getObject();
+            SearchedConfigYAMLKeyValue searchedYAMLKeyValue = (SearchedConfigYAMLKeyValue) element.getObject();
             YAMLPsiElement elem = searchedYAMLKeyValue.getElement();
             presentation.setIcon(PlatformIcons.PROPERTY_ICON);
             String value = null;
             TextAttributes attrs = EditorColorsManager.getInstance().getGlobalScheme().getAttributes(PropertiesHighlighter.PROPERTY_VALUE);
-            presentation.setItemText(YAMLUtil.getConfigFullName(elem));
+            presentation.setItemText(searchedYAMLKeyValue.getItemText());
             if (elem instanceof YAMLKeyValue) {
                 YAMLKeyValue yamlKeyValue = (YAMLKeyValue) elem;
                 value = ConfigYamlUtils.getValuePresentationText(yamlKeyValue);
@@ -71,28 +71,15 @@ public class SearchedYAMLKeyValue {
         return result;
     }
 
-
-    private final String insertion;
-
-    private final YAMLPsiElement element;
-
-    public SearchedYAMLKeyValue(String insertion, YAMLPsiElement element) {
-        this.insertion = insertion;
-        this.element = element;
-    }
-
-    public String getInsertion() {
-        return insertion;
-    }
-
-    public YAMLPsiElement getElement() {
-        return element;
+    public SearchedConfigYAMLKeyValue(String insertion, YAMLPsiElement element, boolean isEL) {
+        super(insertion, element, isEL);
     }
 
     @Override
-    public String toString() {
-        return insertion;
+    public String getItemText() {
+        if (isEL) {
+            return insertion;
+        }
+        return YAMLUtil.getConfigFullName(element);
     }
-
-
 }

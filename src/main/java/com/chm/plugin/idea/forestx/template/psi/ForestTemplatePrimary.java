@@ -11,7 +11,7 @@ public interface ForestTemplatePrimary extends PsiElement {
   ForestTemplateDecimal getDecimal();
 
   @Nullable
-  ForestTemplateIdentity getIdentity();
+  ForestTemplateIdentifier getIdentifier();
 
   @Nullable
   ForestTemplateInteger getInteger();

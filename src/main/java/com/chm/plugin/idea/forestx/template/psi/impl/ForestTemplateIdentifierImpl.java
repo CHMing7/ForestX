@@ -11,14 +11,14 @@ import static com.chm.plugin.idea.forestx.template.psi.TemplateTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.chm.plugin.idea.forestx.template.psi.*;
 
-public class ForestTemplateNumberImpl extends ASTWrapperPsiElement implements ForestTemplateNumber {
+public class ForestTemplateIdentifierImpl extends ASTWrapperPsiElement implements ForestTemplateIdentifier {
 
-  public ForestTemplateNumberImpl(@NotNull ASTNode node) {
+  public ForestTemplateIdentifierImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ForestTemplateVisitor visitor) {
-    visitor.visitNumber(this);
+    visitor.visitIdentifier(this);
   }
 
   @Override

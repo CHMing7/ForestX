@@ -44,14 +44,9 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
         }
         List<PsiElement> results = new LinkedList<>();
         String propertyKey = sourceElement.getText();
-        final String testDir = "/src/test/";
         VirtualFile sourceVirtualFile = sourceElement.getContainingFile().getVirtualFile();
-        String filePath = sourceVirtualFile.getPath();
-        if (sourceVirtualFile instanceof VirtualFileWindow) {
-            VirtualFile delegate = ((VirtualFileWindow) sourceVirtualFile).getDelegate();
-            filePath = delegate.getPath();
-        }
-        boolean isTestSourceFile = filePath.contains(testDir);
+        String filePath = ForestTemplateUtil.getPathOfVirtualFile(sourceVirtualFile);
+        boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
         Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
 
         for (VirtualFile virtualFile : virtualFiles) {

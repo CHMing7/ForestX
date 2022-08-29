@@ -35,8 +35,8 @@ public class ForestTemplatePrimaryImpl extends ASTWrapperPsiElement implements F
 
   @Override
   @Nullable
-  public ForestTemplateIdentity getIdentity() {
-    return findChildByClass(ForestTemplateIdentity.class);
+  public ForestTemplateIdentifier getIdentifier() {
+    return findChildByClass(ForestTemplateIdentifier.class);
   }
 
   @Override

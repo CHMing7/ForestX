@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface ForestTemplateNamePart extends PsiElement {
 
   @NotNull
-  ForestTemplateIdentity getIdentity();
+  ForestTemplateIdentifier getIdentifier();
 
 }

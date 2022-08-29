@@ -31,7 +31,7 @@ public class ForestTemplateVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitIdentity(@NotNull ForestTemplateIdentity o) {
+  public void visitIdentifier(@NotNull ForestTemplateIdentifier o) {
     visitPsiElement(o);
   }
 

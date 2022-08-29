@@ -36,7 +36,7 @@ PathExpress ::= Primary (PathElement)*
 PathElement ::= EL_DOT NamePart | Arguments
 
 // 名字部分
-NamePart ::= Identity
+NamePart ::= Identifier
 
 // 参数
 Arguments ::= EL_LPAREN ArgumentList? EL_RPAREN
@@ -48,7 +48,7 @@ ArgumentList ::= ArgumentListElement (EL_COMMA ArgumentListElement)?
 ArgumentListElement ::= ElExpress
 
 // 基本计算要素
-Primary ::= Identity | Integer | Decimal
+Primary ::= Identifier | Integer | Decimal
 
 // 整数
 Integer ::= EL_INT
@@ -57,4 +57,4 @@ Integer ::= EL_INT
 Decimal ::= EL_DECIMAL
 
 // EL中的标识符
-Identity ::= EL_IDENTITY
+Identifier ::= EL_IDENTIFIER
