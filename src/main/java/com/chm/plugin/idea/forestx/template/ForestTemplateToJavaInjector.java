@@ -54,7 +54,7 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
                 parent = annotationParameterList.getParent();
                 if (parent instanceof PsiAnnotation) {
                     PsiAnnotation annotation = (PsiAnnotation) parent;
-                    return Annotation.isForestAnnotation(annotation.getQualifiedName());
+                    return Annotation.Companion.isForestAnnotation(annotation.getQualifiedName());
                 }
             }
         }

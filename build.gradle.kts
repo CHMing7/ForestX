@@ -20,7 +20,7 @@ repositories {
 intellij {
     version.set("2020.2.4")
     type.set("IU") // 企业版
-    plugins.set(listOf("java", "Spring", "SpringBoot"))
+    plugins.set(listOf("java", "Spring", "SpringBoot", "yaml"))
 
     pluginName.set("ForestX")
     sandboxDir.set("${rootProject.rootDir}/idea-sandbox")

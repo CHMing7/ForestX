@@ -14,7 +14,7 @@ interface Icons {
         /**
          * Forest 图标
          */
-        var ICON = IconLoader.getIcon("/icons/forest-logo-20x20.svg")
+        val ICON = IconLoader.getIcon("/icons/forest-logo-20x20.svg")
 
         var ICON_16 = IconLoader.getIcon("/icons/forest-logo-16x16.svg")
 

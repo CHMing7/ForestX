@@ -33,6 +33,6 @@ public class ForestTemplateFileType extends LanguageFileType {
 
     @Override
     public @Nullable Icon getIcon() {
-        return Icons.ICON;
+        return Icons.Companion.getICON();
     }
 }
