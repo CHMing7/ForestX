@@ -25,12 +25,8 @@ public class ForestTemplateCompletionContributor extends CompletionContributor {
     public ForestTemplateCompletionContributor() {
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(TemplateTypes.PROP_REFERENCE),
                 new ForestConfigReferenceCompletionProvider());
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(TemplateTypes.EL_IDENTIFIER).inside(ForestTemplatePrimary.class).afterLeaf("${", "{"),
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement().inside(ForestTemplatePrimary.class).afterLeaf("${", "{"),
                 new ForestELIdentifierCompletionProvider());
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(TemplateTypes.EL_INT).inside(ForestTemplatePrimary.class).afterLeaf("${", "{"),
-                new ForestELIdentifierCompletionProvider());
-
-
     }
 
     @Override
