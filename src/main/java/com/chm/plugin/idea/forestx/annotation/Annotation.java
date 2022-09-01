@@ -124,6 +124,13 @@ public class Annotation implements Cloneable {
      */
     public static final Annotation BASE_REQUEST = new Annotation("@BaseRequest", "com.dtflys.forest.annotation.BaseRequest");
 
+    // 参数注解
+
+    /**
+     * The constant VAR
+     */
+    public static final Annotation VAR = new Annotation("@Var", "com.dtflys.forest.annotation.Var");
+
     /**
      * The constant AUTOWIRED.
      */

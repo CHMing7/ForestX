@@ -26,7 +26,7 @@ import static com.chm.plugin.idea.forestx.template.psi.TemplateTypes.*;import st
 EOL = \R
 WHITE_SPACE = \s+
 
-CHARACTER = [a-zA-Z$_] | [^\u0000-\u007F\uD800-\uDBFF] | [\uD800-\uDBFF] [\uDC00-\uDFFF]
+CHARACTER = [a-zA-Z] | [_$] | [^\u0000-\u007F\uD800-\uDBFF] | [\uD800-\uDBFF] [\uDC00-\uDFFF]
 BACK_SLASH = \\
 LINE_ESCAPE = {BACK_SLASH} (\r)? \n
 JAVA_STRING_CHARACTER = [^#${}\"] | {LINE_ESCAPE} | {BACK_SLASH} [#${}\"]

@@ -4,6 +4,7 @@ import com.chm.plugin.idea.forestx.template.utils.SearchedConfigItem;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.properties.PropertiesHighlighter;
 import com.intellij.microservices.config.yaml.ConfigYamlUtils;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
@@ -11,6 +12,7 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PlatformIcons;
 import com.intellij.util.SmartList;
+import icons.JavaUltimateIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLUtil;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
@@ -38,6 +40,9 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
             } else if (elem instanceof YAMLSequenceItem) {
                 YAMLSequenceItem item = (YAMLSequenceItem) elem;
                 value = getSequenceItemText(item);
+            }
+            if (searchedYAMLKeyValue.isEL()) {
+                presentation.setTypeText("String");
             }
             presentation.setTailText("=" + value, attrs.getForegroundColor());
         }

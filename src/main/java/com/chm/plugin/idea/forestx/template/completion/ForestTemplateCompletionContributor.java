@@ -2,6 +2,7 @@ package com.chm.plugin.idea.forestx.template.completion;
 
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateIdentifier;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateLanguage;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
 import com.chm.plugin.idea.forestx.template.psi.TemplateTypes;
 import com.chm.plugin.idea.forestx.template.psi.impl.ForestTemplateIdentifierImpl;
 import com.intellij.codeInsight.completion.CompletionContributor;
@@ -22,10 +23,13 @@ import java.util.List;
 public class ForestTemplateCompletionContributor extends CompletionContributor {
 
     public ForestTemplateCompletionContributor() {
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(TemplateTypes.PROP_REFERENCE).withLanguage(ForestTemplateLanguage.INSTANCE),
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(TemplateTypes.PROP_REFERENCE),
                 new ForestConfigReferenceCompletionProvider());
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(TemplateTypes.EL_IDENTIFIER).withParent(ForestTemplateIdentifierImpl.class),
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(TemplateTypes.EL_IDENTIFIER).inside(ForestTemplatePrimary.class).afterLeaf("${", "{"),
                 new ForestELIdentifierCompletionProvider());
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(TemplateTypes.EL_INT).inside(ForestTemplatePrimary.class).afterLeaf("${", "{"),
+                new ForestELIdentifierCompletionProvider());
+
 
     }
 
