@@ -1,6 +1,7 @@
 package com.chm.plugin.idea.forestx.template;
 
 import com.chm.plugin.idea.forestx.annotation.Annotation;
+import com.chm.plugin.idea.forestx.template.context.ForestTemplateContextProvider;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateLanguage;
 import com.intellij.lang.injection.MultiHostInjector;
 import com.intellij.lang.injection.MultiHostRegistrar;
@@ -11,6 +12,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
+import com.intellij.spring.el.SpringElInjector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -19,13 +21,16 @@ import java.util.List;
 public class ForestTemplateToJavaInjector implements MultiHostInjector {
 
     @Override
-    public void getLanguagesToInject(@NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
-        if (context instanceof PsiLiteralExpressionImpl && shouldInject(context)) {
-            PsiLiteralExpressionImpl expr = (PsiLiteralExpressionImpl) context;
+    public void getLanguagesToInject(@NotNull MultiHostRegistrar registrar, @NotNull PsiElement host) {
+        if (host instanceof PsiLiteralExpressionImpl && shouldInject(host)) {
+            PsiLiteralExpressionImpl expr = (PsiLiteralExpressionImpl) host;
+
             registrar
                     .startInjecting(ForestTemplateLanguage.INSTANCE)
                     .addPlace(null, null, expr, innerRangeStrippingQuotes(expr))
                     .doneInjecting();
+
+            host.putUserData(ForestTemplateContextProvider.TemplateContextKey, new ForestTemplateContextProvider(host));
         }
     }
 
