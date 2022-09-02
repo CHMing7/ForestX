@@ -1,5 +1,8 @@
 package com.chm.plugin.idea.forestx.template.completion;
 
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePropertyVariableHolder;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateVariableHolder;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHolder;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateIdentifier;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
@@ -32,7 +35,6 @@ import java.util.List;
 
 public class ForestELIdentifierCompletionProvider extends CompletionProvider<CompletionParameters> {
 
-
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet resultSet) {
         final PsiElement element = parameters.getPosition();
@@ -54,15 +56,7 @@ public class ForestELIdentifierCompletionProvider extends CompletionProvider<Com
         final boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
         final boolean hasSpringBootLib = SpringBootLibraryUtil.hasSpringBootLibrary(module);
 
-        final CompletionContext completionContext = element.getUserData(CompletionContext.COMPLETION_CONTEXT_KEY);
-        if (completionContext == null) {
-            return;
-        }
-        final DocumentWindow doc = (DocumentWindow) completionContext.getOffsetMap().getDocument();
-        final Segment[] textRange = doc.getHostRanges();
-        final TextRange range = new TextRange(textRange[0].getStartOffset(), textRange[0].getEndOffset());
-        final PsiFile javaFile = PsiDocumentManager.getInstance(project).getPsiFile(doc.getDelegate());
-        final PsiElement literal = javaFile.findElementAt(range.getStartOffset());
+        final PsiElement literal = ForestTemplateUtil.getJavaElement(project, element);
         final PsiMethod method = PsiTreeUtil.getParentOfType(literal, PsiMethod.class);
 
         if (method != null) {
@@ -84,14 +78,14 @@ public class ForestELIdentifierCompletionProvider extends CompletionProvider<Com
             }
         }
         if (hasSpringBootLib) {
-            List<SearchedConfigItem> searchedConfigItems = ForestTemplateUtil.searchConfigItems(project, isTestSourceFile, "forest.variables.", true);
-            for (SearchedConfigItem item : searchedConfigItems) {
-                if (item instanceof SearchedConfigYAMLKeyValue) {
-                    resultSet.addElement(LookupElementBuilder.create(item)
-                            .withRenderer(SearchedConfigYAMLKeyValue.YAML_KEY_VALUE_CONFIG_RENDER));
-                } else if (item instanceof SearchedConfigProperty) {
-                    resultSet.addElement(LookupElementBuilder.create(item)
-                            .withRenderer(SearchedConfigProperty.PROPERTY_RENDER));
+            List<ForestTemplateVariableHolder> variableHolders = ForestTemplateUtil.findConfigHolders(project, isTestSourceFile, "forest.variables.", true);
+            for (ForestTemplateVariableHolder holder : variableHolders) {
+                if (holder instanceof ForestTemplateYAMLVariableHolder) {
+                    resultSet.addElement(LookupElementBuilder.create(holder)
+                            .withRenderer(ForestTemplateYAMLVariableHolder.YAML_KEY_VALUE_CONFIG_RENDER));
+                } else if (holder instanceof ForestTemplatePropertyVariableHolder) {
+                    resultSet.addElement(LookupElementBuilder.create(holder)
+                            .withRenderer(ForestTemplatePropertyVariableHolder.PROPERTY_RENDER));
                 }
             }
         }

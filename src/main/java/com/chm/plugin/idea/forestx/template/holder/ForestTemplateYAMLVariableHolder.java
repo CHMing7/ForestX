@@ -1,6 +1,6 @@
-package com.chm.plugin.idea.forestx.template.completion;
+package com.chm.plugin.idea.forestx.template.holder;
 
-import com.chm.plugin.idea.forestx.template.utils.SearchedConfigItem;
+import com.chm.plugin.idea.forestx.template.completion.SearchedConfigYAMLKeyValue;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
@@ -9,29 +9,30 @@ import com.intellij.microservices.config.yaml.ConfigYamlUtils;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.PsiType;
 import com.intellij.util.PlatformIcons;
-import com.intellij.util.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLUtil;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLPsiElement;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElement> {
+public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHolder<YAMLPsiElement> {
 
     public final static LookupElementRenderer<LookupElement> YAML_KEY_VALUE_CONFIG_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            SearchedConfigYAMLKeyValue searchedYAMLKeyValue = (SearchedConfigYAMLKeyValue) element.getObject();
-            YAMLPsiElement elem = searchedYAMLKeyValue.getElement();
+            ForestTemplateYAMLVariableHolder yamlVariable = (ForestTemplateYAMLVariableHolder) element.getObject();
+            YAMLPsiElement elem = yamlVariable.getElement();
             presentation.setIcon(PlatformIcons.PROPERTY_ICON);
             String value = null;
             TextAttributes attrs = EditorColorsManager.getInstance().getGlobalScheme().getAttributes(PropertiesHighlighter.PROPERTY_VALUE);
-            presentation.setItemText(searchedYAMLKeyValue.getItemText());
+            presentation.setItemText(yamlVariable.getVarName());
             if (elem instanceof YAMLKeyValue) {
                 YAMLKeyValue yamlKeyValue = (YAMLKeyValue) elem;
                 value = ConfigYamlUtils.getValuePresentationText(yamlKeyValue);
@@ -39,7 +40,7 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
                 YAMLSequenceItem item = (YAMLSequenceItem) elem;
                 value = getSequenceItemText(item);
             }
-            if (searchedYAMLKeyValue.isEL()) {
+            if (yamlVariable.isEl()) {
                 presentation.setTypeText("String");
             }
             presentation.setTailText("=" + value, attrs.getForegroundColor());
@@ -48,7 +49,7 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
 
 
     private static @NotNull String getSequenceItemText(YAMLSequenceItem item) {
-        List<YAMLKeyValue> keysValues = new SmartList();
+        List<YAMLKeyValue> keysValues = new ArrayList<>();
         int count = 0;
         String suffix = "";
         Iterator<YAMLKeyValue> iterator = item.getKeysValues().iterator();
@@ -69,20 +70,22 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
 
         String result = StringUtil.join(
                 keysValues, (keyValue) ->
-                keyValue.getKeyText() + ": " + ConfigYamlUtils.getValuePresentationText(keyValue), ", ") +
+                        keyValue.getKeyText() + ": " + ConfigYamlUtils.getValuePresentationText(keyValue), ", ") +
                 suffix;
         return result;
     }
 
-    public SearchedConfigYAMLKeyValue(String insertion, YAMLPsiElement element, boolean isEL) {
-        super(insertion, element, isEL);
+
+    public ForestTemplateYAMLVariableHolder(String insertion, YAMLPsiElement element, PsiType type, boolean el) {
+        super(insertion, element, type, el);
     }
 
     @Override
-    public String getItemText() {
-        if (isEL) {
+    public String getVarName() {
+        if (el) {
             return insertion;
         }
         return YAMLUtil.getConfigFullName(element);
     }
+
 }
