@@ -6,11 +6,14 @@ import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHold
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePropertyVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHolder;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplateNamePart;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
 import com.intellij.codeInsight.completion.CompletionContext;
 import com.intellij.injected.editor.DocumentWindow;
 import com.intellij.injected.editor.VirtualFileWindow;
 import com.intellij.lang.properties.IProperty;
+import com.intellij.lang.properties.PropertiesUtil;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
 import com.intellij.microservices.config.yaml.ConfigYamlAccessor;
 import com.intellij.openapi.project.Project;
@@ -23,9 +26,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.PsiTypeMapper;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PropertyUtil;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
+import com.intellij.spring.boot.library.SpringBootLibraryUtil;
 import org.jetbrains.yaml.YAMLUtil;
 import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
@@ -42,6 +48,8 @@ import java.util.List;
 public class ForestTemplateUtil {
 
     public final static String TEST_DIR = "/src/test/";
+
+    public final static String FOREST_VARIABLES_PREFIX = "forest.variables.";
 
 
     public static VirtualFile getSourceJavaFile(final VirtualFile virtualFile) {
@@ -65,10 +73,48 @@ public class ForestTemplateUtil {
         return filePath.contains(ForestTemplateUtil.TEST_DIR);
     }
 
+    public static ForestTemplateVariableHolder getConfigHolder(final Project project, final boolean isTestSourceFile, final String keyName, final boolean isEL) {
+        Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
+        if (virtualFiles == null) {
+            return null;
+        }
+        final PsiManager manager = PsiManager.getInstance(project);
+        final PsiClassType STRING_TYPE = PsiType.getJavaLangString(manager, GlobalSearchScope.allScope(project));
+        for (VirtualFile yamlVirtualFile : virtualFiles) {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(yamlVirtualFile);
+            if (psiFile == null) {
+                continue;
+            }
+            if (psiFile instanceof YAMLFileImpl) {
+                // yaml 配置文件
+                YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
+                List<YAMLDocument> documents = yamlFile.getDocuments();
+                for (YAMLDocument document : documents) {
+                    ConfigYamlAccessor accessor = new ConfigYamlAccessor(
+                            document, SpringBootApplicationMetaConfigKeyManager.getInstance());
+                    YAMLKeyValue keyValue = accessor.findExistingKey(keyName);
+                    if (keyValue != null) {
+                        return new ForestTemplateYAMLVariableHolder(keyName, keyValue, STRING_TYPE, isEL);
+                    }
+                }
+            } else if (psiFile instanceof PropertiesFileImpl) {
+                // Properties 配置文件
+                PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
+                IProperty property = propertiesFile.findPropertyByKey(keyName);
+                if (property != null) {
+                    return new ForestTemplatePropertyVariableHolder(keyName, property, STRING_TYPE, isEL);
+                }
+            }
+        }
+        return null;
+    }
 
     public static List<ForestTemplateVariableHolder> findConfigHolders(final Project project, final boolean isTestSourceFile, final String prefix, final boolean isEL) {
         List<ForestTemplateVariableHolder> resultItems = new ArrayList<>();
         Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
+        if (virtualFiles == null) {
+            return null;
+        }
         final PsiManager manager = PsiManager.getInstance(project);
         final PsiClassType STRING_TYPE = PsiType.getJavaLangString(manager, GlobalSearchScope.allScope(project));
         for (VirtualFile yamlVirtualFile : virtualFiles) {
@@ -226,10 +272,33 @@ public class ForestTemplateUtil {
     }
 
 
-    public static ForestTemplatePathElementHolder getHolder(PsiElement element) {
+    public static ForestTemplatePathElementHolder getELHolder(final boolean isTestSourceFile, final PsiElement element) {
+        final Project project = element.getOriginalElement().getProject();
+        String text = element.getText();
         if (element instanceof ForestTemplatePrimary) {
-
+            if (SpringBootLibraryUtil.hasSpringBootLibrary(project)) {
+                String keyName = FOREST_VARIABLES_PREFIX + text;
+                ForestTemplateVariableHolder holder = getConfigHolder(
+                        project,
+                        isTestSourceFile,
+                        keyName, true);
+                return holder;
+            }
+            return null;
         }
+
+        if (element instanceof LeafPsiElement) {
+            ForestTemplatePrimary primary = PsiTreeUtil.getParentOfType(element, ForestTemplatePrimary.class);
+            if (primary != null) {
+                return getELHolder(isTestSourceFile, primary);
+            }
+            ForestTemplatePathElement pathElement = PsiTreeUtil.getParentOfType(element, ForestTemplatePathElement.class);
+            if (pathElement != null) {
+                return getELHolder(isTestSourceFile, pathElement);
+            }
+            return null;
+        }
+
         return null;
     }
 

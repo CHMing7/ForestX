@@ -78,7 +78,8 @@ public class ForestELIdentifierCompletionProvider extends CompletionProvider<Com
             }
         }
         if (hasSpringBootLib) {
-            List<ForestTemplateVariableHolder> variableHolders = ForestTemplateUtil.findConfigHolders(project, isTestSourceFile, "forest.variables.", true);
+            List<ForestTemplateVariableHolder> variableHolders = ForestTemplateUtil.findConfigHolders(
+                    project, isTestSourceFile, ForestTemplateUtil.FOREST_VARIABLES_PREFIX, true);
             for (ForestTemplateVariableHolder holder : variableHolders) {
                 if (holder instanceof ForestTemplateYAMLVariableHolder) {
                     resultSet.addElement(LookupElementBuilder.create(holder)

@@ -21,8 +21,16 @@ public class SpringBootConfigFileUtil {
 
     public static List<VirtualFile> findSpringBootConfigFiles(final Project project, final boolean needTestFile) {
         List<VirtualFile> fileList = new ArrayList<>();
-        Collection<VirtualFile> virtualYAMLFiles = FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project));
-        Collection<VirtualFile> virtualPropertiesFile = FileTypeIndex.getFiles(PropertiesFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        Collection<VirtualFile> virtualYAMLFiles = null;
+        try {
+            virtualYAMLFiles = FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project));
+        } catch (Throwable th) {
+        }
+        Collection<VirtualFile> virtualPropertiesFile = null;
+        try {
+            virtualPropertiesFile = FileTypeIndex.getFiles(PropertiesFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        } catch (Throwable th) {
+        }
 
         List<VirtualFile> bootstrapYmlFiles = new LinkedList<>();
         List<VirtualFile> bootstrapYamlFiles = new LinkedList<>();
@@ -34,8 +42,12 @@ public class SpringBootConfigFileUtil {
         List<VirtualFile> applicationDefaultYamlFiles = new LinkedList<>();
         List<VirtualFile> applicationDefaultPropertiesFiles = new LinkedList<>();
         List<VirtualFile> allConfigFiles = new LinkedList<>();
-        allConfigFiles.addAll(virtualYAMLFiles);
-        allConfigFiles.addAll(virtualPropertiesFile);
+        if (virtualYAMLFiles != null) {
+            allConfigFiles.addAll(virtualYAMLFiles);
+        }
+        if (virtualPropertiesFile != null) {
+            allConfigFiles.addAll(virtualPropertiesFile);
+        }
         for (VirtualFile virtualFile : allConfigFiles) {
             String configFilePath = virtualFile.getPath();
             final boolean isTestConfigFile = configFilePath.contains("/src/test");
