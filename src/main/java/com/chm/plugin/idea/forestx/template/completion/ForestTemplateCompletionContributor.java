@@ -27,22 +27,4 @@ public class ForestTemplateCompletionContributor extends CompletionContributor {
                 new ForestELPathElementCompletionProvider());
     }
 
-    @Override
-    public void beforeCompletion(@NotNull CompletionInitializationContext context) {
-        if (!(context instanceof CompletionInitializationContextImpl)) {
-            return;
-        }
-
-        final OffsetsInFile offsetsInFile = ((CompletionInitializationContextImpl) context).getHostOffsets();
-        final OffsetMap offsetMap = offsetsInFile.getOffsets();
-        final List<OffsetKey> allOffsets =  offsetMap.getAllOffsets();
-        if (allOffsets.isEmpty()) {
-            return;
-        }
-
-        final int offset = offsetMap.getOffset(allOffsets.get(0));
-        PsiElement javaLiteral = offsetsInFile.getFile().findElementAt(offset);
-        if (javaLiteral != null) {
-        }
-    }
 }

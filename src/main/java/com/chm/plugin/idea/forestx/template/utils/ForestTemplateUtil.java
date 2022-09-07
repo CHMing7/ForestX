@@ -282,8 +282,11 @@ public class ForestTemplateUtil {
                         project,
                         isTestSourceFile,
                         keyName, true);
-                return holder;
+                if (holder != null) {
+                    return holder;
+                }
             }
+
             return null;
         }
 
