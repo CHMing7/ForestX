@@ -37,7 +37,6 @@ public class ForestTemplateInvocationHolder extends ForestTemplatePathElementHol
     private final PsiMethod method;
     private final List<PsiElement> arguments;
 
-
     public ForestTemplateInvocationHolder(String insertion, PsiMethod method, PsiType type, List<PsiElement> arguments) {
         super(insertion, method, type, false);
         this.method = method;

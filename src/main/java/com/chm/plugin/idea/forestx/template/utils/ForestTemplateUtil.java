@@ -2,13 +2,18 @@ package com.chm.plugin.idea.forestx.template.utils;
 
 import com.chm.plugin.idea.forestx.template.completion.SearchedConfigProperty;
 import com.chm.plugin.idea.forestx.template.completion.SearchedConfigYAMLKeyValue;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateInvocationHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePropertyVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHolder;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplateArgumentList;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplateArguments;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateNamePart;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
+import com.chm.plugin.idea.forestx.template.psi.impl.ForestTemplateArgumentListImpl;
+import com.chm.plugin.idea.forestx.utils.JavaUtil;
 import com.intellij.codeInsight.completion.CompletionContext;
 import com.intellij.injected.editor.DocumentWindow;
 import com.intellij.injected.editor.VirtualFileWindow;
@@ -20,11 +25,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -274,7 +281,7 @@ public class ForestTemplateUtil {
 
     public static ForestTemplatePathElementHolder getELHolder(final boolean isTestSourceFile, final PsiElement element) {
         final Project project = element.getOriginalElement().getProject();
-        String text = element.getText();
+        final String text = element.getText();
         if (element instanceof ForestTemplatePrimary) {
             if (SpringBootLibraryUtil.hasSpringBootLibrary(project)) {
                 String keyName = FOREST_VARIABLES_PREFIX + text;
@@ -286,8 +293,35 @@ public class ForestTemplateUtil {
                     return holder;
                 }
             }
-
             return null;
+        }
+
+        if (element instanceof ForestTemplatePathElement) {
+            PsiElement firstChild = element.getFirstChild();
+            PsiElement prevElement = element.getPrevSibling();
+            if (firstChild == null || prevElement == null) {
+                return null;
+            }
+            if (firstChild instanceof ForestTemplateArguments) {
+                PsiElement namePart = prevElement.getLastChild();
+                if (namePart == null) {
+                    return null;
+                }
+                String methodName = namePart.getText();
+                ForestTemplatePathElementHolder invokerHolder = getELHolder(isTestSourceFile, prevElement.getPrevSibling());
+                if (invokerHolder == null) {
+                    return null;
+                }
+                PsiClass invokerClass = invokerHolder.getPsiClass();
+                PsiMethod[] methods = invokerClass.findMethodsByName(methodName, true);
+                for (PsiMethod method : methods) {
+                    if (method.getParameterList().getParametersCount() == 0) {
+                        return new ForestTemplateInvocationHolder(
+                                methodName, method, invokerHolder.getType(), new ArrayList<>());
+                    }
+                }
+                return null;
+            }
         }
 
         if (element instanceof LeafPsiElement) {

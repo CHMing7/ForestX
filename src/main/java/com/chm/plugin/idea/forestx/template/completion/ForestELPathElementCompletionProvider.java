@@ -75,8 +75,7 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                 continue;
             }
             nameCache.add(methodName);
-            int getterIndex = methodName.indexOf("get");
-            if (getterIndex >= 0 && methodName.length() > 3) {
+            if (methodName.startsWith("get") && methodName.length() > 3) {
                 String getter = methodName.substring(3);
                 getter = getter.substring(0, 1).toLowerCase() + getter.substring(1);
                 ForestTemplateFiledHolder filedHolder = new ForestTemplateFiledHolder(getter, method, type);

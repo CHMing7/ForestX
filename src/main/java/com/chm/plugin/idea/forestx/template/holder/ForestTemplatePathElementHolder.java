@@ -1,6 +1,11 @@
 package com.chm.plugin.idea.forestx.template.holder;
 
+import com.chm.plugin.idea.forestx.utils.JavaUtil;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiType;
+
+import java.util.Optional;
 
 public abstract class ForestTemplatePathElementHolder<T> {
 
@@ -26,6 +31,14 @@ public abstract class ForestTemplatePathElementHolder<T> {
 
     public PsiType getType() {
         return type;
+    }
+
+    public PsiClass getPsiClass() {
+        if (element instanceof PsiElement) {
+            Optional<PsiClass> clazz = JavaUtil.findClazz(((PsiElement) element).getProject(), type.getCanonicalText());
+            return clazz.get();
+        }
+        return null;
     }
 
     public boolean isEl() {
