@@ -65,10 +65,10 @@ public class ForestELIdentifierCompletionProvider extends CompletionProvider<Com
                 PsiParameter[] methodParamArray = paramList.getParameters();
                 for (int i = 0; i < methodParamArray.length; i++) {
                     PsiParameter methodParam = methodParamArray[i];
-                    SearchedParameterIndexVariable indexVariable = SearchedParameterIndexVariable.getIndexVariable(methodParam, i);
+                    final SearchedParameterIndexVariable indexVariable = SearchedParameterIndexVariable.getIndexVariable(methodParam, i);
                     resultSet.addElement(LookupElementBuilder.create(indexVariable)
                             .withRenderer(SearchedParameterIndexVariable.PARAMETER_INDEX_VAR_RENDER));
-                    SearchedParameterVariable variable = SearchedParameterVariable.findVariable(methodParam);
+                    final SearchedParameterVariable variable = SearchedParameterVariable.findVariable(methodParam);
                     if (variable == null) {
                         continue;
                     }
@@ -78,9 +78,9 @@ public class ForestELIdentifierCompletionProvider extends CompletionProvider<Com
             }
         }
         if (hasSpringBootLib) {
-            List<ForestTemplateVariableHolder> variableHolders = ForestTemplateUtil.findConfigHolders(
+            final List<ForestTemplateVariableHolder> variableHolders = ForestTemplateUtil.findConfigHolders(
                     project, isTestSourceFile, ForestTemplateUtil.FOREST_VARIABLES_PREFIX, true);
-            for (ForestTemplateVariableHolder holder : variableHolders) {
+            for (final ForestTemplateVariableHolder holder : variableHolders) {
                 if (holder instanceof ForestTemplateYAMLVariableHolder) {
                     resultSet.addElement(LookupElementBuilder.create(holder)
                             .withRenderer(ForestTemplateYAMLVariableHolder.YAML_KEY_VALUE_CONFIG_RENDER));

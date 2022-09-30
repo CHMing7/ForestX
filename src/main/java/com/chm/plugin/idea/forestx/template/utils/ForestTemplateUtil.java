@@ -2,7 +2,11 @@ package com.chm.plugin.idea.forestx.template.utils;
 
 import com.chm.plugin.idea.forestx.template.completion.SearchedConfigProperty;
 import com.chm.plugin.idea.forestx.template.completion.SearchedConfigYAMLKeyValue;
+import com.chm.plugin.idea.forestx.template.completion.SearchedParameterIndexVariable;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateFieldHolder;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateGetterHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateInvocationHolder;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePropertyVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateVariableHolder;
@@ -32,11 +36,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PropertyUtil;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
 import com.intellij.spring.boot.library.SpringBootLibraryUtil;
 import org.jetbrains.yaml.YAMLUtil;
@@ -61,7 +68,7 @@ public class ForestTemplateUtil {
 
     public static VirtualFile getSourceJavaFile(final VirtualFile virtualFile) {
         if (virtualFile instanceof VirtualFileWindow) {
-            VirtualFile delegate = ((VirtualFileWindow) virtualFile).getDelegate();
+            final VirtualFile delegate = ((VirtualFileWindow) virtualFile).getDelegate();
             return delegate;
         }
         return null;
@@ -70,7 +77,7 @@ public class ForestTemplateUtil {
     public static String getPathOfVirtualFile(final VirtualFile virtualFile) {
         String filePath = virtualFile.getPath();
         if (virtualFile instanceof VirtualFileWindow) {
-            VirtualFile delegate = ((VirtualFileWindow) virtualFile).getDelegate();
+            final VirtualFile delegate = ((VirtualFileWindow) virtualFile).getDelegate();
             filePath = delegate.getPath();
         }
         return filePath;
@@ -81,33 +88,33 @@ public class ForestTemplateUtil {
     }
 
     public static ForestTemplateVariableHolder getConfigHolder(final Project project, final boolean isTestSourceFile, final String keyName, final boolean isEL) {
-        Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
+        final Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
         if (virtualFiles == null) {
             return null;
         }
         final PsiManager manager = PsiManager.getInstance(project);
         final PsiClassType STRING_TYPE = PsiType.getJavaLangString(manager, GlobalSearchScope.allScope(project));
         for (VirtualFile yamlVirtualFile : virtualFiles) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(yamlVirtualFile);
+            final PsiFile psiFile = PsiManager.getInstance(project).findFile(yamlVirtualFile);
             if (psiFile == null) {
                 continue;
             }
             if (psiFile instanceof YAMLFileImpl) {
                 // yaml 配置文件
-                YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                List<YAMLDocument> documents = yamlFile.getDocuments();
-                for (YAMLDocument document : documents) {
-                    ConfigYamlAccessor accessor = new ConfigYamlAccessor(
+                final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
+                final List<YAMLDocument> documents = yamlFile.getDocuments();
+                for (final YAMLDocument document : documents) {
+                    final ConfigYamlAccessor accessor = new ConfigYamlAccessor(
                             document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                    YAMLKeyValue keyValue = accessor.findExistingKey(keyName);
+                    final YAMLKeyValue keyValue = accessor.findExistingKey(keyName);
                     if (keyValue != null) {
                         return new ForestTemplateYAMLVariableHolder(keyName, keyValue, STRING_TYPE, isEL);
                     }
                 }
             } else if (psiFile instanceof PropertiesFileImpl) {
                 // Properties 配置文件
-                PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
-                IProperty property = propertiesFile.findPropertyByKey(keyName);
+                final PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
+                final IProperty property = propertiesFile.findPropertyByKey(keyName);
                 if (property != null) {
                     return new ForestTemplatePropertyVariableHolder(keyName, property, STRING_TYPE, isEL);
                 }
@@ -117,28 +124,28 @@ public class ForestTemplateUtil {
     }
 
     public static List<ForestTemplateVariableHolder> findConfigHolders(final Project project, final boolean isTestSourceFile, final String prefix, final boolean isEL) {
-        List<ForestTemplateVariableHolder> resultItems = new ArrayList<>();
-        Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
+        final List<ForestTemplateVariableHolder> resultItems = new ArrayList<>();
+        final Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
         if (virtualFiles == null) {
             return null;
         }
         final PsiManager manager = PsiManager.getInstance(project);
         final PsiClassType STRING_TYPE = PsiType.getJavaLangString(manager, GlobalSearchScope.allScope(project));
         for (VirtualFile yamlVirtualFile : virtualFiles) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(yamlVirtualFile);
+            final PsiFile psiFile = PsiManager.getInstance(project).findFile(yamlVirtualFile);
             if (psiFile == null) {
                 continue;
             }
             if (psiFile instanceof YAMLFileImpl) {
                 // yaml 配置文件
-                YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                List<YAMLDocument> documents = yamlFile.getDocuments();
-                for (YAMLDocument document : documents) {
-                    ConfigYamlAccessor accessor = new ConfigYamlAccessor(
+                final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
+                final List<YAMLDocument> documents = yamlFile.getDocuments();
+                for (final YAMLDocument document : documents) {
+                    final ConfigYamlAccessor accessor = new ConfigYamlAccessor(
                             document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                    List<YAMLKeyValue> allDocKeyValues = accessor.getAllKeys();
-                    for (YAMLKeyValue keyValue : allDocKeyValues) {
-                        YAMLValue value = keyValue.getValue();
+                    final List<YAMLKeyValue> allDocKeyValues = accessor.getAllKeys();
+                    for (final YAMLKeyValue keyValue : allDocKeyValues) {
+                        final YAMLValue value = keyValue.getValue();
                         if (value instanceof YAMLPlainTextImpl) {
                             String key = YAMLUtil.getConfigFullName(keyValue);
                             if (prefix != null) {
@@ -150,8 +157,8 @@ public class ForestTemplateUtil {
                                 resultItems.add(new ForestTemplateYAMLVariableHolder(key, keyValue, STRING_TYPE, isEL));
                             }
                         } else if (value instanceof YAMLBlockSequenceImpl) {
-                            for (YAMLSequenceItem item : ((YAMLBlockSequenceImpl) value).getItems()) {
-                                YAMLValue itemValue = item.getValue();
+                            for (final YAMLSequenceItem item : ((YAMLBlockSequenceImpl) value).getItems()) {
+                                final YAMLValue itemValue = item.getValue();
                                 if (itemValue instanceof YAMLPlainTextImpl) {
                                     String key = YAMLUtil.getConfigFullName(item);
                                     if (prefix != null) {
@@ -169,9 +176,9 @@ public class ForestTemplateUtil {
                 }
             } else if (psiFile instanceof PropertiesFileImpl) {
                 // Properties 配置文件
-                PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
-                List<IProperty> properties = propertiesFile.getProperties();
-                for (IProperty property : properties) {
+                final PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
+                final List<IProperty> properties = propertiesFile.getProperties();
+                for (final IProperty property : properties) {
                     String key = property.getKey();
                     if (key == null) {
                         continue;
@@ -279,18 +286,32 @@ public class ForestTemplateUtil {
     }
 
 
-    public static ForestTemplatePathElementHolder getELHolder(final boolean isTestSourceFile, final PsiElement element) {
+    public static ForestTemplatePathElementHolder getELHolder(
+            final boolean isTestSourceFile, final PsiElement element, final PsiMethod method) {
         final Project project = element.getOriginalElement().getProject();
         final String text = element.getText();
         if (element instanceof ForestTemplatePrimary) {
             if (SpringBootLibraryUtil.hasSpringBootLibrary(project)) {
-                String keyName = FOREST_VARIABLES_PREFIX + text;
-                ForestTemplateVariableHolder holder = getConfigHolder(
+                final String keyName = FOREST_VARIABLES_PREFIX + text;
+                final ForestTemplateVariableHolder holder = getConfigHolder(
                         project,
                         isTestSourceFile,
                         keyName, true);
                 if (holder != null) {
                     return holder;
+                }
+            }
+
+            final PsiParameterList paramList = PsiTreeUtil.getChildOfType(method, PsiParameterList.class);
+            if (paramList != null && paramList.getParametersCount() > 0) {
+                final PsiParameter[] methodParamArray = paramList.getParameters();
+                for (int i = 0; i < methodParamArray.length; i++) {
+                    final PsiParameter methodParam = methodParamArray[i];
+                    final ForestTemplateVariableHolder holder =
+                            ForestTemplateParameterVariableHolder.findVariable(methodParam);
+                    if (holder != null && text.equals(holder.getVarName())) {
+                        return holder;
+                    }
                 }
             }
             return null;
@@ -303,21 +324,47 @@ public class ForestTemplateUtil {
                 return null;
             }
             if (firstChild instanceof ForestTemplateArguments) {
-                PsiElement namePart = prevElement.getLastChild();
+                ForestTemplateArguments args = (ForestTemplateArguments) firstChild;
+                final PsiElement namePart = prevElement.getLastChild();
                 if (namePart == null) {
                     return null;
                 }
                 String methodName = namePart.getText();
-                ForestTemplatePathElementHolder invokerHolder = getELHolder(isTestSourceFile, prevElement.getPrevSibling());
+                ForestTemplatePathElementHolder invokerHolder = getELHolder(
+                        isTestSourceFile, prevElement.getPrevSibling(), method);
                 if (invokerHolder == null) {
                     return null;
                 }
                 PsiClass invokerClass = invokerHolder.getPsiClass();
                 PsiMethod[] methods = invokerClass.findMethodsByName(methodName, true);
-                for (PsiMethod method : methods) {
-                    if (method.getParameterList().getParametersCount() == 0) {
+                for (PsiMethod mtd : methods) {
+                    if (mtd.getParameterList().getParametersCount() == args.getChildren().length) {
                         return new ForestTemplateInvocationHolder(
-                                methodName, method, invokerHolder.getType(), new ArrayList<>());
+                                methodName, mtd, mtd.getReturnType(), new ArrayList<>());
+                    }
+                }
+                return null;
+            } else {
+                final PsiElement namePart = element.getLastChild();
+                if (namePart == null) {
+                    return null;
+                }
+                String getterName = namePart.getText();
+                ForestTemplatePathElementHolder invokerHolder = getELHolder(
+                        isTestSourceFile, element.getPrevSibling(), method);
+                if (invokerHolder == null) {
+                    return null;
+                }
+                PsiClass invokerClass = invokerHolder.getPsiClass();
+                String methodName = "get" + getterName.substring(0, 1).toUpperCase() + getterName.substring(1);
+                PsiMethod[] methods = invokerClass.findMethodsByName(methodName, true);
+                if (methods == null || methods.length == 0) {
+                    methods = invokerClass.findMethodsByName(getterName, true);
+                }
+                for (PsiMethod mtd : methods) {
+                    if (mtd.getParameterList().getParametersCount() == 0) {
+                        return new ForestTemplateFieldHolder(
+                                getterName, mtd, mtd.getReturnType());
                     }
                 }
                 return null;
@@ -327,11 +374,11 @@ public class ForestTemplateUtil {
         if (element instanceof LeafPsiElement) {
             ForestTemplatePrimary primary = PsiTreeUtil.getParentOfType(element, ForestTemplatePrimary.class);
             if (primary != null) {
-                return getELHolder(isTestSourceFile, primary);
+                return getELHolder(isTestSourceFile, primary, method);
             }
             ForestTemplatePathElement pathElement = PsiTreeUtil.getParentOfType(element, ForestTemplatePathElement.class);
             if (pathElement != null) {
-                return getELHolder(isTestSourceFile, pathElement);
+                return getELHolder(isTestSourceFile, pathElement, method);
             }
             return null;
         }

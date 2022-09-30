@@ -16,12 +16,12 @@ public class ForestTemplateInvocationHolder extends ForestTemplatePathElementHol
     public final static LookupElementRenderer<LookupElement> INVOCATION_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            ForestTemplateInvocationHolder invocationHolder = (ForestTemplateInvocationHolder) element.getObject();
-            PsiMethod psiMethod = invocationHolder.getMethod();
-            StringBuilder paramText = new StringBuilder("(");
-            PsiParameter[] parameters = psiMethod.getParameterList().getParameters();
+            final ForestTemplateInvocationHolder invocationHolder = (ForestTemplateInvocationHolder) element.getObject();
+            final PsiMethod psiMethod = invocationHolder.getMethod();
+            final StringBuilder paramText = new StringBuilder("(");
+            final PsiParameter[] parameters = psiMethod.getParameterList().getParameters();
             for (int i = 0; i < parameters.length; i++) {
-                PsiParameter parameter = parameters[i];
+                final PsiParameter parameter = parameters[i];
                 paramText.append(parameter.getType().getPresentableText())
                         .append(" ")
                         .append(parameter.getName());

@@ -26,11 +26,11 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
     public final static LookupElementRenderer<LookupElement> YAML_KEY_VALUE_CONFIG_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            SearchedConfigYAMLKeyValue searchedYAMLKeyValue = (SearchedConfigYAMLKeyValue) element.getObject();
-            YAMLPsiElement elem = searchedYAMLKeyValue.getElement();
+            final SearchedConfigYAMLKeyValue searchedYAMLKeyValue = (SearchedConfigYAMLKeyValue) element.getObject();
+            final YAMLPsiElement elem = searchedYAMLKeyValue.getElement();
             presentation.setIcon(PlatformIcons.PROPERTY_ICON);
             String value = null;
-            TextAttributes attrs = EditorColorsManager.getInstance().getGlobalScheme().getAttributes(PropertiesHighlighter.PROPERTY_VALUE);
+            final TextAttributes attrs = EditorColorsManager.getInstance().getGlobalScheme().getAttributes(PropertiesHighlighter.PROPERTY_VALUE);
             presentation.setItemText(searchedYAMLKeyValue.getItemText());
             if (elem instanceof YAMLKeyValue) {
                 YAMLKeyValue yamlKeyValue = (YAMLKeyValue) elem;

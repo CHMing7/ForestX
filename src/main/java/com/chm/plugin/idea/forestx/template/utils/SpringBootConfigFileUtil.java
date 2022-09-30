@@ -20,7 +20,7 @@ public class SpringBootConfigFileUtil {
 
 
     public static List<VirtualFile> findSpringBootConfigFiles(final Project project, final boolean needTestFile) {
-        List<VirtualFile> fileList = new ArrayList<>();
+        final List<VirtualFile> fileList = new ArrayList<>();
         Collection<VirtualFile> virtualYAMLFiles = null;
         try {
             virtualYAMLFiles = FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project));
@@ -32,32 +32,32 @@ public class SpringBootConfigFileUtil {
         } catch (Throwable th) {
         }
 
-        List<VirtualFile> bootstrapYmlFiles = new LinkedList<>();
-        List<VirtualFile> bootstrapYamlFiles = new LinkedList<>();
-        List<VirtualFile> bootstrapPropertiesFiles = new LinkedList<>();
-        List<VirtualFile> applicationYmlFiles = new LinkedList<>();
-        List<VirtualFile> applicationYamlFiles = new LinkedList<>();
-        List<VirtualFile> applicationPropertiesFiles = new LinkedList<>();
-        List<VirtualFile> applicationDefaultYmlFiles = new LinkedList<>();
-        List<VirtualFile> applicationDefaultYamlFiles = new LinkedList<>();
-        List<VirtualFile> applicationDefaultPropertiesFiles = new LinkedList<>();
-        List<VirtualFile> allConfigFiles = new LinkedList<>();
+        final List<VirtualFile> bootstrapYmlFiles = new LinkedList<>();
+        final List<VirtualFile> bootstrapYamlFiles = new LinkedList<>();
+        final List<VirtualFile> bootstrapPropertiesFiles = new LinkedList<>();
+        final List<VirtualFile> applicationYmlFiles = new LinkedList<>();
+        final List<VirtualFile> applicationYamlFiles = new LinkedList<>();
+        final List<VirtualFile> applicationPropertiesFiles = new LinkedList<>();
+        final List<VirtualFile> applicationDefaultYmlFiles = new LinkedList<>();
+        final List<VirtualFile> applicationDefaultYamlFiles = new LinkedList<>();
+        final List<VirtualFile> applicationDefaultPropertiesFiles = new LinkedList<>();
+        final List<VirtualFile> allConfigFiles = new LinkedList<>();
         if (virtualYAMLFiles != null) {
             allConfigFiles.addAll(virtualYAMLFiles);
         }
         if (virtualPropertiesFile != null) {
             allConfigFiles.addAll(virtualPropertiesFile);
         }
-        for (VirtualFile virtualFile : allConfigFiles) {
-            String configFilePath = virtualFile.getPath();
+        for (final VirtualFile virtualFile : allConfigFiles) {
+            final String configFilePath = virtualFile.getPath();
             final boolean isTestConfigFile = configFilePath.contains("/src/test");
             if (needTestFile && !isTestConfigFile) {
                 continue;
             } else if (!needTestFile && isTestConfigFile) {
                 continue;
             }
-            String[] paths = virtualFile.getName().split("[\\\\/]");
-            String fileName = paths[paths.length - 1];
+            final String[] paths = virtualFile.getName().split("[\\\\/]");
+            final String fileName = paths[paths.length - 1];
             if ("bootstrap.yml".equals(fileName)) {
                 bootstrapYmlFiles.add(virtualFile);
             } else if ("bootstrap.yaml".equals(fileName)) {

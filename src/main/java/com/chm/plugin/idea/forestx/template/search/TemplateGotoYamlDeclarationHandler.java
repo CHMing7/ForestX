@@ -38,28 +38,30 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
 
     @Override
     public PsiElement @Nullable [] getGotoDeclarationTargets(@Nullable PsiElement sourceElement, int offset, Editor editor) {
-        Project project = sourceElement.getProject();
+        final Project project = sourceElement.getProject();
         if (!isPropertyKey(sourceElement)) {
             return null;
         }
-        List<PsiElement> results = new LinkedList<>();
-        String propertyKey = sourceElement.getText();
-        VirtualFile sourceVirtualFile = sourceElement.getContainingFile().getVirtualFile();
-        String filePath = ForestTemplateUtil.getPathOfVirtualFile(sourceVirtualFile);
-        boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
-        Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
+        final List<PsiElement> results = new LinkedList<>();
+        final String propertyKey = sourceElement.getText();
+        final VirtualFile sourceVirtualFile = sourceElement.getContainingFile().getVirtualFile();
+        final String filePath = ForestTemplateUtil.getPathOfVirtualFile(sourceVirtualFile);
+        final boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
+        final Collection<VirtualFile> virtualFiles =
+                SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
 
-        for (VirtualFile virtualFile : virtualFiles) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+        for (final VirtualFile virtualFile : virtualFiles) {
+            final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
             if (psiFile instanceof YAMLFileImpl) {
-                YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                for (YAMLDocument document : yamlFile.getDocuments()) {
-                    ConfigYamlAccessor accessor = new ConfigYamlAccessor(document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                    List<YAMLKeyValue> allKeyValues = accessor.getAllKeys();
-                    for (YAMLKeyValue keyValue : allKeyValues) {
-                        YAMLValue value = keyValue.getValue();
+                final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
+                for (final YAMLDocument document : yamlFile.getDocuments()) {
+                    final ConfigYamlAccessor accessor =
+                            new ConfigYamlAccessor(document, SpringBootApplicationMetaConfigKeyManager.getInstance());
+                    final List<YAMLKeyValue> allKeyValues = accessor.getAllKeys();
+                    for (final YAMLKeyValue keyValue : allKeyValues) {
+                        final YAMLValue value = keyValue.getValue();
                         if (value instanceof YAMLPlainTextImpl) {
-                            String keyName = YAMLUtil.getConfigFullName(keyValue);
+                            final String keyName = YAMLUtil.getConfigFullName(keyValue);
                             if (keyName.equals(propertyKey)) {
                                 results.add(keyValue);
                                 break;
@@ -70,9 +72,9 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
                     }
                 }
             } else if (psiFile instanceof PropertiesFileImpl) {
-                PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
-                for (IProperty property : propertiesFile.getProperties()) {
-                    String key = property.getKey();
+                final PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
+                for (final IProperty property : propertiesFile.getProperties()) {
+                    final String key = property.getKey();
                     if (StringUtils.isNotEmpty(key) && key.equals(propertyKey)) {
                         results.add(property.getPsiElement());
                     }

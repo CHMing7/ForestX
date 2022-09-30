@@ -1,6 +1,6 @@
 package com.chm.plugin.idea.forestx.template.completion;
 
-import com.chm.plugin.idea.forestx.template.holder.ForestTemplateFiledHolder;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateFieldHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateInvocationHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
@@ -50,40 +50,42 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
         }
         final String filePath = javaVirtualFile.getPath();
         final boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
-
-        ForestTemplatePathElement pathElement = PsiTreeUtil.getParentOfType(element, ForestTemplatePathElement.class);
-        PsiElement prevElement = pathElement.getPrevSibling();
+        final ForestTemplatePathElement pathElement = PsiTreeUtil.getParentOfType(element, ForestTemplatePathElement.class);
+        final PsiElement prevElement = pathElement.getPrevSibling();
         if (prevElement == null) {
             return;
         }
-        ForestTemplatePathElementHolder holder = ForestTemplateUtil.getELHolder(isTestSourceFile, prevElement);
+
+        final PsiElement literal = ForestTemplateUtil.getJavaElement(project, element);
+        final PsiMethod method = PsiTreeUtil.getParentOfType(literal, PsiMethod.class);
+        final ForestTemplatePathElementHolder holder = ForestTemplateUtil.getELHolder(
+                isTestSourceFile, prevElement, method);
         if (holder == null) {
             return;
         }
-        PsiType type = holder.getType();
-        System.out.println(type);
-        PsiClass psiClass = PsiUtil.resolveClassInType(type);
-        PsiMethod[] methods = PsiClassImplUtil.getAllMethods(psiClass);
-        Set<String> nameCache = new HashSet<>();
-        for (PsiMethod method : methods) {
-            PsiParameterList paramList = method.getParameterList();
-            if (paramList.getParametersCount() > 0) {
+        final PsiType type = holder.getType();
+        final PsiClass psiClass = PsiUtil.resolveClassInType(type);
+        final PsiMethod[] methods = PsiClassImplUtil.getAllMethods(psiClass);
+        final Set<String> nameCache = new HashSet<>();
+        for (PsiMethod mtd : methods) {
+            final PsiParameterList paramList = mtd.getParameterList();
+            if (paramList.getParametersCount() > 1) {
                 continue;
             }
-            String methodName = method.getName();
-            if (nameCache.contains(method.getName())) {
+            final String methodName = mtd.getName();
+            if (nameCache.contains(mtd.getName())) {
                 continue;
             }
             nameCache.add(methodName);
             if (methodName.startsWith("get") && methodName.length() > 3) {
                 String getter = methodName.substring(3);
                 getter = getter.substring(0, 1).toLowerCase() + getter.substring(1);
-                ForestTemplateFiledHolder filedHolder = new ForestTemplateFiledHolder(getter, method, type);
+                ForestTemplateFieldHolder filedHolder = new ForestTemplateFieldHolder(getter, mtd, type);
                 resultSet.addElement(LookupElementBuilder.create(filedHolder)
-                        .withRenderer(ForestTemplateFiledHolder.FIELD_RENDER));
+                        .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
             }
-            ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(
-                    method.getName(), method, type, Lists.newArrayList());
+            final ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(
+                    mtd.getName(), mtd, type, Lists.newArrayList());
             resultSet.addElement(LookupElementBuilder.create(invocationHolder)
                     .withRenderer(ForestTemplateInvocationHolder.INVOCATION_RENDER));
         }

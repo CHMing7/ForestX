@@ -27,17 +27,17 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
     public final static LookupElementRenderer<LookupElement> YAML_KEY_VALUE_CONFIG_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            ForestTemplateYAMLVariableHolder yamlVariable = (ForestTemplateYAMLVariableHolder) element.getObject();
-            YAMLPsiElement elem = yamlVariable.getElement();
+            final ForestTemplateYAMLVariableHolder yamlVariable = (ForestTemplateYAMLVariableHolder) element.getObject();
+            final YAMLPsiElement elem = yamlVariable.getElement();
             presentation.setIcon(PlatformIcons.PROPERTY_ICON);
             String value = null;
-            TextAttributes attrs = EditorColorsManager.getInstance().getGlobalScheme().getAttributes(PropertiesHighlighter.PROPERTY_VALUE);
+            final TextAttributes attrs = EditorColorsManager.getInstance().getGlobalScheme().getAttributes(PropertiesHighlighter.PROPERTY_VALUE);
             presentation.setItemText(yamlVariable.getVarName());
             if (elem instanceof YAMLKeyValue) {
-                YAMLKeyValue yamlKeyValue = (YAMLKeyValue) elem;
+                final YAMLKeyValue yamlKeyValue = (YAMLKeyValue) elem;
                 value = ConfigYamlUtils.getValuePresentationText(yamlKeyValue);
             } else if (elem instanceof YAMLSequenceItem) {
-                YAMLSequenceItem item = (YAMLSequenceItem) elem;
+                final YAMLSequenceItem item = (YAMLSequenceItem) elem;
                 value = getSequenceItemText(item);
             }
             if (yamlVariable.isEl()) {
@@ -49,12 +49,12 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
 
 
     private static @NotNull String getSequenceItemText(YAMLSequenceItem item) {
-        List<YAMLKeyValue> keysValues = new ArrayList<>();
+        final List<YAMLKeyValue> keysValues = new ArrayList<>();
         int count = 0;
         String suffix = "";
-        Iterator<YAMLKeyValue> iterator = item.getKeysValues().iterator();
+        final Iterator<YAMLKeyValue> iterator = item.getKeysValues().iterator();
 
-        for (YAMLKeyValue keysValue : item.getKeysValues()) {
+        for (final YAMLKeyValue keysValue : item.getKeysValues()) {
             keysValues.add(keysValue);
             if (count++ == 2) {
                 if (iterator.hasNext()) {
@@ -68,7 +68,7 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
             return Objects.requireNonNull(item.getValue()).getText();
         }
 
-        String result = StringUtil.join(
+        final String result = StringUtil.join(
                 keysValues, (keyValue) ->
                         keyValue.getKeyText() + ": " + ConfigYamlUtils.getValuePresentationText(keyValue), ", ") +
                 suffix;

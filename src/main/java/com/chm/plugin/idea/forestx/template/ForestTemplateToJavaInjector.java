@@ -23,7 +23,7 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
     @Override
     public void getLanguagesToInject(@NotNull MultiHostRegistrar registrar, @NotNull PsiElement host) {
         if (host instanceof PsiLiteralExpressionImpl && shouldInject(host)) {
-            PsiLiteralExpressionImpl expr = (PsiLiteralExpressionImpl) host;
+            final PsiLiteralExpressionImpl expr = (PsiLiteralExpressionImpl) host;
 
             registrar
                     .startInjecting(ForestTemplateLanguage.INSTANCE)
@@ -39,26 +39,26 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
         return Collections.singletonList(PsiLiteralExpression.class);
     }
 
-    public TextRange innerRangeStrippingQuotes(PsiLiteralExpression expr) {
+    public TextRange innerRangeStrippingQuotes(final PsiLiteralExpression expr) {
         return new TextRange(
                 0,
                 expr.getTextLength());
     }
 
-    public boolean shouldInject(PsiElement context) {
+    public boolean shouldInject(final PsiElement context) {
         if (!(context instanceof PsiLiteralExpression)) {
             return false;
         }
-        PsiLiteralExpression expr = (PsiLiteralExpression) context;
+        final PsiLiteralExpression expr = (PsiLiteralExpression) context;
         PsiElement parent = expr.getParent();
         if (parent instanceof PsiNameValuePair) {
-            PsiNameValuePair nameValuePair = (PsiNameValuePair) parent;
+            final PsiNameValuePair nameValuePair = (PsiNameValuePair) parent;
             parent = nameValuePair.getParent();
             if (parent instanceof PsiAnnotationParameterList) {
-                PsiAnnotationParameterList annotationParameterList = (PsiAnnotationParameterList) parent;
+                final PsiAnnotationParameterList annotationParameterList = (PsiAnnotationParameterList) parent;
                 parent = annotationParameterList.getParent();
                 if (parent instanceof PsiAnnotation) {
-                    PsiAnnotation annotation = (PsiAnnotation) parent;
+                    final PsiAnnotation annotation = (PsiAnnotation) parent;
                     return Annotation.isForestAnnotation(annotation.getQualifiedName());
                 }
             }

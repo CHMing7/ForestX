@@ -1,6 +1,7 @@
-package com.chm.plugin.idea.forestx.template.completion;
+package com.chm.plugin.idea.forestx.template.holder;
 
 import com.chm.plugin.idea.forestx.annotation.Annotation;
+import com.chm.plugin.idea.forestx.template.completion.SearchedParameterVariable;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
@@ -11,12 +12,13 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.util.PlatformIcons;
 
-public class SearchedParameterVariable {
+public class ForestTemplateParameterVariableHolder extends ForestTemplateVariableHolder {
 
     public final static LookupElementRenderer<LookupElement> PARAMETER_VAR_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            final SearchedParameterVariable forestVariable = (SearchedParameterVariable) element.getObject();
+            final ForestTemplateParameterVariableHolder forestVariable = (ForestTemplateParameterVariableHolder)
+                    element.getObject();
             final String varName = forestVariable.getVarName();
             final PsiType varType = forestVariable.getType();
             presentation.setIcon(PlatformIcons.PARAMETER_ICON);
@@ -26,15 +28,7 @@ public class SearchedParameterVariable {
     };
 
 
-    protected final String varName;
-
-    protected final PsiParameter parameter;
-
-    protected final PsiType type;
-
-
-
-    public static SearchedParameterVariable findVariable(PsiParameter parameter) {
+    public static ForestTemplateParameterVariableHolder findVariable(PsiParameter parameter) {
         PsiAnnotation[] annotations = parameter.getAnnotations();
         for (PsiAnnotation ann : annotations) {
             if (ann.getQualifiedName().equals(Annotation.VAR.getQualifiedName())) {
@@ -46,32 +40,19 @@ public class SearchedParameterVariable {
                     return null;
                 }
                 PsiType type = parameter.getType();
-                return new SearchedParameterVariable(varName, type, parameter);
+                return new ForestTemplateParameterVariableHolder(varName, type, parameter);
             }
         }
         return null;
     }
 
-    public SearchedParameterVariable(String varName, PsiType type, PsiParameter parameter) {
-        this.varName = varName;
-        this.type = type;
-        this.parameter = parameter;
-    }
 
-    public String getVarName() {
-        return varName;
-    }
-
-    public PsiType getType() {
-        return type;
-    }
-
-    public PsiParameter getParameter() {
-        return parameter;
+    public ForestTemplateParameterVariableHolder(String varName, PsiType type, PsiParameter parameter) {
+        super(varName, parameter, type, false);
     }
 
     @Override
-    public String toString() {
-        return varName;
+    public String getVarName() {
+        return insertion;
     }
 }

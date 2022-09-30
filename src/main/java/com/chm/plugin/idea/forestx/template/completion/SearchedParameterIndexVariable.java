@@ -12,9 +12,9 @@ public class SearchedParameterIndexVariable extends SearchedParameterVariable {
     public final static LookupElementRenderer<LookupElement> PARAMETER_INDEX_VAR_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            SearchedParameterIndexVariable forestVariable = (SearchedParameterIndexVariable) element.getObject();
-            PsiParameter psiParameter = forestVariable.getParameter();
-            PsiType varType = forestVariable.getType();
+            final SearchedParameterIndexVariable forestVariable = (SearchedParameterIndexVariable) element.getObject();
+            final PsiParameter psiParameter = forestVariable.getParameter();
+            final PsiType varType = forestVariable.getType();
             presentation.setIcon(PlatformIcons.PARAMETER_ICON);
             presentation.setItemText(forestVariable.toString());
             presentation.setTypeText(varType.getPresentableText());
@@ -24,8 +24,8 @@ public class SearchedParameterIndexVariable extends SearchedParameterVariable {
 
 
     public static SearchedParameterIndexVariable getIndexVariable(PsiParameter parameter, int index) {
-        PsiType type = parameter.getType();
-        String varName = index + "";
+        final PsiType type = parameter.getType();
+        final String varName = index + "";
         return new SearchedParameterIndexVariable(varName, index, type, parameter);
     }
 

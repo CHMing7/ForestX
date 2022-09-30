@@ -35,7 +35,7 @@ public class ForestConfigReferenceCompletionProvider extends CompletionProvider<
         final boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
         final boolean hasSpringBootLib = SpringBootLibraryUtil.hasSpringBootLibrary(module);
         if (hasSpringBootLib) {
-            List<SearchedConfigItem> searchedConfigItems = ForestTemplateUtil.searchConfigItems(project, isTestSourceFile, null, false);
+            final List<SearchedConfigItem> searchedConfigItems = ForestTemplateUtil.searchConfigItems(project, isTestSourceFile, null, false);
             for (SearchedConfigItem item : searchedConfigItems) {
                 if (item instanceof SearchedConfigYAMLKeyValue) {
                     resultSet.addElement(LookupElementBuilder.create(item)

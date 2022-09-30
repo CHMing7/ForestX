@@ -35,7 +35,7 @@ public abstract class ForestTemplatePathElementHolder<T> {
 
     public PsiClass getPsiClass() {
         if (element instanceof PsiElement) {
-            Optional<PsiClass> clazz = JavaUtil.findClazz(((PsiElement) element).getProject(), type.getCanonicalText());
+            final Optional<PsiClass> clazz = JavaUtil.findClazz(((PsiElement) element).getProject(), type.getCanonicalText());
             return clazz.get();
         }
         return null;

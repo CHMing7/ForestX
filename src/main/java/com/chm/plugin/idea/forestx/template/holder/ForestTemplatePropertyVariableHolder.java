@@ -12,8 +12,8 @@ public class ForestTemplatePropertyVariableHolder extends ForestTemplateVariable
     public final static LookupElementRenderer<LookupElement> PROPERTY_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            ForestTemplatePropertyVariableHolder searchedProp = (ForestTemplatePropertyVariableHolder) element.getObject();
-            IProperty prop = searchedProp.getElement();
+            final ForestTemplatePropertyVariableHolder searchedProp = (ForestTemplatePropertyVariableHolder) element.getObject();
+            final IProperty prop = searchedProp.getElement();
             presentation.setIcon(PlatformIcons.PROPERTY_ICON);
             presentation.setItemText(searchedProp.getVarName());
             presentation.setTailText("=" + prop.getValue());

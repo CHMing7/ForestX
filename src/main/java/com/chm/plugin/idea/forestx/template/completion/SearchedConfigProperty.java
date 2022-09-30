@@ -12,8 +12,8 @@ public class SearchedConfigProperty extends SearchedConfigItem<IProperty> {
     public final static LookupElementRenderer<LookupElement> PROPERTY_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            SearchedConfigProperty searchedProp = (SearchedConfigProperty) element.getObject();
-            IProperty prop = searchedProp.getElement();
+            final SearchedConfigProperty searchedProp = (SearchedConfigProperty) element.getObject();
+            final IProperty prop = searchedProp.getElement();
             presentation.setIcon(PlatformIcons.PROPERTY_ICON);
             presentation.setItemText(searchedProp.getItemText());
             presentation.setTailText("=" + prop.getValue());
