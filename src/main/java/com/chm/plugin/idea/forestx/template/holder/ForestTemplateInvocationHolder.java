@@ -1,5 +1,7 @@
 package com.chm.plugin.idea.forestx.template.holder;
 
+import com.intellij.codeInsight.completion.InsertHandler;
+import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
@@ -8,6 +10,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.util.PlatformIcons;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -30,9 +33,22 @@ public class ForestTemplateInvocationHolder extends ForestTemplatePathElementHol
             presentation.setIcon(PlatformIcons.METHOD_ICON);
             presentation.setItemText(psiMethod.getName());
             presentation.setTailText(paramText.toString());
-//            presentation.setTypeText(psiMethod.getReturnType().getPresentableText());
         }
     };
+
+    public final static InsertHandler<LookupElement> INVOCATION_INSERT_HANDLER = (context, item) -> {
+        final int offset = context.getTailOffset();
+        context.getDocument().insertString(offset, "()");
+        final ForestTemplateInvocationHolder invocationHolder = (ForestTemplateInvocationHolder) item.getObject();
+        final PsiMethod psiMethod = invocationHolder.getMethod();
+        final PsiParameter[] parameters = psiMethod.getParameterList().getParameters();
+        int toOffset = offset + 2;
+        if (parameters.length > 0) {
+            toOffset = offset + 1;
+        }
+        context.getEditor().getCaretModel().moveToOffset(toOffset);
+    };
+
 
     private final PsiMethod method;
     private final List<PsiElement> arguments;

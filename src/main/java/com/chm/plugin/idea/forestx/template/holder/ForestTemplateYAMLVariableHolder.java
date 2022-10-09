@@ -48,7 +48,7 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
     };
 
 
-    private static @NotNull String getSequenceItemText(YAMLSequenceItem item) {
+    private static @NotNull String getSequenceItemText(final YAMLSequenceItem item) {
         final List<YAMLKeyValue> keysValues = new ArrayList<>();
         int count = 0;
         String suffix = "";

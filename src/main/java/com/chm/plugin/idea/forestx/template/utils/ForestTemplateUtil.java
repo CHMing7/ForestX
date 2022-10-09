@@ -74,7 +74,7 @@ public class ForestTemplateUtil {
         return filePath;
     }
 
-    public static boolean isTestFile(String filePath) {
+    public static boolean isTestFile(final String filePath) {
         return filePath.contains(ForestTemplateUtil.TEST_DIR);
     }
 
@@ -192,23 +192,23 @@ public class ForestTemplateUtil {
 
 
     public static List<SearchedConfigItem> searchConfigItems(final Project project, final boolean isTestSourceFile, final String prefix, final boolean isEL) {
-        List<SearchedConfigItem> resultItems = new ArrayList<>();
-        Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
+        final List<SearchedConfigItem> resultItems = new ArrayList<>();
+        final Collection<VirtualFile> virtualFiles = SpringBootConfigFileUtil.findSpringBootConfigFiles(project, isTestSourceFile);
         for (VirtualFile yamlVirtualFile : virtualFiles) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(yamlVirtualFile);
+            final PsiFile psiFile = PsiManager.getInstance(project).findFile(yamlVirtualFile);
             if (psiFile == null) {
                 continue;
             }
             if (psiFile instanceof YAMLFileImpl) {
                 // yaml 配置文件
-                YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                List<YAMLDocument> documents = yamlFile.getDocuments();
+                final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
+                final List<YAMLDocument> documents = yamlFile.getDocuments();
                 for (YAMLDocument document : documents) {
-                    ConfigYamlAccessor accessor = new ConfigYamlAccessor(
+                    final ConfigYamlAccessor accessor = new ConfigYamlAccessor(
                             document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                    List<YAMLKeyValue> allDocKeyValues = accessor.getAllKeys();
+                    final List<YAMLKeyValue> allDocKeyValues = accessor.getAllKeys();
                     for (YAMLKeyValue keyValue : allDocKeyValues) {
-                        YAMLValue value = keyValue.getValue();
+                        final YAMLValue value = keyValue.getValue();
                         if (value instanceof YAMLPlainTextImpl) {
                             String key = YAMLUtil.getConfigFullName(keyValue);
                             if (prefix != null) {
@@ -221,7 +221,7 @@ public class ForestTemplateUtil {
                             }
                         } else if (value instanceof YAMLBlockSequenceImpl) {
                             for (YAMLSequenceItem item : ((YAMLBlockSequenceImpl) value).getItems()) {
-                                YAMLValue itemValue = item.getValue();
+                                final YAMLValue itemValue = item.getValue();
                                 if (itemValue instanceof YAMLPlainTextImpl) {
                                     String key = YAMLUtil.getConfigFullName(item);
                                     if (prefix != null) {
@@ -239,8 +239,8 @@ public class ForestTemplateUtil {
                 }
             } else if (psiFile instanceof PropertiesFileImpl) {
                 // Properties 配置文件
-                PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
-                List<IProperty> properties = propertiesFile.getProperties();
+                final PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
+                final List<IProperty> properties = propertiesFile.getProperties();
                 for (IProperty property : properties) {
                     String key = property.getKey();
                     if (key == null) {

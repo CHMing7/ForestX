@@ -48,10 +48,10 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
 
 
     private static @NotNull String getSequenceItemText(YAMLSequenceItem item) {
-        List<YAMLKeyValue> keysValues = new SmartList();
+        final List<YAMLKeyValue> keysValues = new SmartList();
         int count = 0;
         String suffix = "";
-        Iterator<YAMLKeyValue> iterator = item.getKeysValues().iterator();
+        final Iterator<YAMLKeyValue> iterator = item.getKeysValues().iterator();
 
         for (YAMLKeyValue keysValue : item.getKeysValues()) {
             keysValues.add(keysValue);

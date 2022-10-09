@@ -87,7 +87,7 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
 
     private void processYAMLBlockSequence(YAMLBlockSequenceImpl blockSequence, String propertyKey, List<PsiElement> results) {
         for (YAMLSequenceItem item : blockSequence.getItems()) {
-            YAMLValue itemValue = item.getValue();
+            final YAMLValue itemValue = item.getValue();
             if (itemValue instanceof YAMLPlainTextImpl) {
                 String keyName = YAMLUtil.getConfigFullName(item);
                 if (keyName.equals(propertyKey)) {
@@ -98,7 +98,7 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
         }
     }
 
-    public boolean isPropertyKey(PsiElement element) {
+    public boolean isPropertyKey(final PsiElement element) {
         if (!(element instanceof LeafPsiElement)) {
             return false;
         }

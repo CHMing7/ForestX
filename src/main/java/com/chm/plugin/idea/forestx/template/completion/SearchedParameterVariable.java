@@ -34,18 +34,18 @@ public class SearchedParameterVariable {
 
 
 
-    public static SearchedParameterVariable findVariable(PsiParameter parameter) {
-        PsiAnnotation[] annotations = parameter.getAnnotations();
+    public static SearchedParameterVariable findVariable(final PsiParameter parameter) {
+        final PsiAnnotation[] annotations = parameter.getAnnotations();
         for (PsiAnnotation ann : annotations) {
             if (ann.getQualifiedName().equals(Annotation.VAR.getQualifiedName())) {
-                PsiAnnotationMemberValue varNameAttrValue = ann.findAttributeValue("value");
+                final PsiAnnotationMemberValue varNameAttrValue = ann.findAttributeValue("value");
                 String varName = null;
                 if (varNameAttrValue instanceof PsiLiteralExpression) {
                     varName = String.valueOf(((PsiLiteralExpression) varNameAttrValue).getValue());
                 } else {
                     return null;
                 }
-                PsiType type = parameter.getType();
+                final PsiType type = parameter.getType();
                 return new SearchedParameterVariable(varName, type, parameter);
             }
         }

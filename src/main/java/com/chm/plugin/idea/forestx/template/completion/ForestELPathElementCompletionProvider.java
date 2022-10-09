@@ -65,6 +65,9 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
         }
         final PsiType type = holder.getType();
         final PsiClass psiClass = PsiUtil.resolveClassInType(type);
+        if (psiClass == null) {
+            return;
+        }
         final PsiMethod[] methods = PsiClassImplUtil.getAllMethods(psiClass);
         final Set<String> nameCache = new HashSet<>();
         for (PsiMethod mtd : methods) {
@@ -80,14 +83,15 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
             if (methodName.startsWith("get") && methodName.length() > 3) {
                 String getter = methodName.substring(3);
                 getter = getter.substring(0, 1).toLowerCase() + getter.substring(1);
-                ForestTemplateFieldHolder filedHolder = new ForestTemplateFieldHolder(getter, mtd, type);
+                final ForestTemplateFieldHolder filedHolder = new ForestTemplateFieldHolder(getter, mtd, type);
                 resultSet.addElement(LookupElementBuilder.create(filedHolder)
                         .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
             }
             final ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(
                     mtd.getName(), mtd, type, Lists.newArrayList());
             resultSet.addElement(LookupElementBuilder.create(invocationHolder)
-                    .withRenderer(ForestTemplateInvocationHolder.INVOCATION_RENDER));
+                    .withRenderer(ForestTemplateInvocationHolder.INVOCATION_RENDER)
+                    .withInsertHandler(ForestTemplateInvocationHolder.INVOCATION_INSERT_HANDLER));
         }
     }
 }

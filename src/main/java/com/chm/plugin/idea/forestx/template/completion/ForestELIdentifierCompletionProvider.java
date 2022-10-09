@@ -62,9 +62,9 @@ public class ForestELIdentifierCompletionProvider extends CompletionProvider<Com
         if (method != null) {
             final PsiParameterList paramList = PsiTreeUtil.getChildOfType(method, PsiParameterList.class);
             if (paramList != null && paramList.getParametersCount() > 0) {
-                PsiParameter[] methodParamArray = paramList.getParameters();
+                final PsiParameter[] methodParamArray = paramList.getParameters();
                 for (int i = 0; i < methodParamArray.length; i++) {
-                    PsiParameter methodParam = methodParamArray[i];
+                    final PsiParameter methodParam = methodParamArray[i];
                     final SearchedParameterIndexVariable indexVariable = SearchedParameterIndexVariable.getIndexVariable(methodParam, i);
                     resultSet.addElement(LookupElementBuilder.create(indexVariable)
                             .withRenderer(SearchedParameterIndexVariable.PARAMETER_INDEX_VAR_RENDER));

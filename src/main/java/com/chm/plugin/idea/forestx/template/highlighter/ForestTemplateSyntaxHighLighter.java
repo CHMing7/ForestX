@@ -24,7 +24,7 @@ public class ForestTemplateSyntaxHighLighter extends SyntaxHighlighterBase {
             createTextAttributesKey("PROP_BLOCKS", DefaultLanguageHighlighterColors.KEYWORD);
 
     public static final TextAttributesKey PROP_REFERENCE =
-            createTextAttributesKey("PROP_REFERENCE", DefaultLanguageHighlighterColors.CONSTANT);
+            createTextAttributesKey("PROP_REFERENCE", DefaultLanguageHighlighterColors.IDENTIFIER);
 
     public static final TextAttributesKey EL_BLOCK_BEGIN =
             createTextAttributesKey("EL_BLOCK_BEGIN", DefaultLanguageHighlighterColors.KEYWORD);
