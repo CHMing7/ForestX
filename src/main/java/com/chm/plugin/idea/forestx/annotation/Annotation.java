@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.jgoodies.common.base.Strings;
@@ -169,30 +170,26 @@ public class Annotation implements Cloneable {
     private Map<String, AnnotationValue> attributePairs;
 
 
-    public static boolean isForestAnnotation(String qualifiedName) {
-        if (Strings.isEmpty(qualifiedName)) {
+    public static boolean isForestAnnotation(PsiAnnotation annotation) {
+        if (annotation == null) {
             return false;
         }
+        final String qualifiedName = annotation.getQualifiedName();
         if (qualifiedName.startsWith("com.dtflys.forest")) {
             return true;
         }
-        try {
-            Class annotationClass = Class.forName(qualifiedName);
-            java.lang.annotation.Annotation[] parentAnnotationClass = annotationClass.getAnnotations();
-            for (java.lang.annotation.Annotation annClass : parentAnnotationClass) {
-                final String className = annClass.annotationType().getName();
-                if (className.equals("com.dtflys.forest.annotation.MethodLifeCycle") ||
-                        className.equals("com.dtflys.forest.annotation.ParamLifeCycle") ||
-                        className.equals("com.dtflys.forest.annotation.BaseLifeCycle")) {
-                    return true;
-                }
+        PsiClass annotationType = annotation.resolveAnnotationType();
+        PsiAnnotation[] typeAnnotations = annotationType.getAnnotations();
+        for (PsiAnnotation typeAnnotation : typeAnnotations) {
+            final String className = typeAnnotation.getQualifiedName();
+            if (className.equals("com.dtflys.forest.annotation.MethodLifeCycle") ||
+                    className.equals("com.dtflys.forest.annotation.ParamLifeCycle") ||
+                    className.equals("com.dtflys.forest.annotation.BaseLifeCycle")) {
+                return true;
             }
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
         return false;
     }
-
 
 
     /**
