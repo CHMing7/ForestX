@@ -1,4 +1,4 @@
-package com.chm.plugin.idea.forestx.template.completion;
+package com.chm.plugin.idea.forestx.template.holder;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
@@ -7,13 +7,13 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.util.PlatformIcons;
 
-public class SearchedParameterIndexVariable extends SearchedParameterVariable {
+public class ForestTemplateParameterIndexVariableHolder extends ForestTemplateParameterVariableHolder {
 
     public final static LookupElementRenderer<LookupElement> PARAMETER_INDEX_VAR_RENDER = new LookupElementRenderer<LookupElement>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
-            final SearchedParameterIndexVariable forestVariable = (SearchedParameterIndexVariable) element.getObject();
-            final PsiParameter psiParameter = forestVariable.getParameter();
+            final ForestTemplateParameterIndexVariableHolder forestVariable = (ForestTemplateParameterIndexVariableHolder) element.getObject();
+            final PsiParameter psiParameter = (PsiParameter) forestVariable.getElement();
             final PsiType varType = forestVariable.getType();
             presentation.setIcon(PlatformIcons.PARAMETER_ICON);
             presentation.setItemText(forestVariable.toString());
@@ -23,18 +23,12 @@ public class SearchedParameterIndexVariable extends SearchedParameterVariable {
     };
 
 
-    public static SearchedParameterIndexVariable getIndexVariable(PsiParameter parameter, int index) {
-        final PsiType type = parameter.getType();
-        final String varName = index + "";
-        return new SearchedParameterIndexVariable(varName, index, type, parameter);
-    }
-
-
     private final int index;
 
     private final boolean hasDollar;
 
-    public SearchedParameterIndexVariable(String varName, int index, PsiType type, PsiParameter parameter) {
+
+    public ForestTemplateParameterIndexVariableHolder(String varName, int index, PsiType type, PsiParameter parameter) {
         super(varName, type, parameter);
         this.index = index;
         this.hasDollar = true;
@@ -44,7 +38,7 @@ public class SearchedParameterIndexVariable extends SearchedParameterVariable {
         return index;
     }
 
-    public boolean hasDollar() {
+    public boolean isHasDollar() {
         return hasDollar;
     }
 
@@ -57,4 +51,11 @@ public class SearchedParameterIndexVariable extends SearchedParameterVariable {
         builder.append(index);
         return builder.toString();
     }
+
+    public static ForestTemplateParameterIndexVariableHolder findIndexVariable(PsiParameter parameter, int index) {
+        final PsiType type = parameter.getType();
+        final String varName = index + "";
+        return new ForestTemplateParameterIndexVariableHolder(varName, index, type, parameter);
+    }
+
 }

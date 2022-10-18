@@ -2,14 +2,28 @@ package com.chm.plugin.idea.forestx.utils;
 
 import com.chm.plugin.idea.forestx.Icons;
 import com.chm.plugin.idea.forestx.annotation.Annotation;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterIndexVariableHolder;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
+import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.google.common.collect.Maps;
 import com.intellij.codeInsight.AnnotationUtil;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiParameterList;
+import com.intellij.psi.PsiTypeParameter;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.spring.boot.library.SpringBootLibraryUtil;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.apache.commons.compress.utils.Lists;
 
@@ -22,6 +36,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author caihongming
@@ -77,6 +95,55 @@ public class TreeNodeUtil {
             }
         }
         return null;
+    }
+
+    public static String getMethodFullName(PsiMethod method) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(method.getName()).append('(');
+        PsiTypeParameter[] paramTypes = method.getTypeParameterList().getTypeParameters();
+        int count = method.getParameterList().getParametersCount();
+        for (int i = 0; i < count; i++) {
+            PsiParameter param = method.getParameterList().getParameter(i);
+            builder.append(param.getType());
+            if (i < paramTypes.length - 1) {
+                builder.append(',');
+            }
+        }
+        builder.append(')');
+        return builder.toString();
+    }
+
+    public static void resolveElement(final Project project, final VirtualFile virtualFile, final PsiElement element, final ResolveElementFunction func) {
+        final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+        final Module module = fileIndex.getModuleForFile(virtualFile);
+        if (module == null) {
+            return;
+        }
+        final VirtualFile javaVirtualFile = ForestTemplateUtil.getSourceJavaFile(virtualFile);
+        if (javaVirtualFile == null) {
+            return;
+        }
+        final String filePath = javaVirtualFile.getPath();
+        final boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
+        final boolean hasSpringBootLib = SpringBootLibraryUtil.hasSpringBootLibrary(module);
+
+        final PsiElement literal = ForestTemplateUtil.getJavaElement(element);
+        final PsiMethod method = PsiTreeUtil.getParentOfType(literal, PsiMethod.class);
+
+        func.resolve(javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, method);
+    }
+
+    public static void findMethodParameter(PsiMethod method, BiFunction<PsiParameter, Integer, Boolean> func) {
+        final PsiParameterList paramList = PsiTreeUtil.getChildOfType(method, PsiParameterList.class);
+        if (paramList != null && paramList.getParametersCount() > 0) {
+            final PsiParameter[] methodParamArray = paramList.getParameters();
+            for (int i = 0; i < methodParamArray.length; i++) {
+                final PsiParameter methodParam = methodParamArray[i];
+                if (!func.apply(methodParam, i)) {
+                    return;
+                }
+            }
+        }
     }
 
     public static DefaultMutableTreeNode findNodeOrNew(DefaultTreeModel model,
@@ -244,9 +311,11 @@ public class TreeNodeUtil {
             o = node;
         }
         if (o instanceof Project) {
-            return Icons.PROJECT_16;
+//            Icon newIcon = IconManager.getInstance().createLayered(AllIcons.Nodes.Folder, AllIcons.Modules.SourceRootFileLayer);
+            return AllIcons.Nodes.Folder;
         } else if (o instanceof Module) {
-            return Icons.MODULE_16;
+//            Icon newIcon = IconManager.getInstance().createLayered(AllIcons.Nodes.Folder, AllIcons.Modules.SourceRootFileLayer);
+            return AllIcons.Nodes.Folder;
         } else if (o instanceof PsiClass) {
             return Icons.INTERFACE_18;
         } else if (o instanceof PsiMethod) {

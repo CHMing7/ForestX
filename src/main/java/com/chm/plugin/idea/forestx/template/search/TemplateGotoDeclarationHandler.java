@@ -1,23 +1,27 @@
 package com.chm.plugin.idea.forestx.template.search;
 
-import com.chm.plugin.idea.forestx.template.psi.ForestTemplateElementType;
-import com.chm.plugin.idea.forestx.template.psi.ForestTemplateTokenType;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
 import com.chm.plugin.idea.forestx.template.psi.TemplateTypes;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.chm.plugin.idea.forestx.template.utils.SpringBootConfigFileUtil;
+import com.chm.plugin.idea.forestx.utils.ResolveElementFunction;
+import com.chm.plugin.idea.forestx.utils.TreeNodeUtil;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
-import com.intellij.injected.editor.VirtualFileWindow;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
 import com.intellij.microservices.config.yaml.ConfigYamlAccessor;
-import com.intellij.microservices.config.yaml.ConfigYamlUtils;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -33,15 +37,19 @@ import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiFunction;
 
-public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandler {
+public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
 
     @Override
     public PsiElement @Nullable [] getGotoDeclarationTargets(@Nullable PsiElement sourceElement, int offset, Editor editor) {
-        final Project project = sourceElement.getProject();
+        if (isElIdentifier(sourceElement)) {
+            return getGotoELIdentifierDeclarationTargets(sourceElement, offset, editor);
+        }
         if (!isPropertyKey(sourceElement)) {
             return null;
         }
+        final Project project = sourceElement.getProject();
         final List<PsiElement> results = new LinkedList<>();
         final String propertyKey = sourceElement.getText();
         final VirtualFile sourceVirtualFile = sourceElement.getContainingFile().getVirtualFile();
@@ -98,7 +106,18 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
         }
     }
 
-    public boolean isPropertyKey(final PsiElement element) {
+
+    private boolean isElIdentifier(final PsiElement element) {
+        if (!(element instanceof LeafPsiElement)) {
+            return false;
+        }
+        if (((LeafPsiElement) element).getElementType().equals(TemplateTypes.EL_IDENTIFIER)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isPropertyKey(final PsiElement element) {
         if (!(element instanceof LeafPsiElement)) {
             return false;
         }
@@ -106,6 +125,32 @@ public class TemplateGotoYamlDeclarationHandler implements GotoDeclarationHandle
             return true;
         }
         return false;
+    }
+
+
+    public PsiElement[] getGotoELIdentifierDeclarationTargets(PsiElement sourceElement, int offset, Editor editor) {
+        final Project project = sourceElement.getProject();
+        final VirtualFile virtualFile = PsiUtil.getVirtualFile(sourceElement);
+        if (virtualFile == null) {
+            return null;
+        }
+        final List<PsiElement> results = new LinkedList<>();
+        TreeNodeUtil.resolveElement(project, virtualFile, sourceElement,
+                (javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, defMethod) -> {
+                    final String idText = sourceElement.getText();
+                    TreeNodeUtil.findMethodParameter(defMethod, (psiParameter, integer) -> {
+                        final ForestTemplateParameterVariableHolder variableHolder =
+                                ForestTemplateParameterVariableHolder.findVariable(psiParameter);
+                        if (variableHolder != null) {
+                            if (idText.equals(variableHolder.getVarName())) {
+                                results.add(psiParameter);
+                                return false;
+                            }
+                        }
+                        return true;
+                    });
+                });
+        return results.toArray(new PsiElement[] {});
     }
 
 }

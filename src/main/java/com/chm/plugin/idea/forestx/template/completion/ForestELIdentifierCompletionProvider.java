@@ -1,5 +1,7 @@
 package com.chm.plugin.idea.forestx.template.completion;
 
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterIndexVariableHolder;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePropertyVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHolder;
@@ -7,6 +9,8 @@ import com.chm.plugin.idea.forestx.template.psi.ForestTemplateIdentifier;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.chm.plugin.idea.forestx.template.utils.SearchedConfigItem;
+import com.chm.plugin.idea.forestx.utils.ResolveElementFunction;
+import com.chm.plugin.idea.forestx.utils.TreeNodeUtil;
 import com.intellij.codeInsight.completion.CompletionContext;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
@@ -43,53 +47,37 @@ public class ForestELIdentifierCompletionProvider extends CompletionProvider<Com
         if (virtualFile == null) {
             return;
         }
-        final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
-        final Module module = fileIndex.getModuleForFile(virtualFile);
-        if (module == null) {
-            return;
-        }
-        final VirtualFile javaVirtualFile = ForestTemplateUtil.getSourceJavaFile(virtualFile);
-        if (javaVirtualFile == null) {
-            return;
-        }
-        final String filePath = javaVirtualFile.getPath();
-        final boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
-        final boolean hasSpringBootLib = SpringBootLibraryUtil.hasSpringBootLibrary(module);
-
-        final PsiElement literal = ForestTemplateUtil.getJavaElement(project, element);
-        final PsiMethod method = PsiTreeUtil.getParentOfType(literal, PsiMethod.class);
-
-        if (method != null) {
-            final PsiParameterList paramList = PsiTreeUtil.getChildOfType(method, PsiParameterList.class);
-            if (paramList != null && paramList.getParametersCount() > 0) {
-                final PsiParameter[] methodParamArray = paramList.getParameters();
-                for (int i = 0; i < methodParamArray.length; i++) {
-                    final PsiParameter methodParam = methodParamArray[i];
-                    final SearchedParameterIndexVariable indexVariable = SearchedParameterIndexVariable.getIndexVariable(methodParam, i);
-                    resultSet.addElement(LookupElementBuilder.create(indexVariable)
-                            .withRenderer(SearchedParameterIndexVariable.PARAMETER_INDEX_VAR_RENDER));
-                    final SearchedParameterVariable variable = SearchedParameterVariable.findVariable(methodParam);
-                    if (variable == null) {
-                        continue;
+        TreeNodeUtil.resolveElement(project, virtualFile, element,
+                (javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, method) -> {
+            if (method != null) {
+                TreeNodeUtil.findMethodParameter(method, (methodParam, i) -> {
+                    final ForestTemplateParameterIndexVariableHolder indexVariableHolder =
+                            ForestTemplateParameterIndexVariableHolder.findIndexVariable(methodParam, i);
+                    resultSet.addElement(LookupElementBuilder.create(indexVariableHolder)
+                            .withRenderer(ForestTemplateParameterIndexVariableHolder.PARAMETER_INDEX_VAR_RENDER));
+                    final ForestTemplateParameterVariableHolder variableHolder =
+                            ForestTemplateParameterVariableHolder.findVariable(methodParam);
+                    if (variableHolder != null) {
+                        resultSet.addElement(LookupElementBuilder.create(variableHolder)
+                                .withRenderer(ForestTemplateParameterVariableHolder.PARAMETER_VAR_RENDER));
                     }
-                    resultSet.addElement(LookupElementBuilder.create(variable)
-                            .withRenderer(SearchedParameterVariable.PARAMETER_VAR_RENDER));
+                    return true;
+                });
+            }
+            if (hasSpringBootLib) {
+                final List<ForestTemplateVariableHolder> variableHolders = ForestTemplateUtil.findConfigHolders(
+                        project, isTestSourceFile, ForestTemplateUtil.FOREST_VARIABLES_PREFIX, true);
+                for (final ForestTemplateVariableHolder holder : variableHolders) {
+                    if (holder instanceof ForestTemplateYAMLVariableHolder) {
+                        resultSet.addElement(LookupElementBuilder.create(holder)
+                                .withRenderer(ForestTemplateYAMLVariableHolder.YAML_KEY_VALUE_CONFIG_RENDER));
+                    } else if (holder instanceof ForestTemplatePropertyVariableHolder) {
+                        resultSet.addElement(LookupElementBuilder.create(holder)
+                                .withRenderer(ForestTemplatePropertyVariableHolder.PROPERTY_RENDER));
+                    }
                 }
             }
-        }
-        if (hasSpringBootLib) {
-            final List<ForestTemplateVariableHolder> variableHolders = ForestTemplateUtil.findConfigHolders(
-                    project, isTestSourceFile, ForestTemplateUtil.FOREST_VARIABLES_PREFIX, true);
-            for (final ForestTemplateVariableHolder holder : variableHolders) {
-                if (holder instanceof ForestTemplateYAMLVariableHolder) {
-                    resultSet.addElement(LookupElementBuilder.create(holder)
-                            .withRenderer(ForestTemplateYAMLVariableHolder.YAML_KEY_VALUE_CONFIG_RENDER));
-                } else if (holder instanceof ForestTemplatePropertyVariableHolder) {
-                    resultSet.addElement(LookupElementBuilder.create(holder)
-                            .withRenderer(ForestTemplatePropertyVariableHolder.PROPERTY_RENDER));
-                }
-            }
-        }
+        });
     }
 
 }

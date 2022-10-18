@@ -260,20 +260,25 @@ public class ForestTemplateUtil {
         return resultItems;
     }
 
-    public static PsiElement getJavaElement(final Project project, final PsiElement element) {
-        final CompletionContext completionContext = element.getUserData(CompletionContext.COMPLETION_CONTEXT_KEY);
-        if (completionContext == null) {
-            return null;
-        }
-        final DocumentWindow doc = (DocumentWindow) completionContext.getOffsetMap().getDocument();
-        final Segment[] textRange = doc.getHostRanges();
-        final TextRange range = new TextRange(textRange[0].getStartOffset(), textRange[0].getEndOffset());
-        final PsiFile javaFile = PsiDocumentManager.getInstance(project).getPsiFile(doc.getDelegate());
-        if (javaFile == null) {
-            return null;
-        }
-        final PsiElement javaFileElement = javaFile.findElementAt(range.getStartOffset());
-        return javaFileElement;
+    public static PsiElement getJavaElement(final PsiElement element) {
+        PsiFile psiFile = PsiTreeUtil.getParentOfType(element, PsiFile.class);
+        return psiFile.getContext().getFirstChild();
+
+//        CompletionContext completionContext = element.getUserData(CompletionContext.COMPLETION_CONTEXT_KEY);
+//        if (completionContext == null) {
+//            PsiFile psiFile = PsiTreeUtil.getParentOfType(element, PsiFile.class);
+//            return psiFile.getContext();
+//        }
+//        final DocumentWindow doc = (DocumentWindow) completionContext.getOffsetMap().getDocument();
+//        final Segment[] textRange = doc.getHostRanges();
+////        final TextRange range = new TextRange(textRange[0].getStartOffset(), textRange[0].getEndOffset());
+//        final TextRange range = element.getTextRange();
+//        final PsiFile javaFile = PsiDocumentManager.getInstance(project).getPsiFile(doc.getDelegate());
+//        if (javaFile == null) {
+//            return null;
+//        }
+//        final PsiElement javaFileElement = javaFile.findElementAt(range.getStartOffset());
+//        return javaFileElement;
     }
 
 

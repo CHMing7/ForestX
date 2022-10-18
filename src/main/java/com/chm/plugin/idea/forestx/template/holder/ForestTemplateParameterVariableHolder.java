@@ -1,7 +1,6 @@
 package com.chm.plugin.idea.forestx.template.holder;
 
 import com.chm.plugin.idea.forestx.annotation.Annotation;
-import com.chm.plugin.idea.forestx.template.completion.SearchedParameterVariable;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
@@ -40,7 +39,10 @@ public class ForestTemplateParameterVariableHolder extends ForestTemplateVariabl
                     return null;
                 }
                 final PsiType type = parameter.getType();
-                return new ForestTemplateParameterVariableHolder(varName, type, parameter);
+                ForestTemplateParameterVariableHolder holder =
+                        new ForestTemplateParameterVariableHolder(varName, type, parameter);
+                holder.setVarAnnotation(ann);
+                return holder;
             }
         }
         return null;
@@ -49,6 +51,17 @@ public class ForestTemplateParameterVariableHolder extends ForestTemplateVariabl
 
     public ForestTemplateParameterVariableHolder(String varName, PsiType type, PsiParameter parameter) {
         super(varName, parameter, type, false);
+    }
+
+
+    private PsiAnnotation varAnnotation;
+
+    public void setVarAnnotation(PsiAnnotation varAnnotation) {
+        this.varAnnotation = varAnnotation;
+    }
+
+    public PsiAnnotation getVarAnnotation() {
+        return varAnnotation;
     }
 
     @Override

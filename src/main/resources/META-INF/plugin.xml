@@ -46,7 +46,7 @@
         <completion.contributor language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.completion.ForestTemplateCompletionContributor"/>
 
         <!-- Forest模板跳转到Yaml配置文件 -->
-        <gotoDeclarationHandler order="first" implementation="com.chm.plugin.idea.forestx.template.search.TemplateGotoYamlDeclarationHandler" />
+        <gotoDeclarationHandler order="first" implementation="com.chm.plugin.idea.forestx.template.search.TemplateGotoDeclarationHandler" />
 
 
         <fileType

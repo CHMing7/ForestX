@@ -5,6 +5,8 @@ import com.chm.plugin.idea.forestx.template.holder.ForestTemplateInvocationHolde
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
+import com.chm.plugin.idea.forestx.utils.ResolveElementFunction;
+import com.chm.plugin.idea.forestx.utils.TreeNodeUtil;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
@@ -39,59 +41,54 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
         if (virtualFile == null) {
             return;
         }
-        final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
-        final Module module = fileIndex.getModuleForFile(virtualFile);
-        if (module == null) {
-            return;
-        }
-        final VirtualFile javaVirtualFile = ForestTemplateUtil.getSourceJavaFile(virtualFile);
-        if (javaVirtualFile == null) {
-            return;
-        }
-        final String filePath = javaVirtualFile.getPath();
-        final boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
-        final ForestTemplatePathElement pathElement = PsiTreeUtil.getParentOfType(element, ForestTemplatePathElement.class);
-        final PsiElement prevElement = pathElement.getPrevSibling();
-        if (prevElement == null) {
-            return;
-        }
+        TreeNodeUtil.resolveElement(project, virtualFile, element,
+                (javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, defMethod) -> {
+                    final ForestTemplatePathElement pathElement = PsiTreeUtil.getParentOfType(element, ForestTemplatePathElement.class);
+                    final PsiElement prevElement = pathElement.getPrevSibling();
+                    if (prevElement == null) {
+                        return;
+                    }
+                    final PsiElement literal = ForestTemplateUtil.getJavaElement(element);
+                    final PsiMethod method = PsiTreeUtil.getParentOfType(literal, PsiMethod.class);
+                    final ForestTemplatePathElementHolder holder = ForestTemplateUtil.getELHolder(
+                            isTestSourceFile, prevElement, method);
+                    if (holder == null) {
+                        return;
+                    }
+                    final PsiType type = holder.getType();
+                    final PsiClass psiClass = PsiUtil.resolveClassInType(type);
+                    if (psiClass == null) {
+                        return;
+                    }
+                    final PsiMethod[] methods = PsiClassImplUtil.getAllMethods(psiClass);
+                    final Set<String> nameCache = new HashSet<>();
+                    for (PsiMethod mtd : methods) {
+                        final PsiParameterList paramList = mtd.getParameterList();
+                        final int paramCount = paramList.getParametersCount();
+                        if (paramCount > 1) {
+                            continue;
+                        }
+                        final String methodName = mtd.getName();
+                        if (mtd.isConstructor()) {
+                            continue;
+                        }
+                        final String methodFullName = TreeNodeUtil.getMethodFullName(mtd);
+                        if (nameCache.contains(methodFullName)) {
+                            continue;
+                        }
+                        nameCache.add(methodFullName);
+                        if (methodName.startsWith("get") && methodName.length() > 3) {
+                            final ForestTemplateFieldHolder filedHolder = ForestTemplateFieldHolder.getHolder(mtd, type);
+                            resultSet.addElement(LookupElementBuilder.create(filedHolder)
+                                    .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
+                        }
+                        final ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(
+                                mtd.getName(), mtd, type, Lists.newArrayList());
+                        resultSet.addElement(LookupElementBuilder.create(invocationHolder)
+                                .withRenderer(ForestTemplateInvocationHolder.INVOCATION_RENDER)
+                                .withInsertHandler(ForestTemplateInvocationHolder.INVOCATION_INSERT_HANDLER));
+                    }
+                });
 
-        final PsiElement literal = ForestTemplateUtil.getJavaElement(project, element);
-        final PsiMethod method = PsiTreeUtil.getParentOfType(literal, PsiMethod.class);
-        final ForestTemplatePathElementHolder holder = ForestTemplateUtil.getELHolder(
-                isTestSourceFile, prevElement, method);
-        if (holder == null) {
-            return;
-        }
-        final PsiType type = holder.getType();
-        final PsiClass psiClass = PsiUtil.resolveClassInType(type);
-        if (psiClass == null) {
-            return;
-        }
-        final PsiMethod[] methods = PsiClassImplUtil.getAllMethods(psiClass);
-        final Set<String> nameCache = new HashSet<>();
-        for (PsiMethod mtd : methods) {
-            final PsiParameterList paramList = mtd.getParameterList();
-            if (paramList.getParametersCount() > 1) {
-                continue;
-            }
-            final String methodName = mtd.getName();
-            if (nameCache.contains(mtd.getName())) {
-                continue;
-            }
-            nameCache.add(methodName);
-            if (methodName.startsWith("get") && methodName.length() > 3) {
-                String getter = methodName.substring(3);
-                getter = getter.substring(0, 1).toLowerCase() + getter.substring(1);
-                final ForestTemplateFieldHolder filedHolder = new ForestTemplateFieldHolder(getter, mtd, type);
-                resultSet.addElement(LookupElementBuilder.create(filedHolder)
-                        .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
-            }
-            final ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(
-                    mtd.getName(), mtd, type, Lists.newArrayList());
-            resultSet.addElement(LookupElementBuilder.create(invocationHolder)
-                    .withRenderer(ForestTemplateInvocationHolder.INVOCATION_RENDER)
-                    .withInsertHandler(ForestTemplateInvocationHolder.INVOCATION_INSERT_HANDLER));
-        }
     }
 }
