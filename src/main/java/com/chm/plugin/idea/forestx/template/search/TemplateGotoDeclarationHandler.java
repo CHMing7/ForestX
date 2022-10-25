@@ -40,8 +40,6 @@ import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
 
@@ -129,77 +127,6 @@ public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
             return true;
         }
         return false;
-    }
-
-    public static ForestTemplatePathElementHolder findHolder(
-            PsiElement element,
-            Module module,
-            boolean isTestSourceFile, boolean hasSpringBootLib, PsiMethod defMethod) {
-        ForestTemplatePathElement pathElement = null;
-        ForestTemplatePrimary primary = null;
-        if (element instanceof ForestTemplatePathElement) {
-            pathElement = (ForestTemplatePathElement) element;
-        } else if (element instanceof ForestTemplatePrimary) {
-            primary = (ForestTemplatePrimary) element;
-        } else {
-            final ForestTemplateIdentifier identifier = PsiTreeUtil.getParentOfType(element, ForestTemplateIdentifier.class);
-            if (identifier == null) {
-                return null;
-            }
-            pathElement = PsiTreeUtil.getParentOfType(identifier, ForestTemplatePathElement.class);
-            if (pathElement == null) {
-                primary = PsiTreeUtil.getPrevSiblingOfType(identifier, ForestTemplatePrimary.class);
-            }
-            if (primary == null) {
-                return null;
-            }
-        }
-        if (primary != null) {
-            final String idText = primary.getText();
-            AtomicReference<ForestTemplateParameterVariableHolder> holder = null;
-            TreeNodeUtil.findMethodParameter(defMethod, (psiParameter, integer) -> {
-                final ForestTemplateParameterVariableHolder variableHolder =
-                        ForestTemplateParameterVariableHolder.findVariable(psiParameter);
-                if (variableHolder != null) {
-                    if (idText.equals(variableHolder.getVarName())) {
-                        holder.set(variableHolder);
-                        return false;
-                    }
-                }
-                return true;
-            });
-            return holder.get();
-        }
-        if (pathElement != null) {
-            final String idText = pathElement.getText();
-            ForestTemplatePathElementHolder prevHolder = null;
-            final ForestTemplatePathElement prevElem =
-                    PsiTreeUtil.getPrevSiblingOfType(pathElement, ForestTemplatePathElement.class);
-            if (prevElem != null) {
-                prevHolder = findHolder(prevElem, module, isTestSourceFile, hasSpringBootLib, defMethod);
-            } else {
-                ForestTemplatePrimary prevPrimary =
-                        PsiTreeUtil.getPrevSiblingOfType(pathElement, ForestTemplatePrimary.class);
-                if (prevPrimary == null) {
-                    return null;
-                }
-                prevHolder = findHolder(prevPrimary, module, isTestSourceFile, hasSpringBootLib, defMethod);
-            }
-            if (prevHolder == null) {
-                return null;
-            }
-            ForestTemplatePathElementHolder holder = null;
-            TreeNodeUtil.findMethods(prevHolder, method -> {
-                final String methodName = method.getName();
-                if (method.getParameterList().getParametersCount() > 0) {
-                    return true;
-                }
-                if (idText.equals(methodName) || TreeNodeUtil.getterMethodName(idText).equals(methodName)) {
-                }
-                return true;
-            });
-        }
-        return null;
     }
 
     public PsiElement[] getGotoELIdentifierDeclarationTargets(PsiElement sourceElement, int offset, Editor editor) {

@@ -147,21 +147,6 @@ public class TreeNodeUtil {
             }
         }
     }
-    public static void findMethods(ForestTemplatePathElementHolder prevHolder,
-                                      Function<PsiMethod, Boolean> func) {
-        PsiClass clazz = prevHolder.getPsiClass();
-        if (clazz == null) {
-            return;
-        }
-        PsiMethod[] methods = clazz.getAllMethods();
-        for (PsiMethod method : methods) {
-            if (!method.isConstructor() && method.isValid()) {
-                if (!func.apply(method)) {
-                    return;
-                }
-            }
-        }
-    }
 
     public static String getterMethodName(String name) {
         return  "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
