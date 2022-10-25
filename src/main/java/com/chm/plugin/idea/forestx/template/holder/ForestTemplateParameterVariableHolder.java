@@ -50,7 +50,7 @@ public class ForestTemplateParameterVariableHolder extends ForestTemplateVariabl
 
 
     public ForestTemplateParameterVariableHolder(String varName, PsiType type, PsiParameter parameter) {
-        super(varName, parameter, type, false);
+        super(null, varName, parameter, type, false);
     }
 
 

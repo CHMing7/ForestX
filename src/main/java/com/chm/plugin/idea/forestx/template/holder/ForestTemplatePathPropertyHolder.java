@@ -6,8 +6,8 @@ import com.intellij.psi.PsiType;
 public class ForestTemplatePathPropertyHolder extends ForestTemplatePathElementHolder {
     private final String name;
 
-    public ForestTemplatePathPropertyHolder(String insertion, PsiElement element, PsiType type) {
-        super(insertion, element, type, false);
+    public ForestTemplatePathPropertyHolder(ForestTemplatePathElementHolder prevHolder, String insertion, PsiElement element, PsiType type) {
+        super(prevHolder, insertion, element, type, false);
         this.name = element.getText();
     }
 

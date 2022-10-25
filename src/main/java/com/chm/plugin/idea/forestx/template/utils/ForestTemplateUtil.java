@@ -12,6 +12,7 @@ import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHol
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateArguments;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
+import com.chm.plugin.idea.forestx.utils.TreeNodeUtil;
 import com.intellij.codeInsight.completion.CompletionContext;
 import com.intellij.injected.editor.DocumentWindow;
 import com.intellij.injected.editor.VirtualFileWindow;
@@ -283,7 +284,7 @@ public class ForestTemplateUtil {
 
 
     public static ForestTemplatePathElementHolder getELHolder(
-            final boolean isTestSourceFile, final PsiElement element, final PsiMethod method) {
+            final boolean isTestSourceFile, final PsiElement element, final PsiMethod defMethod) {
         final Project project = element.getOriginalElement().getProject();
         final String text = element.getText();
         if (element instanceof ForestTemplatePrimary) {
@@ -298,7 +299,7 @@ public class ForestTemplateUtil {
                 }
             }
 
-            final PsiParameterList paramList = PsiTreeUtil.getChildOfType(method, PsiParameterList.class);
+            final PsiParameterList paramList = PsiTreeUtil.getChildOfType(defMethod, PsiParameterList.class);
             if (paramList != null && paramList.getParametersCount() > 0) {
                 final PsiParameter[] methodParamArray = paramList.getParameters();
                 for (int i = 0; i < methodParamArray.length; i++) {
@@ -327,7 +328,7 @@ public class ForestTemplateUtil {
                 }
                 String methodName = namePart.getText();
                 ForestTemplatePathElementHolder invokerHolder = getELHolder(
-                        isTestSourceFile, prevElement.getPrevSibling(), method);
+                        isTestSourceFile, prevElement.getPrevSibling(), defMethod);
                 if (invokerHolder == null) {
                     return null;
                 }
@@ -347,12 +348,12 @@ public class ForestTemplateUtil {
                 }
                 String getterName = namePart.getText();
                 ForestTemplatePathElementHolder invokerHolder = getELHolder(
-                        isTestSourceFile, element.getPrevSibling(), method);
+                        isTestSourceFile, element.getPrevSibling(), defMethod);
                 if (invokerHolder == null) {
                     return null;
                 }
                 PsiClass invokerClass = invokerHolder.getPsiClass();
-                String methodName = "get" + getterName.substring(0, 1).toUpperCase() + getterName.substring(1);
+                String methodName = TreeNodeUtil.getterMethodName(getterName);
                 PsiMethod[] methods = invokerClass.findMethodsByName(methodName, true);
                 if (methods == null || methods.length == 0) {
                     methods = invokerClass.findMethodsByName(getterName, true);
@@ -370,11 +371,11 @@ public class ForestTemplateUtil {
         if (element instanceof LeafPsiElement) {
             ForestTemplatePrimary primary = PsiTreeUtil.getParentOfType(element, ForestTemplatePrimary.class);
             if (primary != null) {
-                return getELHolder(isTestSourceFile, primary, method);
+                return getELHolder(isTestSourceFile, primary, defMethod);
             }
             ForestTemplatePathElement pathElement = PsiTreeUtil.getParentOfType(element, ForestTemplatePathElement.class);
             if (pathElement != null) {
-                return getELHolder(isTestSourceFile, pathElement, method);
+                return getELHolder(isTestSourceFile, pathElement, defMethod);
             }
             return null;
         }

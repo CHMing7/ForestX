@@ -77,7 +77,7 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
 
 
     public ForestTemplateYAMLVariableHolder(String insertion, YAMLPsiElement element, PsiType type, boolean el) {
-        super(insertion, element, type, el);
+        super(null, insertion, element, type, el);
     }
 
     @Override

@@ -15,7 +15,6 @@ public class ForestTemplateFieldHolder extends ForestTemplatePathElementHolder<P
             final ForestTemplateFieldHolder invocationHolder = (ForestTemplateFieldHolder) element.getObject();
             presentation.setIcon(PlatformIcons.PROPERTY_ICON);
             presentation.setItemText(invocationHolder.toString());
-//            presentation.setTypeText(psiMethod.getReturnType().getPresentableText());
         }
     };
 
@@ -28,10 +27,15 @@ public class ForestTemplateFieldHolder extends ForestTemplatePathElementHolder<P
         return new ForestTemplateFieldHolder(getter, method, type);
     }
 
-    public ForestTemplateFieldHolder(String insertion, PsiMethod method, PsiType type) {
-        super(insertion, method, type, false);
+    public ForestTemplateFieldHolder(ForestTemplatePathElementHolder prevHolder, String insertion, PsiMethod method, PsiType type) {
+        super(prevHolder, insertion, method, type, false);
         this.getter = method;
     }
+
+    public ForestTemplateFieldHolder(String insertion, PsiMethod method, PsiType type) {
+        this(null, insertion, method, type);
+    }
+
     public PsiMethod getGetter() {
         return getter;
     }

@@ -4,6 +4,7 @@ import com.chm.plugin.idea.forestx.Icons;
 import com.chm.plugin.idea.forestx.annotation.Annotation;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterIndexVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.google.common.collect.Maps;
 import com.intellij.codeInsight.AnnotationUtil;
@@ -21,6 +22,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
+import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeParameter;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.spring.boot.library.SpringBootLibraryUtil;
@@ -144,6 +146,25 @@ public class TreeNodeUtil {
                 }
             }
         }
+    }
+    public static void findMethods(ForestTemplatePathElementHolder prevHolder,
+                                      Function<PsiMethod, Boolean> func) {
+        PsiClass clazz = prevHolder.getPsiClass();
+        if (clazz == null) {
+            return;
+        }
+        PsiMethod[] methods = clazz.getAllMethods();
+        for (PsiMethod method : methods) {
+            if (!method.isConstructor() && method.isValid()) {
+                if (!func.apply(method)) {
+                    return;
+                }
+            }
+        }
+    }
+
+    public static String getterMethodName(String name) {
+        return  "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
     public static DefaultMutableTreeNode findNodeOrNew(DefaultTreeModel model,

@@ -5,8 +5,8 @@ import com.intellij.psi.PsiType;
 
 public abstract class ForestTemplateVariableHolder<T> extends ForestTemplatePathElementHolder<T> {
 
-    public ForestTemplateVariableHolder(String insertion, T element, PsiType type, boolean el) {
-        super(insertion, element, type, el);
+    public ForestTemplateVariableHolder(ForestTemplatePathElementHolder prevHolder, String insertion, T element, PsiType type, boolean el) {
+        super(prevHolder, insertion, element, type, el);
     }
 
     public abstract String getVarName();

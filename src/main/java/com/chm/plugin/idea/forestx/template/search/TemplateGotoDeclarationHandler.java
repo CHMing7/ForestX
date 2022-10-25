@@ -1,12 +1,15 @@
 package com.chm.plugin.idea.forestx.template.search;
 
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateFieldHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplateIdentifier;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
 import com.chm.plugin.idea.forestx.template.psi.TemplateTypes;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.chm.plugin.idea.forestx.template.utils.SpringBootConfigFileUtil;
-import com.chm.plugin.idea.forestx.utils.ResolveElementFunction;
 import com.chm.plugin.idea.forestx.utils.TreeNodeUtil;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
@@ -19,8 +22,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameter;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +40,8 @@ import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
 
@@ -127,6 +131,76 @@ public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
         return false;
     }
 
+    public static ForestTemplatePathElementHolder findHolder(
+            PsiElement element,
+            Module module,
+            boolean isTestSourceFile, boolean hasSpringBootLib, PsiMethod defMethod) {
+        ForestTemplatePathElement pathElement = null;
+        ForestTemplatePrimary primary = null;
+        if (element instanceof ForestTemplatePathElement) {
+            pathElement = (ForestTemplatePathElement) element;
+        } else if (element instanceof ForestTemplatePrimary) {
+            primary = (ForestTemplatePrimary) element;
+        } else {
+            final ForestTemplateIdentifier identifier = PsiTreeUtil.getParentOfType(element, ForestTemplateIdentifier.class);
+            if (identifier == null) {
+                return null;
+            }
+            pathElement = PsiTreeUtil.getParentOfType(identifier, ForestTemplatePathElement.class);
+            if (pathElement == null) {
+                primary = PsiTreeUtil.getPrevSiblingOfType(identifier, ForestTemplatePrimary.class);
+            }
+            if (primary == null) {
+                return null;
+            }
+        }
+        if (primary != null) {
+            final String idText = primary.getText();
+            AtomicReference<ForestTemplateParameterVariableHolder> holder = null;
+            TreeNodeUtil.findMethodParameter(defMethod, (psiParameter, integer) -> {
+                final ForestTemplateParameterVariableHolder variableHolder =
+                        ForestTemplateParameterVariableHolder.findVariable(psiParameter);
+                if (variableHolder != null) {
+                    if (idText.equals(variableHolder.getVarName())) {
+                        holder.set(variableHolder);
+                        return false;
+                    }
+                }
+                return true;
+            });
+            return holder.get();
+        }
+        if (pathElement != null) {
+            final String idText = pathElement.getText();
+            ForestTemplatePathElementHolder prevHolder = null;
+            final ForestTemplatePathElement prevElem =
+                    PsiTreeUtil.getPrevSiblingOfType(pathElement, ForestTemplatePathElement.class);
+            if (prevElem != null) {
+                prevHolder = findHolder(prevElem, module, isTestSourceFile, hasSpringBootLib, defMethod);
+            } else {
+                ForestTemplatePrimary prevPrimary =
+                        PsiTreeUtil.getPrevSiblingOfType(pathElement, ForestTemplatePrimary.class);
+                if (prevPrimary == null) {
+                    return null;
+                }
+                prevHolder = findHolder(prevPrimary, module, isTestSourceFile, hasSpringBootLib, defMethod);
+            }
+            if (prevHolder == null) {
+                return null;
+            }
+            ForestTemplatePathElementHolder holder = null;
+            TreeNodeUtil.findMethods(prevHolder, method -> {
+                final String methodName = method.getName();
+                if (method.getParameterList().getParametersCount() > 0) {
+                    return true;
+                }
+                if (idText.equals(methodName) || TreeNodeUtil.getterMethodName(idText).equals(methodName)) {
+                }
+                return true;
+            });
+        }
+        return null;
+    }
 
     public PsiElement[] getGotoELIdentifierDeclarationTargets(PsiElement sourceElement, int offset, Editor editor) {
         final Project project = sourceElement.getProject();
@@ -137,18 +211,15 @@ public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
         final List<PsiElement> results = new LinkedList<>();
         TreeNodeUtil.resolveElement(project, virtualFile, sourceElement,
                 (javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, defMethod) -> {
-                    final String idText = sourceElement.getText();
-                    TreeNodeUtil.findMethodParameter(defMethod, (psiParameter, integer) -> {
-                        final ForestTemplateParameterVariableHolder variableHolder =
-                                ForestTemplateParameterVariableHolder.findVariable(psiParameter);
-                        if (variableHolder != null) {
-                            if (idText.equals(variableHolder.getVarName())) {
-                                results.add(psiParameter);
-                                return false;
-                            }
-                        }
-                        return true;
-                    });
+                    ForestTemplatePathElementHolder holder =
+                            ForestTemplateUtil.getELHolder(isTestSourceFile, sourceElement, defMethod);
+                    if (holder == null) {
+                        return;
+                    }
+                    Object elem = holder.getElement();
+                    if (elem instanceof PsiElement) {
+                        results.add((PsiElement) elem);
+                    }
                 });
         return results.toArray(new PsiElement[] {});
     }

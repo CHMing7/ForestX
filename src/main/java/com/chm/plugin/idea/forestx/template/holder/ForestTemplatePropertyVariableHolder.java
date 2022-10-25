@@ -21,9 +21,15 @@ public class ForestTemplatePropertyVariableHolder extends ForestTemplateVariable
     };
 
 
-    public ForestTemplatePropertyVariableHolder(String insertion, IProperty element, PsiType type, boolean el) {
-        super(insertion, element, type, el);
+    public ForestTemplatePropertyVariableHolder(
+            ForestTemplatePathElementHolder prevHolder, String insertion, IProperty element, PsiType type, boolean el) {
+        super(prevHolder, insertion, element, type, el);
     }
+
+    public ForestTemplatePropertyVariableHolder(String insertion, IProperty element, PsiType type, boolean el) {
+        this(null, insertion, element, type, el);
+    }
+
 
     @Override
     public String getVarName() {

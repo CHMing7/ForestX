@@ -78,8 +78,8 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                         }
                         nameCache.add(methodFullName);
                         if (methodName.startsWith("get") && methodName.length() > 3) {
-                            final ForestTemplateFieldHolder filedHolder = ForestTemplateFieldHolder.getHolder(mtd, type);
-                            resultSet.addElement(LookupElementBuilder.create(filedHolder)
+                            final ForestTemplateFieldHolder fieldHolder = ForestTemplateFieldHolder.getHolder(mtd, type);
+                            resultSet.addElement(LookupElementBuilder.create(fieldHolder)
                                     .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
                         }
                         final ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(

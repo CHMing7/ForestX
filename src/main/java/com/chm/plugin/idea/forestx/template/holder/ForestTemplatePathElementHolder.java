@@ -9,21 +9,30 @@ import java.util.Optional;
 
 public abstract class ForestTemplatePathElementHolder<T> {
 
+    protected final ForestTemplatePathElementHolder prevHolder;
+
     protected final String insertion;
 
     protected final T element;
 
     protected final PsiType type;
-
     protected final boolean el;
 
-    public ForestTemplatePathElementHolder(String insertion, T element, PsiType type, boolean el) {
+    public ForestTemplatePathElementHolder(ForestTemplatePathElementHolder prevHolder, String insertion, T element, PsiType type, boolean el) {
+        this.prevHolder = prevHolder;
         this.insertion = insertion;
         this.element = element;
         this.type = type;
         this.el = el;
     }
 
+    public ForestTemplatePathElementHolder(String insertion, T element, PsiType type, boolean el) {
+        this(null, insertion, element, type, el);
+    }
+
+    public ForestTemplatePathElementHolder getPrevHolder() {
+        return prevHolder;
+    }
 
     public T getElement() {
         return element;
