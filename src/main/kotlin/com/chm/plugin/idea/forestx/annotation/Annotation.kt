@@ -9,6 +9,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
 import java.util.*
 
+
 /**
  * @author caihongming
  * @version v1.0
@@ -117,6 +118,11 @@ class Annotation(
         val TRACE_REQUEST = Annotation("@TraceRequest", "com.dtflys.forest.annotation.TraceRequest")
 
         /**
+         * The constant BASE_REQUEST
+         */
+        val BASE_REQUEST = Annotation("@BaseRequest", "com.dtflys.forest.annotation.BaseRequest")
+
+        /**
          * The constant AUTOWIRED.
          */
         val AUTOWIRED = Annotation("@Autowired", "org.springframework.beans.factory.annotation.Autowired")
@@ -129,11 +135,48 @@ class Annotation(
         /**
          * The constant STATEMENT_SYMMETRIES.
          */
-        val FOREST_METHOD_ANNOTATION: Set<Annotation> = ImmutableSet.of(
+        val FOREST_METHOD_ANNOTATION = ImmutableSet.of(
             REQUEST, GET,
             GET_REQUEST, POST, POST_REQUEST, PUT, PUT_REQUEST, HEAD_REQUEST, OPTIONS, OPTIONS_REQUEST, PATCH,
             PATCH_REQUEST, DELETE, DELETE_REQUEST, TRACE, TRACE_REQUEST
         )
+
+        val FOREST_INTERFACE_ANNOTATION = ImmutableSet.of(BASE_REQUEST)
+
+        var FOREST_ANNOTATION_CLASSES = mutableSetOf<String>()
+
+        init {
+            for (annotation in FOREST_INTERFACE_ANNOTATION) {
+                FOREST_ANNOTATION_CLASSES
+                FOREST_ANNOTATION_CLASSES.add(annotation.qualifiedName)
+            }
+            for (annotation in FOREST_METHOD_ANNOTATION) {
+                FOREST_ANNOTATION_CLASSES.add(annotation.qualifiedName)
+            }
+        }
+
+        fun isForestAnnotation(qualifiedName: String): Boolean {
+            if (qualifiedName.isEmpty()) {
+                return false
+            }
+            if (qualifiedName.startsWith("com.dtflys.forest")) {
+                return true
+            }
+            try {
+                val annotationClass = Class.forName(qualifiedName)
+                val parentAnnotationClass = annotationClass.annotations
+                for (annClass in parentAnnotationClass) {
+                    val className: String = annClass.annotationClass.qualifiedName ?: ""
+                    if (className == "com.dtflys.forest.annotation.MethodLifeCycle" || className == "com.dtflys.forest.annotation.ParamLifeCycle" || className == "com.dtflys.forest.annotation.BaseLifeCycle") {
+                        return true
+                    }
+                }
+            } catch (e: ClassNotFoundException) {
+                throw RuntimeException(e)
+            }
+            return false
+        }
+
     }
 
     private var attributePairs: MutableMap<String, AnnotationValue> = Maps.newHashMap()
