@@ -9,11 +9,13 @@ import com.intellij.microservices.config.yaml.ConfigYamlUtils;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiType;
 import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLUtil;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
+import org.jetbrains.yaml.psi.YAMLMapping;
 import org.jetbrains.yaml.psi.YAMLPsiElement;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 
@@ -73,6 +75,11 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
                         keyValue.getKeyText() + ": " + ConfigYamlUtils.getValuePresentationText(keyValue), ", ") +
                 suffix;
         return result;
+    }
+
+    public boolean isMapping() {
+        PsiElement[] children = element.getChildren();
+        return children.length > 0 && children[0] instanceof YAMLMapping;
     }
 
 

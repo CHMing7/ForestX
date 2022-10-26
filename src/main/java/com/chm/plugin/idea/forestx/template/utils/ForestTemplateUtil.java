@@ -355,8 +355,9 @@ public class ForestTemplateUtil {
                 if (invokerHolder instanceof ForestTemplateYAMLVariableHolder) {
                     final ForestTemplateYAMLVariableHolder yamlHolder = (ForestTemplateYAMLVariableHolder) invokerHolder;
                     final String keyName = yamlHolder.getVarName() + "." + getterName;
-                    return ForestTemplateUtil.getConfigHolder(project, isTestSourceFile, keyName, true);
-
+                    if (yamlHolder.isMapping()) {
+                        return ForestTemplateUtil.getConfigHolder(project, isTestSourceFile, keyName, true);
+                    }
                 }
                 PsiClass invokerClass = invokerHolder.getPsiClass();
                 String methodName = TreeNodeUtil.getterMethodName(getterName);

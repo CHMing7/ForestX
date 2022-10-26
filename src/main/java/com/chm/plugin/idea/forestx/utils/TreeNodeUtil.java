@@ -5,6 +5,9 @@ import com.chm.plugin.idea.forestx.annotation.Annotation;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterIndexVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathExpress;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.google.common.collect.Maps;
 import com.intellij.codeInsight.AnnotationUtil;
@@ -146,6 +149,21 @@ public class TreeNodeUtil {
                 }
             }
         }
+    }
+
+    public static String getPathExpressionText(PsiElement element) {
+        if (element instanceof ForestTemplatePathElement) {
+            ForestTemplatePathElement pathElement = (ForestTemplatePathElement) element;
+            String prevElementText = getPathExpressionText(pathElement.getPrevSibling());
+            if (prevElementText == null) {
+                return element.getText();
+            }
+            return prevElementText + element.getText();
+        }
+        if (element instanceof ForestTemplatePrimary) {
+            return element.getText();
+        }
+        return null;
     }
 
     public static String getterMethodName(String name) {
