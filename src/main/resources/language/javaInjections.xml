@@ -1,0 +1,14 @@
+<injection language="ForestTemplate" injector-id="java">
+    <display-name>Forest (com.dtflys.forest)</display-name>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("url").withParameters("java.lang.String").definedInClass("com.dtflys.forest.http.ForestRequest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("setUrl").withParameters("java.lang.String").definedInClass("com.dtflys.forest.http.ForestRequest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("request").withParameters("java.lang.String").definedInClass("com.dtflys.forest.Forest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("get").withParameters("java.lang.String").definedInClass("com.dtflys.forest.Forest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("post").withParameters("java.lang.String").definedInClass("com.dtflys.forest.Forest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("put").withParameters("java.lang.String").definedInClass("com.dtflys.forest.Forest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("delete").withParameters("java.lang.String").definedInClass("com.dtflys.forest.Forest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("trace").withParameters("java.lang.String").definedInClass("com.dtflys.forest.Forest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("head").withParameters("java.lang.String").definedInClass("com.dtflys.forest.Forest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("options").withParameters("java.lang.String").definedInClass("com.dtflys.forest.Forest")) ]]></place>
+    <place><![CDATA[ psiParameter().ofMethod(0, psiMethod().withName("patch").withParameters("java.lang.String").definedInClass("com.dtflys.forest.Forest")) ]]></place>
+</injection>
