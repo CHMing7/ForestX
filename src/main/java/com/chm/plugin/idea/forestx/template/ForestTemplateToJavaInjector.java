@@ -28,6 +28,7 @@ import java.util.Set;
 public class ForestTemplateToJavaInjector implements MultiHostInjector {
 
     private final static Set<String> FOREST_METHODS = new HashSet<>();
+
     static {
         FOREST_METHODS.add("get");
         FOREST_METHODS.add("post");
@@ -40,6 +41,7 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
     }
 
     private final static Set<String> FOREST_REQUEST_METHODS = new HashSet<>();
+
     static {
         FOREST_METHODS.add("url");
         FOREST_METHODS.add("setUrl");
@@ -89,7 +91,7 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
                 parent = annotationParameterList.getParent();
                 if (parent instanceof PsiAnnotation) {
                     final PsiAnnotation annotation = (PsiAnnotation) parent;
-                    return Annotation.Companion.isForestAnnotation(annotation.getQualifiedName()) && containsELScript(text);
+                    return Annotation.Companion.isForestAnnotation(annotation) && containsELScript(text);
                 }
             }
         } else if (parent instanceof PsiExpressionList) {

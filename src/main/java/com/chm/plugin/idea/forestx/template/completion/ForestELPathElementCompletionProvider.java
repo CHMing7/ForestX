@@ -8,18 +8,12 @@ import com.chm.plugin.idea.forestx.template.holder.ForestTemplateVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHolder;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
-import com.chm.plugin.idea.forestx.utils.ResolveElementFunction;
-import com.chm.plugin.idea.forestx.utils.TreeNodeUtil;
+import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.completion.CompletionSorter;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.codeInsight.lookup.LookupElementWeigher;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -33,7 +27,6 @@ import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.ProcessingContext;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.yaml.psi.YAMLMapping;
 
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +43,7 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
         if (virtualFile == null) {
             return;
         }
-        TreeNodeUtil.resolveElement(project, virtualFile, element,
+        TreeNodeUtilKt.resolveElement(project, virtualFile, element,
                 (javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, defMethod) -> {
                     final ForestTemplatePathElement pathElement = PsiTreeUtil.getParentOfType(element, ForestTemplatePathElement.class);
                     final PsiElement prevElement = pathElement.getPrevSibling();
@@ -67,7 +60,7 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                     if (holder instanceof ForestTemplateYAMLVariableHolder) {
                         ForestTemplateYAMLVariableHolder yamlHolder = (ForestTemplateYAMLVariableHolder) holder;
                         if (yamlHolder.isMapping()) {
-                            final String pathExprText = TreeNodeUtil.getPathExpressionText(prevElement);
+                            final String pathExprText = TreeNodeUtilKt.getPathExpressionText(prevElement);
                             final List<ForestTemplateVariableHolder> variableHolders = ForestTemplateUtil.findConfigHolders(
                                     project, isTestSourceFile, ForestTemplateUtil.FOREST_VARIABLES_PREFIX + pathExprText + ".", true);
                             for (final ForestTemplateVariableHolder varHolder : variableHolders) {
@@ -112,7 +105,7 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                         if (mtd.isConstructor()) {
                             continue;
                         }
-                        final String methodFullName = TreeNodeUtil.getMethodFullName(mtd);
+                        final String methodFullName = TreeNodeUtilKt.getMethodFullName(mtd);
                         if (nameCache.contains(methodFullName)) {
                             continue;
                         }

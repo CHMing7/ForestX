@@ -2,19 +2,24 @@ package com.chm.plugin.idea.forestx.utils
 
 import com.chm.plugin.idea.forestx.Icons
 import com.chm.plugin.idea.forestx.annotation.Annotation
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary
+import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil
 import com.intellij.codeInsight.AnnotationUtil
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiMethod
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.*
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.spring.boot.library.SpringBootLibraryUtil
 import com.intellij.util.ui.tree.TreeUtil
 import org.apache.commons.compress.utils.Lists
+import java.util.function.BiFunction
 import javax.swing.Icon
-import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.DefaultTreeModel
-import javax.swing.tree.MutableTreeNode
-import javax.swing.tree.TreeNode
+import javax.swing.tree.*
 
 /**
  * @author caihongming
@@ -67,6 +72,59 @@ fun TreeNode.findNode(o: Any): DefaultMutableTreeNode? {
         }
     }
     return null
+}
+
+fun getMethodFullName(method: PsiMethod): String {
+    val builder = StringBuilder()
+    builder.append(method.name).append('(')
+    val paramTypes = method.typeParameterList!!.typeParameters
+    val count = method.parameterList.parametersCount
+    for (i in 0 until count) {
+        val param = method.parameterList.getParameter(i)
+        builder.append(param!!.type)
+        if (i < paramTypes.size - 1) {
+            builder.append(',')
+        }
+    }
+    builder.append(')')
+    return builder.toString()
+}
+
+fun resolveElement(project: Project, virtualFile: VirtualFile, element: PsiElement, func: ResolveElementFunction) {
+    val fileIndex = ProjectRootManager.getInstance(project).fileIndex
+    val module = fileIndex.getModuleForFile(virtualFile) ?: return
+    val javaVirtualFile = ForestTemplateUtil.getSourceJavaFile(virtualFile) ?: return
+    val filePath = javaVirtualFile.path
+    val isTestSourceFile = ForestTemplateUtil.isTestFile(filePath)
+    val hasSpringBootLib = SpringBootLibraryUtil.hasSpringBootLibrary(module)
+    val literal = ForestTemplateUtil.getJavaElement(element)
+    val method = PsiTreeUtil.getParentOfType(literal, PsiMethod::class.java)
+    func.resolve(javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, method)
+}
+
+fun findMethodParameter(method: PsiMethod, func: BiFunction<PsiParameter, Int, Boolean>) {
+    val paramList = PsiTreeUtil.getChildOfType(method, PsiParameterList::class.java)
+    if (paramList != null && paramList.parametersCount > 0) {
+        val methodParamArray = paramList.parameters
+        for (i in methodParamArray.indices) {
+            val methodParam = methodParamArray[i]
+            if (!func.apply(methodParam, i)) {
+                return
+            }
+        }
+    }
+}
+
+fun getPathExpressionText(element: PsiElement): String? {
+    if (element is ForestTemplatePathElement) {
+        val prevElementText = getPathExpressionText(element.prevSibling) ?: return element.getText()
+        return prevElementText + element.getText()
+    }
+    return (element as? ForestTemplatePrimary)?.text
+}
+
+fun getterMethodName(name: String): String {
+    return "get" + name.substring(0, 1).toUpperCase() + name.substring(1)
 }
 
 fun DefaultMutableTreeNode.findNodeOrNew(
@@ -237,7 +295,7 @@ fun Any.getNodeName(): String {
     }
 }
 
-fun Any.getNodeIcon(): Icon? {
+fun Any.getNodeIcon(): Icon {
     val o: Any
     o = if (this is DefaultMutableTreeNode) {
         this.userObject
@@ -246,10 +304,10 @@ fun Any.getNodeIcon(): Icon? {
     }
     return when (o) {
         is Project -> {
-            Icons.PROJECT_16
+            AllIcons.Nodes.Folder
         }
         is Module -> {
-            Icons.MODULE_16
+            AllIcons.Nodes.Folder
         }
         is PsiClass -> {
             Icons.INTERFACE_18
@@ -275,4 +333,15 @@ fun Any.getNodeIcon(): Icon? {
             Icons.ICON_16
         }
     }
+}
+
+fun interface ResolveElementFunction {
+
+    fun resolve(
+        javaVirtualFile: VirtualFile,
+        module: Module,
+        isTestSourceFile: Boolean,
+        hasSpringBootLib: Boolean,
+        defMethod: PsiMethod?
+    )
 }

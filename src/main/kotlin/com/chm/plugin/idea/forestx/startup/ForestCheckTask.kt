@@ -15,6 +15,7 @@ import com.intellij.psi.search.GlobalSearchScopesCore
 import com.intellij.psi.search.ProjectScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.AnnotationTargetsSearch
+import com.intellij.util.ui.tree.TreeUtil
 
 /**
  * @author caihongming

@@ -12,20 +12,15 @@ import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHol
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateArguments;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
-import com.chm.plugin.idea.forestx.utils.TreeNodeUtil;
-import com.intellij.codeInsight.completion.CompletionContext;
-import com.intellij.injected.editor.DocumentWindow;
+import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.injected.editor.VirtualFileWindow;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
 import com.intellij.microservices.config.yaml.ConfigYamlAccessor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Segment;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
-import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -360,7 +355,7 @@ public class ForestTemplateUtil {
                     }
                 }
                 PsiClass invokerClass = invokerHolder.getPsiClass();
-                String methodName = TreeNodeUtil.getterMethodName(getterName);
+                String methodName = TreeNodeUtilKt.getterMethodName(getterName);
                 PsiMethod[] methods = invokerClass.findMethodsByName(methodName, true);
                 if (methods == null || methods.length == 0) {
                     methods = invokerClass.findMethodsByName(getterName, true);

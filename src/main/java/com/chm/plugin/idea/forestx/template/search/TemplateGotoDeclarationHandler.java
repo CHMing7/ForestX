@@ -1,29 +1,21 @@
 package com.chm.plugin.idea.forestx.template.search;
 
-import com.chm.plugin.idea.forestx.template.holder.ForestTemplateFieldHolder;
-import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
-import com.chm.plugin.idea.forestx.template.psi.ForestTemplateIdentifier;
-import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
-import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
 import com.chm.plugin.idea.forestx.template.psi.TemplateTypes;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.chm.plugin.idea.forestx.template.utils.SpringBootConfigFileUtil;
-import com.chm.plugin.idea.forestx.utils.TreeNodeUtil;
+import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
 import com.intellij.microservices.config.yaml.ConfigYamlAccessor;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiMethod;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
 import org.apache.commons.lang3.StringUtils;
@@ -136,7 +128,7 @@ public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
             return null;
         }
         final List<PsiElement> results = new LinkedList<>();
-        TreeNodeUtil.resolveElement(project, virtualFile, sourceElement,
+        TreeNodeUtilKt.resolveElement(project, virtualFile, sourceElement,
                 (javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, defMethod) -> {
                     ForestTemplatePathElementHolder holder =
                             ForestTemplateUtil.getELHolder(isTestSourceFile, sourceElement, defMethod);
@@ -148,7 +140,7 @@ public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
                         results.add((PsiElement) elem);
                     }
                 });
-        return results.toArray(new PsiElement[] {});
+        return results.toArray(new PsiElement[]{});
     }
 
 }

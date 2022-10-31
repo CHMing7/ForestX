@@ -11,36 +11,37 @@ import com.intellij.openapi.util.IconLoader
 interface Icons {
 
     companion object {
+
         /**
          * Forest 图标
          */
         val ICON = IconLoader.getIcon("/icons/forest-logo-20x20.svg")
 
-        var ICON_16 = IconLoader.getIcon("/icons/forest-logo-16x16.svg")
+        val ICON_16 = IconLoader.getIcon("/icons/forest-logo-16x16.svg")
 
-        var PROJECT_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg")
+        val PROJECT_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg")
 
-        var MODULE_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg")
+        val MODULE_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg")
 
-        var INTERFACE_18 = IconLoader.getIcon("/icons/forest-logo-18x18.svg")
+        val INTERFACE_18 = IconLoader.getIcon("/icons/forest-logo-18x18.svg")
 
-        var DELETE = IconLoader.getIcon("/icons/request-DELETE.svg")
+        val DELETE = IconLoader.getIcon("/icons/request-DELETE.svg")
 
-        var GET = IconLoader.getIcon("/icons/request-GET.svg")
+        val GET = IconLoader.getIcon("/icons/request-GET.svg")
 
-        var HEAD = IconLoader.getIcon("/icons/request-HEAD.svg")
+        val HEAD = IconLoader.getIcon("/icons/request-HEAD.svg")
 
-        var OPTIONS = IconLoader.getIcon("/icons/request-OPTIONS.svg")
+        val OPTIONS = IconLoader.getIcon("/icons/request-OPTIONS.svg")
 
-        var PATCH = IconLoader.getIcon("/icons/request-PATCH.svg")
+        val PATCH = IconLoader.getIcon("/icons/request-PATCH.svg")
 
-        var POST = IconLoader.getIcon("/icons/request-POST.svg")
+        val POST = IconLoader.getIcon("/icons/request-POST.svg")
 
-        var PUT = IconLoader.getIcon("/icons/request-PUT.svg")
+        val PUT = IconLoader.getIcon("/icons/request-PUT.svg")
 
-        var TRACE = IconLoader.getIcon("/icons/request-TRACE.svg")
+        val TRACE = IconLoader.getIcon("/icons/request-TRACE.svg")
 
-        var SPRING_INJECTION_ICON = ICON
+        val SPRING_INJECTION_ICON = ICON
     }
 }
 

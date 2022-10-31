@@ -30,7 +30,7 @@ public class ForestTemplateParameterVariableHolder extends ForestTemplateVariabl
     public static ForestTemplateParameterVariableHolder findVariable(PsiParameter parameter) {
         final PsiAnnotation[] annotations = parameter.getAnnotations();
         for (PsiAnnotation ann : annotations) {
-            if (ann.getQualifiedName().equals(Annotation.VAR.getQualifiedName())) {
+            if (ann.getQualifiedName().equals(Annotation.Companion.getVAR().getQualifiedName())) {
                 final PsiAnnotationMemberValue varNameAttrValue = ann.findAttributeValue("value");
                 String varName = null;
                 if (varNameAttrValue instanceof PsiLiteralExpression) {

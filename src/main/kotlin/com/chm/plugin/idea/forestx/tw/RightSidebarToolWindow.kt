@@ -7,19 +7,22 @@ import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.util.PsiEditorUtil
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.TreeSpeedSearch
+import com.intellij.ui.tree.TreeVisitor
 import com.intellij.ui.treeStructure.Tree
+import com.intellij.util.ui.tree.TreeModelAdapter
+import com.intellij.util.ui.tree.TreeUtil
 import org.apache.commons.collections.CollectionUtils
 import org.apache.commons.compress.utils.Lists
 import java.awt.BorderLayout
@@ -29,6 +32,7 @@ import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.TreePath
 
 /**
  * @author caihongming
@@ -70,9 +74,7 @@ class RightSidebarToolWindow(project: Project) {
                 hasFocus: Boolean
             ) {
                 val name = value.getNodeName()
-                if (name != null) {
-                    append(name)
-                }
+                append(name)
                 val icon = value.getNodeIcon()
                 setIcon(icon)
             }
@@ -86,11 +88,10 @@ class RightSidebarToolWindow(project: Project) {
                         val lastPathComponent = selectionPath.lastPathComponent
                         if (lastPathComponent is DefaultMutableTreeNode) {
                             val o = lastPathComponent.userObject
-                            if (o is PsiMethod || o is PsiClass) {
-                                val element = o as PsiElement
-                                val psiFile = element.containingFile
+                            if (o is PsiMethod) {
+                                val psiFile = o.containingFile
                                 // 打开文件
-                                FileEditorManager.getInstance(element.project).openFile(psiFile.virtualFile, true)
+                                FileEditorManager.getInstance(o.project).openFile(psiFile.virtualFile, true)
                                 val editor = PsiEditorUtil.findEditor(o) ?: return
                                 val selectionModel = editor.selectionModel
                                 selectionModel.removeSelection(true)
@@ -105,6 +106,42 @@ class RightSidebarToolWindow(project: Project) {
                     }
                 }
             })
+        // 增加节点增加事件监听，默认展开模块
+        treeModel.addTreeModelListener(TreeModelAdapter.create { event, type ->
+            if (type == TreeModelAdapter.EventType.NodesInserted) {
+                event.children.forEach { c ->
+                    if (c is DefaultMutableTreeNode) {
+                        val o = c.userObject
+                        val cPath = TreePath(c.path)
+                        if (o is Module) {
+                            println("tree expand path: $cPath")
+                            TreeUtil.expand(
+                                mainTree,
+                                { path ->
+                                    if (cPath == path)
+                                        TreeVisitor.Action.INTERRUPT
+                                    else
+                                        TreeVisitor.Action.CONTINUE
+                                },
+                                { }
+                            )
+                        } else if (o is PsiClass && c.parent.childCount == 1) {
+                            println("tree expand path: ${c.parent}")
+                            TreeUtil.expand(
+                                mainTree,
+                                { path ->
+                                    if (cPath.parentPath == path)
+                                        TreeVisitor.Action.INTERRUPT
+                                    else
+                                        TreeVisitor.Action.CONTINUE
+                                },
+                                { }
+                            )
+                        }
+                    }
+                }
+            }
+        })
 
         // 工具栏
         val toolbarDecorator = ToolbarDecorator.createDecorator(mainTree)
@@ -113,7 +150,7 @@ class RightSidebarToolWindow(project: Project) {
         rootPanel.add(toolbarDecorator.createPanel(), BorderLayout.CENTER)
     }
 
-    fun getContent(disposable: Disposable?): JPanel? {
+    fun getContent(disposable: Disposable?): JPanel {
         Disposer.register(disposable!!) { rootPanel.removeAll() }
         return rootPanel
     }

@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables
 import com.google.common.collect.Maps
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
 import java.util.*
@@ -123,6 +124,11 @@ class Annotation(
         val BASE_REQUEST = Annotation("@BaseRequest", "com.dtflys.forest.annotation.BaseRequest")
 
         /**
+         * The constant VAR
+         */
+        val VAR = Annotation("@Var", "com.dtflys.forest.annotation.Var")
+
+        /**
          * The constant AUTOWIRED.
          */
         val AUTOWIRED = Annotation("@Autowired", "org.springframework.beans.factory.annotation.Autowired")
@@ -138,7 +144,7 @@ class Annotation(
         val FOREST_METHOD_ANNOTATION = ImmutableSet.of(
             REQUEST, GET,
             GET_REQUEST, POST, POST_REQUEST, PUT, PUT_REQUEST, HEAD_REQUEST, OPTIONS, OPTIONS_REQUEST, PATCH,
-            PATCH_REQUEST, DELETE, DELETE_REQUEST, TRACE, TRACE_REQUEST
+            PATCH_REQUEST, DELETE, DELETE_REQUEST, TRACE, TRACE_REQUEST, ADDRESS, HEADERS
         )
 
         val FOREST_INTERFACE_ANNOTATION = ImmutableSet.of(BASE_REQUEST)
@@ -147,7 +153,6 @@ class Annotation(
 
         init {
             for (annotation in FOREST_INTERFACE_ANNOTATION) {
-                FOREST_ANNOTATION_CLASSES
                 FOREST_ANNOTATION_CLASSES.add(annotation.qualifiedName)
             }
             for (annotation in FOREST_METHOD_ANNOTATION) {
@@ -173,6 +178,25 @@ class Annotation(
                 }
             } catch (e: ClassNotFoundException) {
                 throw RuntimeException(e)
+            }
+            return false
+        }
+
+        fun isForestAnnotation(annotation: PsiAnnotation?): Boolean {
+            if (annotation == null) {
+                return false
+            }
+            val qualifiedName = annotation.qualifiedName ?: return false
+            if (qualifiedName.startsWith("com.dtflys.forest")) {
+                return true
+            }
+            val annotationType = annotation.resolveAnnotationType()
+            val typeAnnotations = annotationType!!.annotations
+            for (typeAnnotation in typeAnnotations) {
+                val className = typeAnnotation.qualifiedName
+                if (className == "com.dtflys.forest.annotation.MethodLifeCycle" || className == "com.dtflys.forest.annotation.ParamLifeCycle" || className == "com.dtflys.forest.annotation.BaseLifeCycle") {
+                    return true
+                }
             }
             return false
         }

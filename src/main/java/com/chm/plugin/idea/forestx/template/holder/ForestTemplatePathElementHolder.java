@@ -1,6 +1,6 @@
 package com.chm.plugin.idea.forestx.template.holder;
 
-import com.chm.plugin.idea.forestx.utils.JavaUtil;
+import com.chm.plugin.idea.forestx.utils.KotlinUtilKt;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiType;
@@ -44,7 +44,7 @@ public abstract class ForestTemplatePathElementHolder<T> {
 
     public PsiClass getPsiClass() {
         if (element instanceof PsiElement) {
-            final Optional<PsiClass> clazz = JavaUtil.findClazz(((PsiElement) element).getProject(), type.getCanonicalText());
+            final Optional<PsiClass> clazz = KotlinUtilKt.findClazz(((PsiElement) element).getProject(), type.getCanonicalText());
             return clazz.get();
         }
         return null;
