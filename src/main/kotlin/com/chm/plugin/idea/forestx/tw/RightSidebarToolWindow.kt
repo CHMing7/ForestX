@@ -114,7 +114,6 @@ class RightSidebarToolWindow(project: Project) {
                         val o = c.userObject
                         val cPath = TreePath(c.path)
                         if (o is Module) {
-                            println("tree expand path: $cPath")
                             TreeUtil.expand(
                                 mainTree,
                                 { path ->
@@ -126,7 +125,6 @@ class RightSidebarToolWindow(project: Project) {
                                 { }
                             )
                         } else if (o is PsiClass && c.parent.childCount == 1) {
-                            println("tree expand path: ${c.parent}")
                             TreeUtil.expand(
                                 mainTree,
                                 { path ->
