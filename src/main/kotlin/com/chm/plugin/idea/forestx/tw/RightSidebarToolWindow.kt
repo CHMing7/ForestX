@@ -112,23 +112,12 @@ class RightSidebarToolWindow(project: Project) {
                 event.children.forEach { c ->
                     if (c is DefaultMutableTreeNode) {
                         val o = c.userObject
-                        val cPath = TreePath(c.path)
-                        if (o is Module) {
+                        if (o is Module || (o is PsiClass && c.parent.childCount == 1)) {
+                            val cPath = if (o is Module) TreePath(c.path) else TreePath(c.path).parentPath
                             TreeUtil.expand(
                                 mainTree,
                                 { path ->
                                     if (cPath == path)
-                                        TreeVisitor.Action.INTERRUPT
-                                    else
-                                        TreeVisitor.Action.CONTINUE
-                                },
-                                { }
-                            )
-                        } else if (o is PsiClass && c.parent.childCount == 1) {
-                            TreeUtil.expand(
-                                mainTree,
-                                { path ->
-                                    if (cPath.parentPath == path)
                                         TreeVisitor.Action.INTERRUPT
                                     else
                                         TreeVisitor.Action.CONTINUE
