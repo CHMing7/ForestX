@@ -8,14 +8,11 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicatorProvider
 import com.intellij.openapi.progress.Task.Backgroundable
 import com.intellij.openapi.project.Project
-import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiMethod
+import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScopesCore
 import com.intellij.psi.search.ProjectScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.AnnotationTargetsSearch
-import com.intellij.util.ui.tree.TreeUtil
 
 /**
  * @author caihongming
@@ -38,12 +35,11 @@ class ForestCheckTask(project: Project) : Backgroundable(project, "Forest check"
         // 搜索项目里
         val inheritorsScope: SearchScope =
             GlobalSearchScopesCore.projectProductionScope(myProject).union(librariesScope)
+        val facade: JavaPsiFacade = JavaPsiFacade.getInstance(myProject)
 
         for (annotation in Annotation.FOREST_METHOD_ANNOTATION) {
             // 获取forest注解类
-            val annotationClass =
-                JavaPsiFacade.getInstance(myProject).findClass(annotation.qualifiedName, librariesScope)
-                    ?: continue
+            val annotationClass = facade.findClass(annotation.qualifiedName, librariesScope) ?: continue
             // 搜索被forest注解标记的类
             val annotationTargets = AnnotationTargetsSearch.search(annotationClass, inheritorsScope)
             val all = annotationTargets.findAll()

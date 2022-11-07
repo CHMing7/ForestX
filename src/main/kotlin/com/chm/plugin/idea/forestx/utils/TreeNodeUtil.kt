@@ -13,10 +13,21 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.*
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.GlobalSearchScopesCore
+import com.intellij.psi.search.ProjectScope
+import com.intellij.psi.search.SearchScope
+import com.intellij.psi.search.searches.AnnotationTargetsSearch
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.spring.boot.library.SpringBootLibraryUtil
 import com.intellij.util.ui.tree.TreeUtil
 import org.apache.commons.compress.utils.Lists
+import org.jetbrains.yaml.YAMLUtil
+import org.jetbrains.yaml.psi.YAMLFile
+import org.jetbrains.yaml.psi.YAMLKeyValue
+import org.jetbrains.yaml.psi.YAMLPsiElement
+import org.jetbrains.yaml.psi.YAMLValue
+import org.jetbrains.yaml.psi.impl.YAMLBlockMappingImpl
+import org.jetbrains.yaml.psi.impl.YAMLBlockSequenceImpl
 import java.util.function.BiFunction
 import javax.swing.Icon
 import javax.swing.tree.*
@@ -61,6 +72,11 @@ val NAME_SORTED: Comparator<Any> = Comparator { o1: Any, o2: Any ->
     name1.compareTo(name2)
 }
 
+val PROJECT_SPRING_BOOT_MAP: MutableMap<String, Boolean> = mutableMapOf()
+val MODULE_SPRING_BOOT_MAP: MutableMap<String, Boolean> = mutableMapOf()
+val MODULE_SPRING_MAP: MutableMap<String, Boolean> = mutableMapOf()
+
+val BINDING_VAR_MAP: MutableMap<String, PsiElement> = mutableMapOf()
 
 fun TreeNode.findNode(o: Any): DefaultMutableTreeNode? {
     for (i in 0 until this.childCount) {
@@ -96,7 +112,7 @@ fun resolveElement(project: Project, virtualFile: VirtualFile, element: PsiEleme
     val javaVirtualFile = ForestTemplateUtil.getSourceJavaFile(virtualFile) ?: return
     val filePath = javaVirtualFile.path
     val isTestSourceFile = ForestTemplateUtil.isTestFile(filePath)
-    val hasSpringBootLib = SpringBootLibraryUtil.hasSpringBootLibrary(module)
+    val hasSpringBootLib = hasSpringBootLibrary(module)
     val literal = ForestTemplateUtil.getJavaElement(element)
     val method = PsiTreeUtil.getParentOfType(literal, PsiMethod::class.java)
     func.resolve(javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, method)
@@ -113,6 +129,118 @@ fun findMethodParameter(method: PsiMethod, func: BiFunction<PsiParameter, Int, B
             }
         }
     }
+}
+
+fun hasSpringLibrary(module: Module): Boolean {
+    val name = module.name
+    if (!MODULE_SPRING_MAP.contains(name)) {
+        val ret = try {
+            val type = PsiType.getTypeByName(
+                "org.springframework.core.SpringVersion",
+                module.project,
+                GlobalSearchScope.moduleScope(module)
+            )
+            type.isValid
+        } catch (th: Throwable) {
+            false
+        }
+        MODULE_SPRING_MAP[name] = ret
+    }
+    return MODULE_SPRING_MAP[name]!!
+}
+
+fun hasSpringBootLibrary(module: Module): Boolean {
+    val name = module.name
+    if (!MODULE_SPRING_BOOT_MAP.contains(name)) {
+        val ret = try {
+            val type = PsiType.getTypeByName(
+                "org.springframework.boot.SpringBootVersion",
+                module.project,
+                GlobalSearchScope.moduleScope(module)
+            )
+            type.isValid
+        } catch (th: Throwable) {
+            false
+        }
+        MODULE_SPRING_BOOT_MAP[name] = ret
+    }
+    return MODULE_SPRING_BOOT_MAP[name]!!
+}
+
+fun hasSpringBootLibrary(project: Project): Boolean {
+    val name = project.name
+    if (!PROJECT_SPRING_BOOT_MAP.contains(name)) {
+        val ret = try {
+            val type = PsiType.getTypeByName(
+                "org.springframework.boot.SpringBootVersion",
+                project,
+                GlobalSearchScope.allScope(project)
+            )
+            type.isValid
+        } catch (th: Throwable) {
+            false
+        }
+        PROJECT_SPRING_BOOT_MAP[name] = ret
+    }
+    return PROJECT_SPRING_BOOT_MAP[name]!!
+}
+
+fun getYAMLKeyValue(yamlFile: YAMLFile, keyName: String): Pair<YAMLPsiElement, YAMLValue?>? {
+    var pair: Pair<YAMLPsiElement, YAMLValue?>? = null;
+    eachYAMLKeyValues(yamlFile) { keyValue: YAMLPsiElement?, yamlValue: YAMLValue? ->
+        val keyValueText = YAMLUtil.getConfigFullName(
+            keyValue!!
+        )
+        if (keyValueText == keyName) {
+            pair = Pair(keyValue, yamlValue)
+            return@eachYAMLKeyValues false
+        }
+        true
+    }
+    return pair
+}
+
+
+fun eachYAMLKeyValues(yamlFile: YAMLFile, func: (YAMLKeyValue?, YAMLValue?) -> Boolean): Boolean {
+    val topKeyValues = YAMLUtil.getTopLevelKeys(yamlFile)
+    for (keyValue in topKeyValues) {
+        val value = keyValue.value
+        if (value != null) {
+            val ret: Boolean = eachYAMLKeyValues(keyValue, value, func)
+            if (!ret) {
+                return false
+            }
+        }
+    }
+    return true
+}
+
+fun eachYAMLKeyValues(keyValue: YAMLKeyValue, value: YAMLValue, func: (YAMLKeyValue?, YAMLValue?) -> Boolean): Boolean {
+    if (!func(keyValue, value)) {
+        return false
+    }
+    if (value is YAMLBlockSequenceImpl) {
+        val block: YAMLBlockSequenceImpl = value
+        val items = block.items
+        for (item in items) {
+            if (item is YAMLKeyValue) {
+                val ret = eachYAMLKeyValues(item, value, func)
+                if (ret != null && !ret) {
+                    return false
+                }
+            }
+        }
+    } else if (value is YAMLBlockMappingImpl) {
+        var mapping: YAMLBlockMappingImpl = value
+        var mkvs = mapping.keyValues
+        for (mkv in mkvs) {
+            var mvalue: YAMLValue? = mkv.value
+            if (!eachYAMLKeyValues(mkv, mvalue!!, func)) {
+                return false
+            }
+        }
+    }
+    return true
 }
 
 fun getPathExpressionText(element: PsiElement): String? {

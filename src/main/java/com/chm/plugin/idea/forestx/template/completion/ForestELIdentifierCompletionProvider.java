@@ -1,5 +1,6 @@
 package com.chm.plugin.idea.forestx.template.completion;
 
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateBindingVarHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterIndexVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePropertyVariableHolder;
@@ -18,6 +19,7 @@ import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class ForestELIdentifierCompletionProvider extends CompletionProvider<CompletionParameters> {
 
@@ -59,6 +61,12 @@ public class ForestELIdentifierCompletionProvider extends CompletionProvider<Com
                             }
                         }
                     }
+
+                    ForestTemplateBindingVarHolder.eachAllVariables(project, holder -> {
+                        resultSet.addElement(LookupElementBuilder.create(holder)
+                                .withRenderer(ForestTemplateBindingVarHolder.BINDING_VAR_RENDER));
+                        return true;
+                    });
                 });
     }
 

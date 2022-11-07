@@ -5,7 +5,6 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
 import com.intellij.lang.properties.PropertiesHighlighter;
-import com.intellij.microservices.config.yaml.ConfigYamlUtils;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.text.StringUtil;
@@ -34,7 +33,7 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
             presentation.setItemText(searchedYAMLKeyValue.getItemText());
             if (elem instanceof YAMLKeyValue) {
                 YAMLKeyValue yamlKeyValue = (YAMLKeyValue) elem;
-                value = ConfigYamlUtils.getValuePresentationText(yamlKeyValue);
+                value = yamlKeyValue.getValueText();
             } else if (elem instanceof YAMLSequenceItem) {
                 YAMLSequenceItem item = (YAMLSequenceItem) elem;
                 value = getSequenceItemText(item);
@@ -69,7 +68,7 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
 
         String result = StringUtil.join(
                 keysValues, (keyValue) ->
-                keyValue.getKeyText() + ": " + ConfigYamlUtils.getValuePresentationText(keyValue), ", ") +
+                keyValue.getKeyText() + ": " + keyValue.getValueText(), ", ") +
                 suffix;
         return result;
     }

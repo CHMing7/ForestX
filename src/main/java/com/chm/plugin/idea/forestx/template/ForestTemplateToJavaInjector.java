@@ -8,6 +8,8 @@ import com.intellij.lang.injection.MultiHostRegistrar;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationParameterList;
+import com.intellij.psi.PsiArrayInitializerExpression;
+import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiExpressionList;
@@ -83,9 +85,11 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
             return false;
         }
         PsiElement parent = expr.getParent();
+        if (parent instanceof PsiArrayInitializerMemberValue) {
+            parent = parent.getParent();
+        }
         if (parent instanceof PsiNameValuePair) {
-            final PsiNameValuePair nameValuePair = (PsiNameValuePair) parent;
-            parent = nameValuePair.getParent();
+            parent = parent.getParent();
             if (parent instanceof PsiAnnotationParameterList) {
                 final PsiAnnotationParameterList annotationParameterList = (PsiAnnotationParameterList) parent;
                 parent = annotationParameterList.getParent();

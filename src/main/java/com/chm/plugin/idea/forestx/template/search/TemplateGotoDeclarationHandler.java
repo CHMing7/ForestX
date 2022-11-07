@@ -8,7 +8,6 @@ import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
-import com.intellij.microservices.config.yaml.ConfigYamlAccessor;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,12 +16,11 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiUtil;
-import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.YAMLUtil;
-import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
+import org.jetbrains.yaml.psi.YAMLPsiElement;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 import org.jetbrains.yaml.psi.YAMLValue;
 import org.jetbrains.yaml.psi.impl.YAMLBlockSequenceImpl;
@@ -56,23 +54,14 @@ public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
             final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
             if (psiFile instanceof YAMLFileImpl) {
                 final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                for (final YAMLDocument document : yamlFile.getDocuments()) {
-                    final ConfigYamlAccessor accessor =
-                            new ConfigYamlAccessor(document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                    final List<YAMLKeyValue> allKeyValues = accessor.getAllKeys();
-                    for (final YAMLKeyValue keyValue : allKeyValues) {
-                        final YAMLValue value = keyValue.getValue();
-                        if (value instanceof YAMLPlainTextImpl) {
-                            final String keyName = YAMLUtil.getConfigFullName(keyValue);
-                            if (keyName.equals(propertyKey)) {
-                                results.add(keyValue);
-                                break;
-                            }
-                        } else if (value instanceof YAMLBlockSequenceImpl) {
-                            processYAMLBlockSequence((YAMLBlockSequenceImpl) value, propertyKey, results);
-                        }
+                TreeNodeUtilKt.eachYAMLKeyValues(yamlFile, (keyValue, value) -> {
+                    final String keyName = YAMLUtil.getConfigFullName(keyValue);
+                    if (keyName.equals(propertyKey)) {
+                        results.add(keyValue);
+                        return false;
                     }
-                }
+                    return true;
+                });
             } else if (psiFile instanceof PropertiesFileImpl) {
                 final PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
                 for (final IProperty property : propertiesFile.getProperties()) {

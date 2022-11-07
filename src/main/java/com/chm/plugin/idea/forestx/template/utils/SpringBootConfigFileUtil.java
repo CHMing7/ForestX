@@ -3,11 +3,8 @@ package com.chm.plugin.idea.forestx.template.utils;
 import com.intellij.lang.properties.PropertiesFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.spring.boot.SpringBootConfigFileConstants;
 import org.jetbrains.yaml.YAMLFileType;
 
 import java.util.ArrayList;
@@ -16,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SpringBootConfigFileUtil {
-
 
 
     public static List<VirtualFile> findSpringBootConfigFiles(final Project project, final boolean needTestFile) {
@@ -41,6 +37,7 @@ public class SpringBootConfigFileUtil {
         final List<VirtualFile> applicationDefaultYmlFiles = new LinkedList<>();
         final List<VirtualFile> applicationDefaultYamlFiles = new LinkedList<>();
         final List<VirtualFile> applicationDefaultPropertiesFiles = new LinkedList<>();
+        final List<VirtualFile> otherFiles = new LinkedList<>();
         final List<VirtualFile> allConfigFiles = new LinkedList<>();
         if (virtualYAMLFiles != null) {
             allConfigFiles.addAll(virtualYAMLFiles);
@@ -64,7 +61,7 @@ public class SpringBootConfigFileUtil {
                 bootstrapYamlFiles.add(virtualFile);
             } else if ("bootstrap.properties".equals(fileName)) {
                 bootstrapPropertiesFiles.add(virtualFile);
-            } else if (SpringBootConfigFileConstants.APPLICATION_YML.equals(fileName)) {
+            } else if ("application.yml".equals(fileName)) {
                 applicationYmlFiles.add(virtualFile);
             } else if ("application.yaml".equals(fileName)) {
                 applicationYamlFiles.add(virtualFile);
@@ -76,6 +73,10 @@ public class SpringBootConfigFileUtil {
                 applicationDefaultYamlFiles.add(virtualFile);
             } else if ("application-default.properties".equals(fileName)) {
                 applicationDefaultPropertiesFiles.add(virtualFile);
+            } else if (fileName.endsWith(".yml") || fileName.endsWith("yaml")) {
+                otherFiles.add(virtualFile);
+            } else if (fileName.endsWith("properties")) {
+                otherFiles.add(virtualFile);
             }
         }
         if (!bootstrapYmlFiles.isEmpty()) {
@@ -109,6 +110,9 @@ public class SpringBootConfigFileUtil {
         if (!applicationDefaultPropertiesFiles.isEmpty()) {
             fileList.addAll(applicationDefaultPropertiesFiles);
             return fileList;
+        }
+        if (!otherFiles.isEmpty()) {
+            return otherFiles;
         }
         return fileList;
     }

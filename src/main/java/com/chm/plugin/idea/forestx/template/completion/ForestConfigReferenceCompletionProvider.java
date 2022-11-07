@@ -2,6 +2,7 @@ package com.chm.plugin.idea.forestx.template.completion;
 
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.chm.plugin.idea.forestx.template.utils.SearchedConfigItem;
+import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
@@ -11,7 +12,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.spring.boot.library.SpringBootLibraryUtil;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ public class ForestConfigReferenceCompletionProvider extends CompletionProvider<
         }
         final String filePath = ForestTemplateUtil.getPathOfVirtualFile(virtualFile);
         final boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
-        final boolean hasSpringBootLib = SpringBootLibraryUtil.hasSpringBootLibrary(module);
+        final boolean hasSpringBootLib = TreeNodeUtilKt.hasSpringBootLibrary(module);
         if (hasSpringBootLib) {
             final List<SearchedConfigItem> searchedConfigItems = ForestTemplateUtil.searchConfigItems(project, isTestSourceFile, null, false);
             for (SearchedConfigItem item : searchedConfigItems) {

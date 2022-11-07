@@ -129,6 +129,11 @@ class Annotation(
         val VAR = Annotation("@Var", "com.dtflys.forest.annotation.Var")
 
         /**
+         * The constant BINDING_VAR
+         */
+        val BINDING_VAR = Annotation("@BindingVar", "com.dtflys.forest.annotation.BindingVar")
+
+        /**
          * The constant AUTOWIRED.
          */
         val AUTOWIRED = Annotation("@Autowired", "org.springframework.beans.factory.annotation.Autowired")
@@ -190,8 +195,8 @@ class Annotation(
             if (qualifiedName.startsWith("com.dtflys.forest")) {
                 return true
             }
-            val annotationType = annotation.resolveAnnotationType()
-            val typeAnnotations = annotationType!!.annotations
+            val annotationType = annotation.resolveAnnotationType() ?: return false
+            val typeAnnotations = annotationType.annotations
             for (typeAnnotation in typeAnnotations) {
                 val className = typeAnnotation.qualifiedName
                 if (className == "com.dtflys.forest.annotation.MethodLifeCycle" || className == "com.dtflys.forest.annotation.ParamLifeCycle" || className == "com.dtflys.forest.annotation.BaseLifeCycle") {

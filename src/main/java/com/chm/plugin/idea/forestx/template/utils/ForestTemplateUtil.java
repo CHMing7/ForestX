@@ -2,6 +2,7 @@ package com.chm.plugin.idea.forestx.template.utils;
 
 import com.chm.plugin.idea.forestx.template.completion.SearchedConfigProperty;
 import com.chm.plugin.idea.forestx.template.completion.SearchedConfigYAMLKeyValue;
+import com.chm.plugin.idea.forestx.template.holder.ForestTemplateBindingVarHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateFieldHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateInvocationHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
@@ -16,7 +17,6 @@ import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.injected.editor.VirtualFileWindow;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
-import com.intellij.microservices.config.yaml.ConfigYamlAccessor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
@@ -31,11 +31,12 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.spring.boot.application.metadata.SpringBootApplicationMetaConfigKeyManager;
-import com.intellij.spring.boot.library.SpringBootLibraryUtil;
+import kotlin.Pair;
+import kotlin.jvm.functions.Function2;
 import org.jetbrains.yaml.YAMLUtil;
 import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
+import org.jetbrains.yaml.psi.YAMLPsiElement;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 import org.jetbrains.yaml.psi.YAMLValue;
 import org.jetbrains.yaml.psi.impl.YAMLBlockSequenceImpl;
@@ -44,7 +45,9 @@ import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ForestTemplateUtil {
 
@@ -89,14 +92,11 @@ public class ForestTemplateUtil {
             if (psiFile instanceof YAMLFileImpl) {
                 // yaml 配置文件
                 final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                final List<YAMLDocument> documents = yamlFile.getDocuments();
-                for (final YAMLDocument document : documents) {
-                    final ConfigYamlAccessor accessor = new ConfigYamlAccessor(
-                            document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                    final YAMLKeyValue keyValue = accessor.findExistingKey(keyName);
-                    if (keyValue != null) {
-                        return new ForestTemplateYAMLVariableHolder(keyName, keyValue, STRING_TYPE, isEL);
-                    }
+                Pair<YAMLPsiElement, YAMLValue> pair = TreeNodeUtilKt.getYAMLKeyValue(yamlFile, keyName);
+                if (pair != null) {
+                    ForestTemplateYAMLVariableHolder holder =
+                            new ForestTemplateYAMLVariableHolder(keyName, pair.getFirst(), STRING_TYPE, isEL);
+                    return holder;
                 }
             } else if (psiFile instanceof PropertiesFileImpl) {
                 // Properties 配置文件
@@ -126,41 +126,21 @@ public class ForestTemplateUtil {
             if (psiFile instanceof YAMLFileImpl) {
                 // yaml 配置文件
                 final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                final List<YAMLDocument> documents = yamlFile.getDocuments();
-                for (final YAMLDocument document : documents) {
-                    final ConfigYamlAccessor accessor = new ConfigYamlAccessor(
-                            document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                    final List<YAMLKeyValue> allDocKeyValues = accessor.getAllKeys();
-                    for (final YAMLKeyValue keyValue : allDocKeyValues) {
-                        final YAMLValue value = keyValue.getValue();
-                        if (value instanceof YAMLPlainTextImpl) {
-                            String key = YAMLUtil.getConfigFullName(keyValue);
-                            if (prefix != null) {
-                                if (key.length() > prefix.length() && key.startsWith(prefix)) {
-                                    key = key.substring(prefix.length());
-                                    resultItems.add(new ForestTemplateYAMLVariableHolder(key, keyValue, STRING_TYPE, isEL));
-                                }
-                            } else {
+                TreeNodeUtilKt.eachYAMLKeyValues(yamlFile, (element, yamlValue) -> {
+                    final YAMLKeyValue keyValue = (YAMLKeyValue) element;
+                    if (yamlValue instanceof YAMLPlainTextImpl) {
+                        String key = YAMLUtil.getConfigFullName(keyValue);
+                        if (prefix != null) {
+                            if (key.length() > prefix.length() && key.startsWith(prefix)) {
+                                key = key.substring(prefix.length());
                                 resultItems.add(new ForestTemplateYAMLVariableHolder(key, keyValue, STRING_TYPE, isEL));
                             }
-                        } else if (value instanceof YAMLBlockSequenceImpl) {
-                            for (final YAMLSequenceItem item : ((YAMLBlockSequenceImpl) value).getItems()) {
-                                final YAMLValue itemValue = item.getValue();
-                                if (itemValue instanceof YAMLPlainTextImpl) {
-                                    String key = YAMLUtil.getConfigFullName(item);
-                                    if (prefix != null) {
-                                        if (key.length() > prefix.length() && key.startsWith(prefix)) {
-                                            key = key.substring(prefix.length());
-                                            resultItems.add(new ForestTemplateYAMLVariableHolder(key, item, STRING_TYPE, isEL));
-                                        }
-                                    } else {
-                                        resultItems.add(new ForestTemplateYAMLVariableHolder(key, item, STRING_TYPE, isEL));
-                                    }
-                                }
-                            }
+                        } else {
+                            resultItems.add(new ForestTemplateYAMLVariableHolder(key, keyValue, STRING_TYPE, isEL));
                         }
                     }
-                }
+                    return true;
+                });
             } else if (psiFile instanceof PropertiesFileImpl) {
                 // Properties 配置文件
                 final PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
@@ -198,41 +178,19 @@ public class ForestTemplateUtil {
             if (psiFile instanceof YAMLFileImpl) {
                 // yaml 配置文件
                 final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                final List<YAMLDocument> documents = yamlFile.getDocuments();
-                for (YAMLDocument document : documents) {
-                    final ConfigYamlAccessor accessor = new ConfigYamlAccessor(
-                            document, SpringBootApplicationMetaConfigKeyManager.getInstance());
-                    final List<YAMLKeyValue> allDocKeyValues = accessor.getAllKeys();
-                    for (YAMLKeyValue keyValue : allDocKeyValues) {
-                        final YAMLValue value = keyValue.getValue();
-                        if (value instanceof YAMLPlainTextImpl) {
-                            String key = YAMLUtil.getConfigFullName(keyValue);
-                            if (prefix != null) {
-                                if (key.length() > prefix.length() && key.startsWith(prefix)) {
-                                    key = key.substring(prefix.length());
-                                    resultItems.add(new SearchedConfigYAMLKeyValue(key, keyValue, isEL));
-                                }
-                            } else {
-                                resultItems.add(new SearchedConfigYAMLKeyValue(key, keyValue, isEL));
-                            }
-                        } else if (value instanceof YAMLBlockSequenceImpl) {
-                            for (YAMLSequenceItem item : ((YAMLBlockSequenceImpl) value).getItems()) {
-                                final YAMLValue itemValue = item.getValue();
-                                if (itemValue instanceof YAMLPlainTextImpl) {
-                                    String key = YAMLUtil.getConfigFullName(item);
-                                    if (prefix != null) {
-                                        if (key.length() > prefix.length() && key.startsWith(prefix)) {
-                                            key = key.substring(prefix.length());
-                                            resultItems.add(new SearchedConfigYAMLKeyValue(key, item, isEL));
-                                        }
-                                    } else {
-                                        resultItems.add(new SearchedConfigYAMLKeyValue(key, item, isEL));
-                                    }
-                                }
-                            }
+                TreeNodeUtilKt.eachYAMLKeyValues(yamlFile, (element, yamlValue) -> {
+                    YAMLKeyValue keyValue = (YAMLKeyValue) element;
+                    String key = YAMLUtil.getConfigFullName(keyValue);
+                    if (prefix != null) {
+                        if (key.length() > prefix.length() && key.startsWith(prefix)) {
+                            key = key.substring(prefix.length());
+                            resultItems.add(new SearchedConfigYAMLKeyValue(key, keyValue, isEL));
                         }
+                    } else {
+                        resultItems.add(new SearchedConfigYAMLKeyValue(key, keyValue, isEL));
                     }
-                }
+                    return true;
+                });
             } else if (psiFile instanceof PropertiesFileImpl) {
                 // Properties 配置文件
                 final PropertiesFileImpl propertiesFile = (PropertiesFileImpl) psiFile;
@@ -283,7 +241,7 @@ public class ForestTemplateUtil {
         final Project project = element.getOriginalElement().getProject();
         final String text = element.getText();
         if (element instanceof ForestTemplatePrimary) {
-            if (SpringBootLibraryUtil.hasSpringBootLibrary(project)) {
+            if (TreeNodeUtilKt.hasSpringBootLibrary(project)) {
                 final String keyName = FOREST_VARIABLES_PREFIX + text;
                 final ForestTemplateVariableHolder holder = getConfigHolder(
                         project,
@@ -305,6 +263,12 @@ public class ForestTemplateUtil {
                         return holder;
                     }
                 }
+            }
+
+            ForestTemplateBindingVarHolder holder =
+                    ForestTemplateBindingVarHolder.findVariable(project, text);
+            if (holder != null) {
+                return holder;
             }
             return null;
         }
