@@ -29,7 +29,6 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
             final YAMLPsiElement elem = searchedYAMLKeyValue.getElement();
             presentation.setIcon(PlatformIcons.PROPERTY_ICON);
             String value = null;
-            final TextAttributes attrs = EditorColorsManager.getInstance().getGlobalScheme().getAttributes(PropertiesHighlighter.PROPERTY_VALUE);
             presentation.setItemText(searchedYAMLKeyValue.getItemText());
             if (elem instanceof YAMLKeyValue) {
                 YAMLKeyValue yamlKeyValue = (YAMLKeyValue) elem;
@@ -41,7 +40,7 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
             if (searchedYAMLKeyValue.isEL()) {
                 presentation.setTypeText("String");
             }
-            presentation.setTailText("=" + value, attrs.getForegroundColor());
+            presentation.setTailText("=" + value);
         }
     };
 

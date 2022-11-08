@@ -31,7 +31,6 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
             final YAMLPsiElement elem = yamlVariable.getElement();
             presentation.setIcon(PlatformIcons.PROPERTY_ICON);
             String value = null;
-            final TextAttributes attrs = EditorColorsManager.getInstance().getGlobalScheme().getAttributes(PropertiesHighlighter.PROPERTY_VALUE);
             presentation.setItemText(yamlVariable.getVarName());
             if (elem instanceof YAMLKeyValue) {
                 final YAMLKeyValue yamlKeyValue = (YAMLKeyValue) elem;
@@ -43,7 +42,7 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
             if (yamlVariable.isEl()) {
                 presentation.setTypeText("String");
             }
-            presentation.setTailText("=" + value, attrs.getForegroundColor());
+            presentation.setTailText("=" + value);
         }
     };
 
