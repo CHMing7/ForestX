@@ -24,7 +24,7 @@
                                         implementationClass="com.chm.plugin.idea.forestx.provider.ForestMethodProvider"/>
 
 
-        <toolWindow id="Forest" secondary="false" anchor="right" icon="/icons/forest-logo-gray-13x13.svg"
+        <toolWindow id="Forest" secondary="false" anchor="right" icon="/icons/forest-logo-13x13.svg"
                     factoryClass="com.chm.plugin.idea.forestx.tw.RightSidebarToolWindowFactory"/>
 
         <postStartupActivity implementation="com.chm.plugin.idea.forestx.startup.MyStartupActivity"/>
