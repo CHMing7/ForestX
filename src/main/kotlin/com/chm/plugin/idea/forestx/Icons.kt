@@ -19,10 +19,6 @@ interface Icons {
 
         val ICON_16 = IconLoader.getIcon("/icons/forest-logo-16x16.svg")
 
-        val PROJECT_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg")
-
-        val MODULE_16 = IconLoader.getIcon("/icons/forest-module-16x16.svg")
-
         val INTERFACE_18 = IconLoader.getIcon("/icons/forest-logo-18x18.svg")
 
         val DELETE = IconLoader.getIcon("/icons/request-DELETE.svg")
