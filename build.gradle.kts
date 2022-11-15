@@ -6,7 +6,7 @@ fun properties(key: String) = project.findProperty(key).toString()
 plugins {
     id("java")
     idea
-    // Kotlin Support
+    // Kotlin Support 太高版本的kotlin jvm需要高版本的idea支持，切换到1.6.10 idea2021.2.2也能运行项目
     kotlin("jvm") version "1.6.10"
     // Intellij Support
     id("org.jetbrains.intellij") version "1.9.0"
