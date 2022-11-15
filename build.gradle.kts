@@ -7,7 +7,7 @@ plugins {
     id("java")
     idea
     // Kotlin Support
-    kotlin("jvm") version "1.7.20"
+    kotlin("jvm") version "1.6.10"
     // Intellij Support
     id("org.jetbrains.intellij") version "1.9.0"
     // Gradle Changelog Plugin

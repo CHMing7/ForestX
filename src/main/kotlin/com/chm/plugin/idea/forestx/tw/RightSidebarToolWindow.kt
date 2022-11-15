@@ -212,7 +212,6 @@ class RightSidebarToolWindow(project: Project) {
             if (isStaticOrDefault(method)) {
                 continue
             }
-            val methodAnnotations = AnnotationUtil.getAllAnnotations(method, false, null)
             for (annotation in Annotation.FOREST_METHOD_ANNOTATION) {
                 val methodAnnotation = method.getAnnotation(annotation.qualifiedName)
                 if (methodAnnotation != null) {
