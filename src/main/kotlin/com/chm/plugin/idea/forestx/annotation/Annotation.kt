@@ -124,6 +124,11 @@ class Annotation(
         val BASE_REQUEST = Annotation("@BaseRequest", "com.dtflys.forest.annotation.BaseRequest")
 
         /**
+         * The constant BASE_URL
+         */
+        val BASE_URL = Annotation("@BaseURL", "com.dtflys.forest.annotation.BaseURL")
+
+        /**
          * The constant VAR
          */
         val VAR = Annotation("@Var", "com.dtflys.forest.annotation.Var")

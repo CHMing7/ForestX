@@ -17,12 +17,14 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.util.PsiEditorUtil
 import com.intellij.ui.ColoredTreeCellRenderer
+import com.intellij.ui.SimpleTextAttributes
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.TreeSpeedSearch
 import com.intellij.ui.tree.TreeVisitor
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeModelAdapter
 import com.intellij.util.ui.tree.TreeUtil
+import kotlinx.serialization.descriptors.setSerialDescriptor
 import org.apache.commons.collections.CollectionUtils
 import org.apache.commons.compress.utils.Lists
 import java.awt.BorderLayout
@@ -75,6 +77,12 @@ class RightSidebarToolWindow(project: Project) {
             ) {
                 val name = value.getNodeName()
                 append(name)
+                val forestAnnotationUrl = value.getForestAnnotationUrl()
+                if (!forestAnnotationUrl.isBlank()) {
+                    // 节点名跟url之间增加空格
+                    append(" ")
+                    append(forestAnnotationUrl, SimpleTextAttributes.GRAYED_ATTRIBUTES)
+                }
                 val icon = value.getNodeIcon()
                 setIcon(icon)
             }
@@ -193,21 +201,24 @@ class RightSidebarToolWindow(project: Project) {
     }
 
     private fun methodsFilter(psiClass: PsiClass): List<PsiMethod> {
+        // 非接口类或者final标记的直接跳过
         if (!psiClass.isInterface || psiClass.modifierList?.hasModifierProperty(PsiModifier.FINAL) == true) {
             return Lists.newArrayList()
         }
         val psiMethods: MutableList<PsiMethod> = Lists.newArrayList()
         val methods = psiClass.methods
-        for (method in methods) {
+        methodForeach@ for (method in methods) {
+            //　静态方法与默认方法跳过
             if (isStaticOrDefault(method)) {
                 continue
             }
             val methodAnnotations = AnnotationUtil.getAllAnnotations(method, false, null)
-            for (methodAnnotation in methodAnnotations) {
-                for (annotation in Annotation.FOREST_METHOD_ANNOTATION) {
-                    if (methodAnnotation.qualifiedName == annotation.qualifiedName) {
-                        psiMethods.add(method)
-                    }
+            for (annotation in Annotation.FOREST_METHOD_ANNOTATION) {
+                val methodAnnotation = method.getAnnotation(annotation.qualifiedName)
+                if (methodAnnotation != null) {
+                    psiMethods.add(method)
+                    //跳出多重循环
+                    continue@methodForeach
                 }
             }
         }

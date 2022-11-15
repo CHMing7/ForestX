@@ -412,13 +412,84 @@ fun Any.getNodeName(): String {
             o.name
         }
         is PsiClass -> {
-            o.qualifiedName ?: ""
+            o.name ?: ""
         }
         is PsiMethod -> {
             o.name
         }
         else -> {
             o?.toString() ?: "null"
+        }
+    }
+}
+
+fun Any.getForestAnnotationUrl(): String {
+    val o: Any?
+    o = if (this is DefaultMutableTreeNode) {
+        this.userObject
+    } else {
+        this
+    }
+    return when (o) {
+        is PsiClass -> {
+            val baseRequest = o.getAnnotation(Annotation.BASE_REQUEST.qualifiedName)
+            baseRequest?.let {
+                // 存在@BaseRequest注解，拼接basePath
+                val baseURLText = AnnotationUtil.getStringAttributeValue(it, "baseURL")
+                if (!baseURLText.isNullOrBlank()) {
+                    return "[${baseURLText}]"
+                }
+            }
+
+            val baseURL = o.getAnnotation(Annotation.BASE_URL.qualifiedName)
+            baseURL?.let {
+                val valueText = AnnotationUtil.getStringAttributeValue(it, "value")
+                if (!valueText.isNullOrBlank()) {
+                    return "[${valueText}]"
+                }
+            }
+
+            val address = o.getAnnotation(Annotation.ADDRESS.qualifiedName)
+            address?.let {
+                // 存在@Address注解，拼接basePath
+                val schemeText = AnnotationUtil.getStringAttributeValue(it, "scheme")
+                val hostText = AnnotationUtil.getStringAttributeValue(it, "host")
+                val portText = AnnotationUtil.getStringAttributeValue(it, "port")
+                if (!schemeText.isNullOrBlank() && !hostText.isNullOrBlank() && !portText.isNullOrBlank()) {
+                    return "[$schemeText://$hostText:$portText]"
+                }
+
+                val basePathText = AnnotationUtil.getStringAttributeValue(it, "basePath")
+                if (!basePathText.isNullOrBlank()) {
+                    return "[${basePathText}]"
+                }
+            }
+
+            ""
+        }
+
+        is PsiMethod -> {
+            for ((forestMethodAnnotationName, icon) in METHOD_ICON_MAP) {
+                val annotation = o.getAnnotation(forestMethodAnnotationName)
+                annotation?.let {
+                    val urlText = AnnotationUtil.getStringAttributeValue(it, "url")
+                    if (!urlText.isNullOrBlank()) {
+                        return "[${urlText}]"
+                    }
+
+                    val valueext = AnnotationUtil.getStringAttributeValue(it, "value")
+                    if (!valueext.isNullOrBlank()) {
+                        return "[${valueext}]"
+                    }
+                }
+
+            }
+
+            ""
+        }
+
+        else -> {
+            ""
         }
     }
 }
@@ -441,20 +512,20 @@ fun Any.getNodeIcon(): Icon {
             Icons.INTERFACE_18
         }
         is PsiMethod -> {
-            val methodAnnotations = AnnotationUtil.getAllAnnotations(
-                o, false, null
-            )
-            for (methodAnnotation in methodAnnotations) {
-                val icon = METHOD_ICON_MAP[methodAnnotation.qualifiedName]
-                if (icon != null) {
+            for ((forestMethodAnnotationName, icon) in METHOD_ICON_MAP) {
+                val annotation = o.getAnnotation(forestMethodAnnotationName)
+                if (annotation != null) {
                     return icon
                 }
-                if (methodAnnotation.qualifiedName == Annotation.REQUEST.qualifiedName) {
-                    val type = AnnotationUtil.getStringAttributeValue(methodAnnotation, "type")
-                    val icon2 = REQUEST_TYPE_ICON_MAP[StringUtil.toUpperCase(type)]
-                    return icon2 ?: Icons.GET
-                }
             }
+
+            val requestAnnotation = o.getAnnotation(Annotation.REQUEST.qualifiedName)
+            if (requestAnnotation != null) {
+                val type = AnnotationUtil.getStringAttributeValue(requestAnnotation, "type")
+                val icon2 = REQUEST_TYPE_ICON_MAP[StringUtil.toUpperCase(type)]
+                return icon2 ?: Icons.GET
+            }
+
             Icons.GET
         }
         else -> {
