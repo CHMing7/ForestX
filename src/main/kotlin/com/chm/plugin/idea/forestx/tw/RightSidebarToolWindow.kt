@@ -3,7 +3,6 @@ package com.chm.plugin.idea.forestx.tw
 import com.chm.plugin.idea.forestx.annotation.Annotation
 import com.chm.plugin.idea.forestx.utils.*
 import com.google.common.collect.Maps
-import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -24,10 +23,10 @@ import com.intellij.ui.tree.TreeVisitor
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeModelAdapter
 import com.intellij.util.ui.tree.TreeUtil
-import kotlinx.serialization.descriptors.setSerialDescriptor
 import org.apache.commons.collections.CollectionUtils
 import org.apache.commons.compress.utils.Lists
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JPanel
@@ -42,6 +41,12 @@ import javax.swing.tree.TreePath
  * @since 2022-08-25
  **/
 class RightSidebarToolWindow(project: Project) {
+
+//    val URL_BOLD_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_BOLD, Color(203, 150, 103))
+    val TYPE_BOLD_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_BOLD, Color(203, 150, 103))
+
+    val URL_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, Color(37, 178, 178))
+
 
     private var rootPanel: JPanel
 
@@ -76,12 +81,22 @@ class RightSidebarToolWindow(project: Project) {
                 hasFocus: Boolean
             ) {
                 val name = value.getNodeName()
-                append(name)
+                append(" ")
+                val o: Any = if (value is DefaultMutableTreeNode) {
+                    value.userObject
+                } else {
+                    value
+                }
+                if (o is Project || o is Module || o is PsiClass) {
+                    append(name, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
+                } else {
+                    append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                }
                 val forestAnnotationUrl = value.getForestAnnotationUrl()
                 if (!forestAnnotationUrl.isBlank()) {
                     // 节点名跟url之间增加空格
-                    append(" ")
-                    append(forestAnnotationUrl, SimpleTextAttributes.GRAYED_ATTRIBUTES)
+                    append("  ")
+                    append(forestAnnotationUrl, SimpleTextAttributes.GRAYED_BOLD_ATTRIBUTES)
                 }
                 val icon = value.getNodeIcon()
                 setIcon(icon)

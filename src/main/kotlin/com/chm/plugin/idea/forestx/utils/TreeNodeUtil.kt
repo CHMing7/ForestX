@@ -437,7 +437,7 @@ fun Any.getForestAnnotationUrl(): String {
                 // 存在@BaseRequest注解，拼接basePath
                 val baseURLText = AnnotationUtil.getStringAttributeValue(it, "baseURL")
                 if (!baseURLText.isNullOrBlank()) {
-                    return "[${baseURLText}]"
+                    return "${baseURLText}"
                 }
             }
 
@@ -445,7 +445,7 @@ fun Any.getForestAnnotationUrl(): String {
             baseURL?.let {
                 val valueText = AnnotationUtil.getStringAttributeValue(it, "value")
                 if (!valueText.isNullOrBlank()) {
-                    return "[${valueText}]"
+                    return "${valueText}"
                 }
             }
 
@@ -456,12 +456,12 @@ fun Any.getForestAnnotationUrl(): String {
                 val hostText = AnnotationUtil.getStringAttributeValue(it, "host")
                 val portText = AnnotationUtil.getStringAttributeValue(it, "port")
                 if (!schemeText.isNullOrBlank() && !hostText.isNullOrBlank() && !portText.isNullOrBlank()) {
-                    return "[$schemeText://$hostText:$portText]"
+                    return "$schemeText://$hostText:$portText"
                 }
 
                 val basePathText = AnnotationUtil.getStringAttributeValue(it, "basePath")
                 if (!basePathText.isNullOrBlank()) {
-                    return "[${basePathText}]"
+                    return "${basePathText}"
                 }
             }
 
@@ -474,12 +474,12 @@ fun Any.getForestAnnotationUrl(): String {
                 annotation?.let {
                     val urlText = AnnotationUtil.getStringAttributeValue(it, "url")
                     if (!urlText.isNullOrBlank()) {
-                        return "[${urlText}]"
+                        return "${urlText}"
                     }
 
                     val valueext = AnnotationUtil.getStringAttributeValue(it, "value")
                     if (!valueext.isNullOrBlank()) {
-                        return "[${valueext}]"
+                        return "${valueext}"
                     }
                 }
 

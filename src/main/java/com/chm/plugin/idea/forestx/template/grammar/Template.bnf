@@ -1,5 +1,6 @@
 {
   parserClass="com.chm.plugin.idea.forestx.template.grammar.TemplateParser"
+  parserUtilClass="com.chm.plugin.idea.forestx.template.grammar.TemplateParserUtil"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 

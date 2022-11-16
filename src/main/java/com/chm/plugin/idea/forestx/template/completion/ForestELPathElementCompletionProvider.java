@@ -89,17 +89,8 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                         if (Objects.equals(returnType, PsiType.VOID)) {
                             continue;
                         }
-                        if (paramCount > 1) {
+                        if (paramCount > 0) {
                             continue;
-                        }
-                        if (paramCount == 1) {
-                            PsiParameter parameter = paramList.getParameter(0);
-                            PsiType paramType = parameter.getType();
-                            if (!(paramType.equals(PsiType.INT) ||
-                                    paramType.equals(PsiType.LONG) ||
-                                    paramType.equals(PsiType.SHORT))) {
-                                continue;
-                            }
                         }
                         final String methodName = mtd.getName();
                         if (mtd.isConstructor()) {
@@ -113,13 +104,15 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                         if (methodName.startsWith("get") && methodName.length() > 3) {
                             final ForestTemplateFieldHolder fieldHolder = ForestTemplateFieldHolder.getHolder(mtd, type);
                             resultSet.addElement(LookupElementBuilder.create(fieldHolder)
-                                    .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
+                                            .withLookupString(methodName)
+                                            .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
+                        } else {
+                            final ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(
+                                    mtd.getName(), mtd, type, Lists.newArrayList());
+                            resultSet.addElement(LookupElementBuilder.create(invocationHolder)
+                                    .withRenderer(ForestTemplateInvocationHolder.INVOCATION_RENDER)
+                                    .withInsertHandler(ForestTemplateInvocationHolder.INVOCATION_INSERT_HANDLER));
                         }
-                        final ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(
-                                mtd.getName(), mtd, type, Lists.newArrayList());
-                        resultSet.addElement(LookupElementBuilder.create(invocationHolder)
-                                .withRenderer(ForestTemplateInvocationHolder.INVOCATION_RENDER)
-                                .withInsertHandler(ForestTemplateInvocationHolder.INVOCATION_INSERT_HANDLER));
                     }
                 });
 
