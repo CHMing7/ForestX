@@ -477,12 +477,25 @@ fun Any.getForestAnnotationUrl(): String {
                         return "${urlText}"
                     }
 
-                    val valueext = AnnotationUtil.getStringAttributeValue(it, "value")
-                    if (!valueext.isNullOrBlank()) {
-                        return "${valueext}"
+                    val valueText = AnnotationUtil.getStringAttributeValue(it, "value")
+                    if (!valueText.isNullOrBlank()) {
+                        return "${valueText}"
                     }
                 }
 
+            }
+
+            val requestAnnotation = o.getAnnotation(Annotation.REQUEST.qualifiedName)
+            if (requestAnnotation != null) {
+                val urlText = AnnotationUtil.getStringAttributeValue(requestAnnotation, "url")
+                if (!urlText.isNullOrBlank()) {
+                    return "${urlText}"
+                }
+
+                val valueText = AnnotationUtil.getStringAttributeValue(requestAnnotation, "value")
+                if (!valueText.isNullOrBlank()) {
+                    return "${valueText}"
+                }
             }
 
             ""

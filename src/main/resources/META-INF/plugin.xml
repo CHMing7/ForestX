@@ -5,6 +5,16 @@
     <version>1.0</version>
     <vendor email="654849388@qq.com" url="https://gitee.com/chming7/ForestX">ForestX</vendor>
 
+    <description><![CDATA[
+      inlined during build from README.md
+      ]]>
+    </description>
+
+    <change-notes><![CDATA[
+      inlined during build from CHANGELOG.md
+      ]]>
+    </change-notes>
+
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
