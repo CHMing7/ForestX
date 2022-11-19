@@ -432,24 +432,24 @@ fun Any.getForestAnnotationUrl(): String {
     }
     return when (o) {
         is PsiClass -> {
-            val baseRequest = o.getAnnotation(Annotation.BASE_REQUEST.qualifiedName)
+            val baseRequest = AnnotationUtil.findAnnotation(o, Annotation.BASE_REQUEST.qualifiedName)
             baseRequest?.let {
                 // 存在@BaseRequest注解，拼接basePath
                 val baseURLText = AnnotationUtil.getStringAttributeValue(it, "baseURL")
                 if (!baseURLText.isNullOrBlank()) {
-                    return "${baseURLText}"
+                    return baseURLText
                 }
             }
 
-            val baseURL = o.getAnnotation(Annotation.BASE_URL.qualifiedName)
+            val baseURL = AnnotationUtil.findAnnotation(o, Annotation.BASE_URL.qualifiedName)
             baseURL?.let {
                 val valueText = AnnotationUtil.getStringAttributeValue(it, "value")
                 if (!valueText.isNullOrBlank()) {
-                    return "${valueText}"
+                    return valueText
                 }
             }
 
-            val address = o.getAnnotation(Annotation.ADDRESS.qualifiedName)
+            val address = AnnotationUtil.findAnnotation(o, Annotation.ADDRESS.qualifiedName)
             address?.let {
                 // 存在@Address注解，拼接basePath
                 val schemeText = AnnotationUtil.getStringAttributeValue(it, "scheme")
@@ -461,7 +461,7 @@ fun Any.getForestAnnotationUrl(): String {
 
                 val basePathText = AnnotationUtil.getStringAttributeValue(it, "basePath")
                 if (!basePathText.isNullOrBlank()) {
-                    return "${basePathText}"
+                    return basePathText
                 }
             }
 
@@ -470,31 +470,31 @@ fun Any.getForestAnnotationUrl(): String {
 
         is PsiMethod -> {
             for ((forestMethodAnnotationName, icon) in METHOD_ICON_MAP) {
-                val annotation = o.getAnnotation(forestMethodAnnotationName)
+                val annotation = AnnotationUtil.findAnnotation(o, forestMethodAnnotationName)
                 annotation?.let {
                     val urlText = AnnotationUtil.getStringAttributeValue(it, "url")
                     if (!urlText.isNullOrBlank()) {
-                        return "${urlText}"
+                        return urlText
                     }
 
                     val valueText = AnnotationUtil.getStringAttributeValue(it, "value")
                     if (!valueText.isNullOrBlank()) {
-                        return "${valueText}"
+                        return valueText
                     }
                 }
 
             }
 
-            val requestAnnotation = o.getAnnotation(Annotation.REQUEST.qualifiedName)
+            val requestAnnotation = AnnotationUtil.findAnnotation(o, Annotation.REQUEST.qualifiedName)
             if (requestAnnotation != null) {
                 val urlText = AnnotationUtil.getStringAttributeValue(requestAnnotation, "url")
                 if (!urlText.isNullOrBlank()) {
-                    return "${urlText}"
+                    return urlText
                 }
 
                 val valueText = AnnotationUtil.getStringAttributeValue(requestAnnotation, "value")
                 if (!valueText.isNullOrBlank()) {
-                    return "${valueText}"
+                    return valueText
                 }
             }
 
@@ -526,13 +526,13 @@ fun Any.getNodeIcon(): Icon {
         }
         is PsiMethod -> {
             for ((forestMethodAnnotationName, icon) in METHOD_ICON_MAP) {
-                val annotation = o.getAnnotation(forestMethodAnnotationName)
+                val annotation = AnnotationUtil.findAnnotation(o, forestMethodAnnotationName)
                 if (annotation != null) {
                     return icon
                 }
             }
 
-            val requestAnnotation = o.getAnnotation(Annotation.REQUEST.qualifiedName)
+            val requestAnnotation = AnnotationUtil.findAnnotation(o, Annotation.REQUEST.qualifiedName)
             if (requestAnnotation != null) {
                 val type = AnnotationUtil.getStringAttributeValue(requestAnnotation, "type")
                 val icon2 = REQUEST_TYPE_ICON_MAP[StringUtil.toUpperCase(type)]
