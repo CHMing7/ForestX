@@ -65,8 +65,9 @@ tasks {
             "README-EN.md" to "English",
             "README.md" to "中文"
         )
-        val pluginDescriptionBuild = StringBuilder("")
+        val pluginDescriptionBuildList = mutableListOf<StringBuilder>()
         readmeFileMap.forEach { (fileName, language) ->
+            val pluginDescriptionBuild = StringBuilder("")
             pluginDescriptionBuild.append("<h1>").append(language).append(":").append("</h1>").append("\n")
             // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
             pluginDescriptionBuild.append(projectDir.resolve(fileName).readText().lines().run {
@@ -80,8 +81,12 @@ tasks {
             }.joinToString("\n").run {
                 org.jetbrains.changelog.markdownToHTML(this)
             })
+            pluginDescriptionBuildList.add(pluginDescriptionBuild)
         }
-        pluginDescription.set(pluginDescriptionBuild.toString())
+        // 不同语言说明之间增加两空行
+        pluginDescription.set(pluginDescriptionBuildList.joinToString("<br><br>") {
+            it.toString()
+        })
 
         // Get the latest available change notes from the changelog file
         changeNotes.set(provider {
