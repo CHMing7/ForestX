@@ -60,19 +60,28 @@ tasks {
         version.set(properties("pluginVersion"))
         sinceBuild.set(properties("pluginSinceBuild"))
         untilBuild.set(properties("pluginUntilBuild"))
-
-        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        pluginDescription.set(
-            projectDir.resolve("README.md").readText().lines().run {
+        // 说明文档键值对
+        val readmeFileMap = mapOf(
+            "README-EN.md" to "English",
+            "README.md" to "中文"
+        )
+        val pluginDescriptionBuild = StringBuilder("")
+        readmeFileMap.forEach { (fileName, language) ->
+            pluginDescriptionBuild.append("<h1>").append(language).append(":").append("</h1>").append("\n")
+            // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
+            pluginDescriptionBuild.append(projectDir.resolve(fileName).readText().lines().run {
                 val start = "<!-- Plugin description -->"
                 val end = "<!-- Plugin description end -->"
 
                 if (!containsAll(listOf(start, end))) {
-                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+                    throw GradleException("Plugin description section not found in$fileName:\n$start ... $end")
                 }
                 subList(indexOf(start) + 1, indexOf(end))
-            }.joinToString("\n").run { org.jetbrains.changelog.markdownToHTML(this) }
-        )
+            }.joinToString("\n").run {
+                org.jetbrains.changelog.markdownToHTML(this)
+            })
+        }
+        pluginDescription.set(pluginDescriptionBuild.toString())
 
         // Get the latest available change notes from the changelog file
         changeNotes.set(provider {
