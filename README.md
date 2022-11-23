@@ -20,15 +20,6 @@
 - Supports jumping from variables in template expressions to the '@Var' parameter definition in method
 - Supports jumping from variables attributes in template expressions to 'java' definition code
 
-<!-- Plugin description end -->
--------------------------------------------------------------------------------
-
-Project License
---------------------------
-The MIT License (MIT)
-
-Copyright (c) 2022 CHMing
-
 -------------------------------------------------------------------------------
 
 <h1>中文:</h1>
