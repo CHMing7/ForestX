@@ -68,7 +68,7 @@ tasks {
         val pluginDescriptionBuildList = mutableListOf<StringBuilder>()
         readmeFileMap.forEach { (fileName, language) ->
             val pluginDescriptionBuild = StringBuilder("")
-            pluginDescriptionBuild.append("<h1>").append(language).append(":").append("</h1>").append("\n")
+            pluginDescriptionBuild.append("<h3>").append(language).append(":").append("</h3>")
             // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
             pluginDescriptionBuild.append(projectDir.resolve(fileName).readText().lines().run {
                 val start = "<!-- Plugin description -->"
@@ -84,7 +84,8 @@ tasks {
             pluginDescriptionBuildList.add(pluginDescriptionBuild)
         }
         // 不同语言说明之间增加两空行
-        pluginDescription.set(pluginDescriptionBuildList.joinToString("<br><br>") {
+        pluginDescription.set("<strong>Forest framework supports plugin</strong>\n" +
+                "<br/>" + pluginDescriptionBuildList.joinToString("<br><br>") {
             it.toString()
         })
 

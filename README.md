@@ -4,8 +4,8 @@
 
 ## 📚 简介
 <!-- Plugin description -->
-<h1>ForestX 是一款专为 Forest 提供支持的 IDEA 插件</h1>
-<h2>它能大幅提高您使用 <a href="https://forest.dtflyx.com/">Forest 框架</a>时的开发体验</h2>
+<h3>ForestX 是一款专为 Forest 提供支持的 IDEA 插件</h3>
+<h3>它能大幅提高您使用 <a href="https://forest.dtflyx.com/">Forest 框架</a>时的开发体验</h2>
 
 ## 🎁 ForestX 特性
 - 支持 Forest 模板表达式语法 (语法高亮、智能提示)

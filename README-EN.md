@@ -4,8 +4,8 @@
 
 ## 📚 Introduction
 <!-- Plugin description -->
-<h1>ForestX is an IDEA plugin designed to support Forest</h1>
-<h2>It greatly improves your development experience when using the <a href="https://forest.dtflyx.com/">Forest framework</a></h2>
+<h3>ForestX is an IDEA plugin designed to support Forest</h3>
+<h3>It greatly improves your development experience when using the <a href="https://forest.dtflyx.com/">Forest framework</a></h2>
 
 ## 🎁 ForestX Features
 - Forest template expression syntax is supported (Grammar highlighting、Smart Tips)
