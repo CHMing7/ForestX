@@ -10,7 +10,7 @@
 ## 🎁 ForestX Features
 - Forest template expression syntax is supported (Grammar highlighting、Smart Tips)
 - Provides the Forest tool window to quickly browse the Forest interface in your project
-- In the tool window, different types of requests have different ICONS (such as: `GET`、`POST`)
+- In the tool window, different types of requests have different ICONS (e.g.: `GET`、`POST`)
 - In the tool window, the URL path is displayed after each Forest interface and request method
 - Supports jumping variables in template expressions to the 'properties' configuration file
 - Supports jumping variables in template expressions to 'yaml' configuration file
