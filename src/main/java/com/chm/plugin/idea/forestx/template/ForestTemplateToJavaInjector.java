@@ -121,6 +121,9 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
     }
 
     private static boolean isForestOfConfigurationClass(PsiClass clazz) {
+        if (clazz == null) {
+            return false;
+        }
         return "com.dtflys.forest.Forest".equals(clazz.getQualifiedName()) ||
                 "com.dtflys.forest.config.ForestConfiguration".equals(clazz.getQualifiedName());
     }
