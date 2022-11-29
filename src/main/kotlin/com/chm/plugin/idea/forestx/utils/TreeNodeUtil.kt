@@ -19,6 +19,7 @@ import com.intellij.psi.search.ProjectScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.AnnotationTargetsSearch
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
 import org.apache.commons.compress.utils.Lists
 import org.jetbrains.yaml.YAMLUtil
