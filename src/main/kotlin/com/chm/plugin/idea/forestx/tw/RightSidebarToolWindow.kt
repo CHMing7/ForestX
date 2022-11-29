@@ -2,6 +2,7 @@ package com.chm.plugin.idea.forestx.tw
 
 import com.chm.plugin.idea.forestx.annotation.Annotation
 import com.chm.plugin.idea.forestx.utils.*
+import com.fasterxml.jackson.databind.util.ClassUtil
 import com.google.common.collect.Maps
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.ScrollType
@@ -11,9 +12,7 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiModifier
+import com.intellij.psi.*
 import com.intellij.psi.util.PsiEditorUtil
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.SimpleTextAttributes
@@ -33,6 +32,7 @@ import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.MutableTreeNode
 import javax.swing.tree.TreePath
 
 /**
@@ -42,7 +42,7 @@ import javax.swing.tree.TreePath
  **/
 class RightSidebarToolWindow(project: Project) {
 
-//    val URL_BOLD_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_BOLD, Color(203, 150, 103))
+    //    val URL_BOLD_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_BOLD, Color(203, 150, 103))
     val TYPE_BOLD_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_BOLD, Color(203, 150, 103))
 
     val URL_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, Color(37, 178, 178))
@@ -87,13 +87,21 @@ class RightSidebarToolWindow(project: Project) {
                 } else {
                     value
                 }
+                // 当class是否存在，若不存在则删除节点
+                if (o is PsiClass && !checkPsiClassExist(o)) {
+                    if (value is MutableTreeNode) {
+                        val path = TreePath(treeModel.getPathToRoot(value))
+                        TreeUtil.removeLastPathComponent(tree, path)
+                    }
+                    return
+                }
                 if (o is Project || o is Module || o is PsiClass) {
                     append(name, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
                 } else {
                     append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
                 }
                 val forestAnnotationUrl = value.getForestAnnotationUrl()
-                if (!forestAnnotationUrl.isBlank()) {
+                if (forestAnnotationUrl.isNotBlank()) {
                     // 节点名跟url之间增加空格
                     append("  ")
                     append(forestAnnotationUrl, SimpleTextAttributes.GRAYED_BOLD_ATTRIBUTES)
@@ -171,6 +179,16 @@ class RightSidebarToolWindow(project: Project) {
 
     private fun getTreeModel(): DefaultTreeModel {
         return treeModel
+    }
+
+    // 检查是否可能被删除java文件，或者删除class代码
+    fun checkPsiClassExist(psiClass: PsiClass): Boolean {
+        if (psiClass.qualifiedName == null) {
+            return false
+        }
+        return psiClass.qualifiedName?.run {
+            psiClass.project.findClazz(this).isPresent
+        } ?: false
     }
 
     fun processClass(psiClass: PsiClass) {

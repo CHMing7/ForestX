@@ -42,16 +42,20 @@
         <postStartupActivity implementation="com.chm.plugin.idea.forestx.startup.MyStartupActivity"/>
 
         <!-- Forest模板语言解析器定义 -->
-        <lang.parserDefinition language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.ForestTemplateParserDefinition"/>
+        <lang.parserDefinition language="ForestTemplate"
+                               implementationClass="com.chm.plugin.idea.forestx.template.ForestTemplateParserDefinition"/>
 
         <!-- Forest模板语言语法荧光笔工厂 -->
-        <lang.syntaxHighlighterFactory language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.highlighter.ForestTemplateSyntaxHighLighterFactory"/>
+        <lang.syntaxHighlighterFactory language="ForestTemplate"
+                                       implementationClass="com.chm.plugin.idea.forestx.template.highlighter.ForestTemplateSyntaxHighLighterFactory"/>
 
         <!-- Forest模板语言代码自动补全 -->
-        <completion.contributor language="ForestTemplate" implementationClass="com.chm.plugin.idea.forestx.template.completion.ForestTemplateCompletionContributor"/>
+        <completion.contributor language="ForestTemplate"
+                                implementationClass="com.chm.plugin.idea.forestx.template.completion.ForestTemplateCompletionContributor"/>
 
         <!-- Forest模板跳转到Yaml配置文件 -->
-        <gotoDeclarationHandler order="first" implementation="com.chm.plugin.idea.forestx.template.search.TemplateGotoDeclarationHandler" />
+        <gotoDeclarationHandler order="first"
+                                implementation="com.chm.plugin.idea.forestx.template.search.TemplateGotoDeclarationHandler"/>
 
 
         <fileType
@@ -70,4 +74,10 @@
     <actions>
         <!-- Add your actions here -->
     </actions>
+
+    <applicationListeners>
+        <listener class="com.chm.plugin.idea.forestx.listener.MyPsiTreeChangeListener"
+                  topic="com.intellij.psi.PsiTreeChangeListener"/>
+    </applicationListeners>
+
 </idea-plugin>
