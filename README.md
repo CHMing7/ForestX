@@ -1,3 +1,6 @@
+
+![banner](/img/ForestX_banner.png)
+
 <!--[**🌎English Documentation**](README-EN.md)-->
 
 -------------------------------------------------------------------------------
