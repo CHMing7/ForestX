@@ -75,9 +75,4 @@
         <!-- Add your actions here -->
     </actions>
 
-    <applicationListeners>
-        <listener class="com.chm.plugin.idea.forestx.listener.MyPsiTreeChangeListener"
-                  topic="com.intellij.psi.PsiTreeChangeListener"/>
-    </applicationListeners>
-
 </idea-plugin>
