@@ -14,12 +14,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.search.GlobalSearchScopesCore
-import com.intellij.psi.search.ProjectScope
-import com.intellij.psi.search.SearchScope
-import com.intellij.psi.search.searches.AnnotationTargetsSearch
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
 import org.apache.commons.compress.utils.Lists
 import org.jetbrains.yaml.YAMLUtil
@@ -31,7 +26,11 @@ import org.jetbrains.yaml.psi.impl.YAMLBlockMappingImpl
 import org.jetbrains.yaml.psi.impl.YAMLBlockSequenceImpl
 import java.util.function.BiFunction
 import javax.swing.Icon
-import javax.swing.tree.*
+import javax.swing.JTree
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.MutableTreeNode
+import javax.swing.tree.TreeNode
 
 /**
  * @author caihongming
@@ -78,18 +77,6 @@ val MODULE_SPRING_BOOT_MAP: MutableMap<String, Boolean> = mutableMapOf()
 val MODULE_SPRING_MAP: MutableMap<String, Boolean> = mutableMapOf()
 
 val BINDING_VAR_MAP: MutableMap<String, PsiElement> = mutableMapOf()
-
-fun TreeNode.findNode(o: Any): DefaultMutableTreeNode? {
-    for (i in 0 until this.childCount) {
-        val child = this.getChildAt(i)
-        val childName = child.getNodeName()
-        val oName = o.getNodeName()
-        if (childName == oName) {
-            return child as DefaultMutableTreeNode
-        }
-    }
-    return null
-}
 
 fun getMethodFullName(method: PsiMethod): String {
     val builder = StringBuilder()
@@ -254,6 +241,29 @@ fun getPathExpressionText(element: PsiElement): String? {
 
 fun getterMethodName(name: String): String {
     return "get" + name.substring(0, 1).toUpperCase() + name.substring(1)
+}
+
+fun JTree.findNode(o: Any): DefaultMutableTreeNode? {
+    val root = this.model.root as TreeNode
+    return root.findNode(o, true)
+}
+
+fun TreeNode.findNode(
+    o: Any,
+    checkChild: Boolean = false
+): DefaultMutableTreeNode? {
+    for (i in 0 until this.childCount) {
+        val child = this.getChildAt(i)
+        val childName = child.getNodeName()
+        val oName = o.getNodeName()
+        if (childName == oName) {
+            return child as DefaultMutableTreeNode
+        }
+        if (checkChild) {
+            child.findNode(o, checkChild)
+        }
+    }
+    return null
 }
 
 fun DefaultMutableTreeNode.findNodeOrNew(

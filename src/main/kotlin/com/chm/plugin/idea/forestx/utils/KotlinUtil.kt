@@ -79,3 +79,15 @@ fun PsiModifierListOwner.getPsiAnnotation(annotation: Annotation): Optional<PsiA
 fun Annotation.getPsiAnnotation(target: PsiModifierListOwner): Optional<PsiAnnotation> {
     return target.getPsiAnnotation(this)
 }
+
+/**
+ * 检查是否可能被删除java文件，或者删除class代码
+ */
+fun PsiClass.checkPsiClassExist(): Boolean {
+    if (this.qualifiedName == null) {
+        return false
+    }
+    return this.qualifiedName?.run {
+        this@checkPsiClassExist.project.findClazz(this).isPresent
+    } ?: false
+}
