@@ -28,6 +28,8 @@
 
 选择`Marketplace`选项卡，搜索`ForestX`，然后点击`install`进行安装
 
+环境要求: Intellij IDEA >= `2021.3`
+
 ## 🎨 功能展示
 
 ### 侧边导航工具栏
