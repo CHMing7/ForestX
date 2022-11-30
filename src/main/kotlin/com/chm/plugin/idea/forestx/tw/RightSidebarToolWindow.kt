@@ -2,7 +2,6 @@ package com.chm.plugin.idea.forestx.tw
 
 import com.chm.plugin.idea.forestx.annotation.Annotation
 import com.chm.plugin.idea.forestx.utils.*
-import com.fasterxml.jackson.databind.util.ClassUtil
 import com.google.common.collect.Maps
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.ScrollType
@@ -87,14 +86,15 @@ class RightSidebarToolWindow(project: Project) {
                 } else {
                     value
                 }
-                // 当class是否存在，若不存在则删除节点
-                if (o is PsiClass && !checkPsiClassExist(o)) {
-                    if (value is MutableTreeNode) {
-                        val path = TreePath(treeModel.getPathToRoot(value))
-                        TreeUtil.removeLastPathComponent(tree, path)
-                    }
-                    return
-                }
+
+//                // 当class是否存在，若不存在则删除节点
+//                if (o is PsiClass && !o.checkPsiClassExist()) {
+//                    if (value is MutableTreeNode) {
+//                        val path = TreePath(treeModel.getPathToRoot(value))
+//                        TreeUtil.removeLastPathComponent(tree, path)
+//                    }
+//                    return
+//                }
                 if (o is Project || o is Module || o is PsiClass) {
                     append(name, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
                 } else {
@@ -181,17 +181,12 @@ class RightSidebarToolWindow(project: Project) {
         return treeModel
     }
 
-    // 检查是否可能被删除java文件，或者删除class代码
-    fun checkPsiClassExist(psiClass: PsiClass): Boolean {
-        if (psiClass.qualifiedName == null) {
-            return false
-        }
-        return psiClass.qualifiedName?.run {
-            psiClass.project.findClazz(this).isPresent
-        } ?: false
-    }
-
+    @Synchronized
     fun processClass(psiClass: PsiClass) {
+        if (!psiClass.checkPsiClassExist()) {
+            deletePsiClass(psiClass)
+            return
+        }
         val currentModule = ModuleUtil.findModuleForPsiElement(psiClass)
         val psiMethodList = methodsFilter(psiClass)
         if (currentModule == null) {
@@ -229,6 +224,19 @@ class RightSidebarToolWindow(project: Project) {
         for (child in allChildren) {
             if (!methodList.contains(child)) {
                 clazz.removeNode(rootModel, child)
+            }
+        }
+    }
+
+    private fun deletePsiClass(psiClass: PsiClass) {
+        val clazz = mainTree.findNode(psiClass)
+        val root = treeModel.root as DefaultMutableTreeNode
+        clazz?.let {
+            val module = clazz.parent as DefaultMutableTreeNode
+            module.removeNode(treeModel, clazz)
+            // 若该模块下没有forest接口类，则清除该模块
+            if (!onlyOneModule && module.childCount == 0) {
+                root.removeNode(treeModel, module)
             }
         }
     }
