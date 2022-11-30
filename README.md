@@ -1,5 +1,4 @@
-
-<!--[**🌎English Documentation**](README-EN.md)-->
+[**🌎English Documentation**](README-EN.md)
 
 -------------------------------------------------------------------------------
 
