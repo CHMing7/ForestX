@@ -27,6 +27,8 @@ Open the Intellij IDEA menu `File`->`Settings`->`Plugins`
 
 Select the`Marketplace`Tab，search for`ForestX`，and then click`install`to install
 
+Environment: Intellij IDEA >= `2021.3`
+
 ## 🎨 Function Display
 
 ### Sidebar Navigation Toolbar
