@@ -151,20 +151,6 @@ class RightSidebarToolWindow(project: Project) {
                     }
                 }
             })
-        // 增加节点增加事件监听，默认展开模块
-        treeModel.addTreeModelListener(TreeModelAdapter.create { event, type ->
-            if (type == TreeModelAdapter.EventType.NodesInserted) {
-                event.children.forEach { c ->
-                    if (c is DefaultMutableTreeNode) {
-                        val o = c.userObject
-                        if (o is PsiClass && c.parent.childCount == 1) {
-                            val cPath = TreePath(c.path).parentPath
-                            TreeUtil.promiseExpand(mainTree, cPath)
-                        }
-                    }
-                }
-            }
-        })
 
         // 工具栏
         val toolbarDecorator = ToolbarDecorator.createDecorator(mainTree)
@@ -184,6 +170,33 @@ class RightSidebarToolWindow(project: Project) {
                 }
             }
         }
+    }
+
+    /**
+     * 增加节点增加事件监听，默认展开模块
+     */
+    fun addDefaultExpandModuleListener() {
+        //
+        treeModel.addTreeModelListener(TreeModelAdapter.create { event, type ->
+            if (type == TreeModelAdapter.EventType.NodesInserted) {
+                event.children.forEach { c ->
+                    if (c is DefaultMutableTreeNode) {
+                        val o = c.userObject
+                        if (o is PsiClass && c.parent.childCount == 1) {
+                            val cPath = TreePath(c.path).parentPath
+                            TreeUtil.promiseExpand(mainTree, cPath)
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * 展开所有模块节点
+     */
+    fun expandModuleNode() {
+        TreeUtil.promiseExpand(mainTree, if (onlyOneModule) 1 else 2)
     }
 
     fun getContent(disposable: Disposable?): JPanel {
@@ -265,7 +278,7 @@ class RightSidebarToolWindow(project: Project) {
 
     private fun methodsFilter(psiClass: PsiClass): List<PsiMethod> {
         // 非接口类或者final标记的直接跳过
-        if (!psiClass.isInterface ||
+        if (!ReadActionUtil.isInterface(psiClass) ||
             ReadActionUtil.hasModifierProperty(psiClass, PsiModifier.FINAL)
         ) {
             return Lists.newArrayList()

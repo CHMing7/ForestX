@@ -15,6 +15,8 @@ import com.intellij.psi.search.GlobalSearchScopesCore
 import com.intellij.psi.search.ProjectScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.AnnotationTargetsSearch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @author caihongming
@@ -71,10 +73,18 @@ class ForestCheckTask(project: Project) : Backgroundable(project, "Forest check"
         // 处理class
         pendingProcessClassSet.forEachIndexed { i, psiClass ->
             // 处理
-            mainForm.processClass(psiClass)
+            GlobalScope.launch {
+                mainForm.channel.send {
+                    mainForm.processClass(psiClass)
+                }
+            }
             indicator.isIndeterminate = false
             indicator.fraction = i.toDouble() / searchedSet.size.toDouble()
         }
+//        // 展开所有模块节点
+//        mainForm.expandModuleNode()
+//        // 添加默认展开模块节点监听器
+//        mainForm.addDefaultExpandModuleListener()
         isCheckFinish = true
     }
 }

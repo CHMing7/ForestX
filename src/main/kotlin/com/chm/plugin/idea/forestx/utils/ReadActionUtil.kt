@@ -69,4 +69,10 @@ object ReadActionUtil {
         }
     }
 
+    fun isInterface(psiClass: PsiClass): Boolean {
+        return ApplicationManager.getApplication().runReadAction<Boolean> {
+            psiClass.isInterface
+        }
+    }
+
 }
