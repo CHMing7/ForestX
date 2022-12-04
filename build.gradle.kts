@@ -38,6 +38,7 @@ intellij {
 
 dependencies {
     testImplementation(kotlin("test"))
+    api(kotlin("stdlib"))
 }
 
 tasks {
@@ -112,3 +113,6 @@ tasks.test {
     useJUnit()
 }
 
+tasks.withType<KotlinCompile>() {
+    kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
+}

@@ -1,10 +1,10 @@
 package com.chm.plugin.idea.forestx.template.search;
 
+import com.chm.plugin.idea.forestx.extension.TreeNodeExtensionKt;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
 import com.chm.plugin.idea.forestx.template.psi.TemplateTypes;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.chm.plugin.idea.forestx.template.utils.SpringBootConfigFileUtil;
-import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
@@ -19,8 +19,6 @@ import com.intellij.psi.util.PsiUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.YAMLUtil;
-import org.jetbrains.yaml.psi.YAMLKeyValue;
-import org.jetbrains.yaml.psi.YAMLPsiElement;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 import org.jetbrains.yaml.psi.YAMLValue;
 import org.jetbrains.yaml.psi.impl.YAMLBlockSequenceImpl;
@@ -54,7 +52,7 @@ public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
             final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
             if (psiFile instanceof YAMLFileImpl) {
                 final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                TreeNodeUtilKt.eachYAMLKeyValues(yamlFile, (keyValue, value) -> {
+                TreeNodeExtensionKt.eachYAMLKeyValues(yamlFile, (keyValue, value) -> {
                     final String keyName = YAMLUtil.getConfigFullName(keyValue);
                     if (keyName.equals(propertyKey)) {
                         results.add(keyValue);
@@ -117,7 +115,7 @@ public class TemplateGotoDeclarationHandler implements GotoDeclarationHandler {
             return null;
         }
         final List<PsiElement> results = new LinkedList<>();
-        TreeNodeUtilKt.resolveElement(project, virtualFile, sourceElement,
+        TreeNodeExtensionKt.resolveElement(project, virtualFile, sourceElement,
                 (javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, defMethod) -> {
                     ForestTemplatePathElementHolder holder =
                             ForestTemplateUtil.getELHolder(isTestSourceFile, sourceElement, defMethod);

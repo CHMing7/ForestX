@@ -1,5 +1,6 @@
 package com.chm.plugin.idea.forestx.template.completion;
 
+import com.chm.plugin.idea.forestx.extension.TreeNodeExtensionKt;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateBindingVarHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterIndexVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateParameterVariableHolder;
@@ -7,7 +8,6 @@ import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePropertyVariabl
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHolder;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
-import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
@@ -31,10 +31,10 @@ public class ForestELIdentifierCompletionProvider extends CompletionProvider<Com
         if (virtualFile == null) {
             return;
         }
-        TreeNodeUtilKt.resolveElement(project, virtualFile, element,
+        TreeNodeExtensionKt.resolveElement(project, virtualFile, element,
                 (javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, method) -> {
                     if (method != null) {
-                        TreeNodeUtilKt.findMethodParameter(method, (methodParam, i) -> {
+                        TreeNodeExtensionKt.findMethodParameter(method, (methodParam, i) -> {
                             final ForestTemplateParameterIndexVariableHolder indexVariableHolder =
                                     ForestTemplateParameterIndexVariableHolder.findIndexVariable(methodParam, i);
                             resultSet.addElement(LookupElementBuilder.create(indexVariableHolder)

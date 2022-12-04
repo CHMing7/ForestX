@@ -8,7 +8,6 @@ import com.intellij.lang.injection.MultiHostRegistrar;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationParameterList;
-import com.intellij.psi.PsiArrayInitializerExpression;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -129,6 +128,9 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
     }
 
     private static boolean isForestRequestClass(PsiClass clazz) {
+        if (clazz == null) {
+            return false;
+        }
         return "com.dtflys.forest.http.ForestRequest".equals(clazz.getQualifiedName());
     }
 

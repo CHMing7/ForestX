@@ -1,8 +1,8 @@
 package com.chm.plugin.idea.forestx.template.completion;
 
+import com.chm.plugin.idea.forestx.extension.TreeNodeExtensionKt;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
 import com.chm.plugin.idea.forestx.template.utils.SearchedConfigItem;
-import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
@@ -33,7 +33,7 @@ public class ForestConfigReferenceCompletionProvider extends CompletionProvider<
         }
         final String filePath = ForestTemplateUtil.getPathOfVirtualFile(virtualFile);
         final boolean isTestSourceFile = ForestTemplateUtil.isTestFile(filePath);
-        final boolean hasSpringBootLib = TreeNodeUtilKt.hasSpringBootLibrary(module);
+        final boolean hasSpringBootLib = TreeNodeExtensionKt.hasSpringBootLibrary(module);
         if (hasSpringBootLib) {
             final List<SearchedConfigItem> searchedConfigItems = ForestTemplateUtil.searchConfigItems(project, isTestSourceFile, null, false);
             for (SearchedConfigItem item : searchedConfigItems) {

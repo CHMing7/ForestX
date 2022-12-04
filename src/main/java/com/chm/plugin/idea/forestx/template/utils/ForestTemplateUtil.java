@@ -1,5 +1,6 @@
 package com.chm.plugin.idea.forestx.template.utils;
 
+import com.chm.plugin.idea.forestx.extension.TreeNodeExtensionKt;
 import com.chm.plugin.idea.forestx.template.completion.SearchedConfigProperty;
 import com.chm.plugin.idea.forestx.template.completion.SearchedConfigYAMLKeyValue;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateBindingVarHolder;
@@ -13,7 +14,6 @@ import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHol
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateArguments;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary;
-import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.injected.editor.VirtualFileWindow;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
@@ -32,22 +32,16 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import kotlin.Pair;
-import kotlin.jvm.functions.Function2;
 import org.jetbrains.yaml.YAMLUtil;
-import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLPsiElement;
-import org.jetbrains.yaml.psi.YAMLSequenceItem;
 import org.jetbrains.yaml.psi.YAMLValue;
-import org.jetbrains.yaml.psi.impl.YAMLBlockSequenceImpl;
 import org.jetbrains.yaml.psi.impl.YAMLFileImpl;
 import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ForestTemplateUtil {
 
@@ -92,7 +86,7 @@ public class ForestTemplateUtil {
             if (psiFile instanceof YAMLFileImpl) {
                 // yaml 配置文件
                 final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                Pair<YAMLPsiElement, YAMLValue> pair = TreeNodeUtilKt.getYAMLKeyValue(yamlFile, keyName);
+                Pair<YAMLPsiElement, YAMLValue> pair = TreeNodeExtensionKt.getYAMLKeyValue(yamlFile, keyName);
                 if (pair != null) {
                     ForestTemplateYAMLVariableHolder holder =
                             new ForestTemplateYAMLVariableHolder(keyName, pair.getFirst(), STRING_TYPE, isEL);
@@ -126,7 +120,7 @@ public class ForestTemplateUtil {
             if (psiFile instanceof YAMLFileImpl) {
                 // yaml 配置文件
                 final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                TreeNodeUtilKt.eachYAMLKeyValues(yamlFile, (element, yamlValue) -> {
+                TreeNodeExtensionKt.eachYAMLKeyValues(yamlFile, (element, yamlValue) -> {
                     final YAMLKeyValue keyValue = (YAMLKeyValue) element;
                     if (yamlValue instanceof YAMLPlainTextImpl) {
                         String key = YAMLUtil.getConfigFullName(keyValue);
@@ -178,7 +172,7 @@ public class ForestTemplateUtil {
             if (psiFile instanceof YAMLFileImpl) {
                 // yaml 配置文件
                 final YAMLFileImpl yamlFile = (YAMLFileImpl) psiFile;
-                TreeNodeUtilKt.eachYAMLKeyValues(yamlFile, (element, yamlValue) -> {
+                TreeNodeExtensionKt.eachYAMLKeyValues(yamlFile, (element, yamlValue) -> {
                     YAMLKeyValue keyValue = (YAMLKeyValue) element;
                     String key = YAMLUtil.getConfigFullName(keyValue);
                     if (prefix != null) {
@@ -241,7 +235,7 @@ public class ForestTemplateUtil {
         final Project project = element.getOriginalElement().getProject();
         final String text = element.getText();
         if (element instanceof ForestTemplatePrimary) {
-            if (TreeNodeUtilKt.hasSpringBootLibrary(project)) {
+            if (TreeNodeExtensionKt.hasSpringBootLibrary(project)) {
                 final String keyName = FOREST_VARIABLES_PREFIX + text;
                 final ForestTemplateVariableHolder holder = getConfigHolder(
                         project,
@@ -319,7 +313,7 @@ public class ForestTemplateUtil {
                     }
                 }
                 PsiClass invokerClass = invokerHolder.getPsiClass();
-                String methodName = TreeNodeUtilKt.getterMethodName(getterName);
+                String methodName = TreeNodeExtensionKt.getterMethodName(getterName);
                 PsiMethod[] methods = invokerClass.findMethodsByName(methodName, true);
                 if (methods == null || methods.length == 0) {
                     methods = invokerClass.findMethodsByName(getterName, true);
