@@ -55,13 +55,13 @@
 
 4. 根据`@BindingVar`注解定义的方法来补全代码
 
-![compeltion-binding-var](/img/completion-BindingVar.gif)
+![completion-binding-var](/img/completion-BindingVar.gif)
 
 5. 在编程式的代码中，也可出现代码补全的智能提示
 
 不过目前仅对 `Forest.get`、`Forest.post` 等请求方法开放次功能
 
-![compeltion-forest-api](/img/completion-forest-api.gif)
+![completion-forest-api](/img/completion-forest-api.gif)
 
 ### 代码跳转
 

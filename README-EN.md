@@ -57,13 +57,13 @@ interfaces defined in the project together for easy management
 
 4. Complete the code according to the method defined by the '@BindingVar' annotation
 
-![compeltion-binding-var](/img/completion-BindingVar.gif)
+![completion-binding-var](/img/completion-BindingVar.gif)
 
 5. In programmatic code, intelligent prompts for code completion may also appear
 
 However, currently only 'Forest.get', 'Forest.post' and other request methods open secondary functions
 
-![compeltion-forest-api](/img/completion-forest-api.gif)
+![completion-forest-api](/img/completion-forest-api.gif)
 
 ### Jump Of Code
 
