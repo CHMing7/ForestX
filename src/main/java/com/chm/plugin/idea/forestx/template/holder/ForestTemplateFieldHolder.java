@@ -20,13 +20,6 @@ public class ForestTemplateFieldHolder extends ForestTemplatePathElementHolder<P
 
     private final PsiMethod getter;
 
-    public static ForestTemplateFieldHolder getHolder(PsiMethod method, PsiType type) {
-        final String methodName = method.getName();
-        String getter = methodName.substring(3);
-        getter = getter.substring(0, 1).toLowerCase() + getter.substring(1);
-        return new ForestTemplateFieldHolder(getter, method, type);
-    }
-
     public ForestTemplateFieldHolder(ForestTemplatePathElementHolder prevHolder, String insertion, PsiMethod method, PsiType type) {
         super(prevHolder, insertion, method, type, false);
         this.getter = method;
@@ -34,6 +27,13 @@ public class ForestTemplateFieldHolder extends ForestTemplatePathElementHolder<P
 
     public ForestTemplateFieldHolder(String insertion, PsiMethod method, PsiType type) {
         this(null, insertion, method, type);
+    }
+
+    public static ForestTemplateFieldHolder getHolder(PsiMethod method, PsiType type) {
+        final String methodName = method.getName();
+        String getter = methodName.substring(3);
+        getter = getter.substring(0, 1).toLowerCase() + getter.substring(1);
+        return new ForestTemplateFieldHolder(getter, method, type);
     }
 
     public PsiMethod getGetter() {

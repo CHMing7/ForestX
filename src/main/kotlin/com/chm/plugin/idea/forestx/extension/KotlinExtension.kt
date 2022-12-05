@@ -1,10 +1,12 @@
 package com.chm.plugin.idea.forestx.utils
 
 import com.chm.plugin.idea.forestx.annotation.Annotation
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.search.GlobalSearchScope
 import java.util.*
@@ -81,13 +83,9 @@ fun Annotation.getPsiAnnotation(target: PsiModifierListOwner): Optional<PsiAnnot
 }
 
 /**
- * 检查是否可能被删除java文件，或者删除class代码
+ * 检查是否可能被删除
  */
-fun PsiClass.checkPsiClassExist(): Boolean {
-    if (this.qualifiedName == null) {
-        return false
-    }
-    return this.qualifiedName?.run {
-        this@checkPsiClassExist.project.findClazz(this).isPresent
-    } ?: false
+fun PsiElement.checkExist(): Boolean {
+    //return File(this.containingFile.virtualFile.path).exists()
+    return ApplicationManager.getApplication().runReadAction<Boolean> { this.isValid }
 }

@@ -34,6 +34,12 @@ public class ForestTemplateParameterIndexVariableHolder extends ForestTemplatePa
         this.hasDollar = true;
     }
 
+    public static ForestTemplateParameterIndexVariableHolder findIndexVariable(PsiParameter parameter, int index) {
+        final PsiType type = parameter.getType();
+        final String varName = index + "";
+        return new ForestTemplateParameterIndexVariableHolder(varName, index, type, parameter);
+    }
+
     public int getIndex() {
         return index;
     }
@@ -50,12 +56,6 @@ public class ForestTemplateParameterIndexVariableHolder extends ForestTemplatePa
         }
         builder.append(index);
         return builder.toString();
-    }
-
-    public static ForestTemplateParameterIndexVariableHolder findIndexVariable(PsiParameter parameter, int index) {
-        final PsiType type = parameter.getType();
-        final String varName = index + "";
-        return new ForestTemplateParameterIndexVariableHolder(varName, index, type, parameter);
     }
 
 }

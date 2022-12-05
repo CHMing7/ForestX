@@ -14,7 +14,6 @@ import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.GlobalSearchScopesCore;
 import com.intellij.psi.search.ProjectScope;
@@ -40,6 +39,10 @@ public class ForestTemplateBindingVarHolder extends ForestTemplateVariableHolder
         }
     };
 
+
+    public ForestTemplateBindingVarHolder(String insertion, PsiElement element, PsiType type, boolean el) {
+        super(null, insertion, element, type, el);
+    }
 
     public static ForestTemplateBindingVarHolder eachAllVariables(
             Project project,
@@ -69,7 +72,6 @@ public class ForestTemplateBindingVarHolder extends ForestTemplateVariableHolder
         }
         return null;
     }
-
 
     public static ForestTemplateBindingVarHolder findVariable(Project project, String varName) {
         GlobalSearchScope librariesScope = ProjectScope.getLibrariesScope(project);
@@ -112,11 +114,6 @@ public class ForestTemplateBindingVarHolder extends ForestTemplateVariableHolder
             }
         }
         return null;
-    }
-
-
-    public ForestTemplateBindingVarHolder(String insertion, PsiElement element, PsiType type, boolean el) {
-        super(null, insertion, element, type, el);
     }
 
     @Override

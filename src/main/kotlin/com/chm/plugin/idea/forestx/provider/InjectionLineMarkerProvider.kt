@@ -2,10 +2,10 @@ package com.chm.plugin.idea.forestx.provider
 
 import com.chm.plugin.idea.forestx.Icons
 import com.chm.plugin.idea.forestx.annotation.Annotation
+import com.chm.plugin.idea.forestx.utils.ReadActionUtil
 import com.chm.plugin.idea.forestx.utils.findClazz
 import com.chm.plugin.idea.forestx.utils.getPsiAnnotation
 import com.chm.plugin.idea.forestx.utils.isAnnotationPresent
-import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
@@ -66,7 +66,7 @@ class InjectionLineMarkerProvider : RelatedItemLineMarkerProvider() {
 
     private fun interfaceFilter(psiClass: PsiClass): Boolean {
         if (!psiClass.isInterface ||
-            psiClass.modifierList?.hasModifierProperty(PsiModifier.FINAL) == true
+            ReadActionUtil.hasModifierProperty(psiClass, PsiModifier.FINAL)
         ) {
             return false
         }
@@ -78,7 +78,7 @@ class InjectionLineMarkerProvider : RelatedItemLineMarkerProvider() {
                 return true
             }
         }
-        val annotations = AnnotationUtil.getAllAnnotations(psiClass, false, null)
+        val annotations = ReadActionUtil.getAllAnnotations(psiClass, false, null)
         for (annotation in annotations) {
             if ("com.dtflys.forest.annotation.ForestClient" == annotation.qualifiedName) {
                 return true
@@ -89,7 +89,7 @@ class InjectionLineMarkerProvider : RelatedItemLineMarkerProvider() {
         }
         val methods = psiClass.methods
         for (method in methods) {
-            val methodAnnotations = AnnotationUtil.getAllAnnotations(method, false, null)
+            val methodAnnotations = ReadActionUtil.getAllAnnotations(method, false, null)
             for (methodAnnotation in methodAnnotations) {
                 for (annotation in Annotation.FOREST_METHOD_ANNOTATION) {
                     if (methodAnnotation.qualifiedName == annotation.qualifiedName) {

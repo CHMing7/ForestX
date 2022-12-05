@@ -1,23 +1,38 @@
 package com.chm.plugin.idea.forestx.tw
 
 import com.chm.plugin.idea.forestx.annotation.Annotation
-import com.chm.plugin.idea.forestx.utils.*
+import com.chm.plugin.idea.forestx.extension.findNode
+import com.chm.plugin.idea.forestx.extension.findNodeOrNew
+import com.chm.plugin.idea.forestx.extension.getAllChildren
+import com.chm.plugin.idea.forestx.extension.getForestAnnotationUrl
+import com.chm.plugin.idea.forestx.extension.getNodeIcon
+import com.chm.plugin.idea.forestx.extension.getNodeName
+import com.chm.plugin.idea.forestx.extension.removeNode
+import com.chm.plugin.idea.forestx.utils.ReadActionUtil
+import com.chm.plugin.idea.forestx.utils.UiUtil
+import com.chm.plugin.idea.forestx.utils.checkExist
 import com.google.common.collect.Maps
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
-import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.intellij.psi.*
+import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiModifier
+import com.intellij.psi.search.GlobalSearchScopesCore
+import com.intellij.psi.search.ProjectScope
+import com.intellij.psi.search.SearchScope
+import com.intellij.psi.search.searches.AnnotationTargetsSearch
 import com.intellij.psi.util.PsiEditorUtil
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.SimpleTextAttributes
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.TreeSpeedSearch
-import com.intellij.ui.tree.TreeVisitor
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeModelAdapter
 import com.intellij.util.ui.tree.TreeUtil
@@ -31,7 +46,6 @@ import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
-import javax.swing.tree.MutableTreeNode
 import javax.swing.tree.TreePath
 
 /**
@@ -39,7 +53,7 @@ import javax.swing.tree.TreePath
  * @version v1.0
  * @since 2022-08-25
  **/
-class RightSidebarToolWindow(project: Project) {
+class RightSidebarToolWindow(val project: Project) {
 
     //    val URL_BOLD_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_BOLD, Color(203, 150, 103))
     val TYPE_BOLD_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_BOLD, Color(203, 150, 103))
@@ -79,22 +93,19 @@ class RightSidebarToolWindow(project: Project) {
                 row: Int,
                 hasFocus: Boolean
             ) {
+                if (value !is DefaultMutableTreeNode) {
+                    return
+                }
+                val o: Any = value.userObject
+                if (o is PsiClass || o is PsiMethod) {
+                    o as PsiElement
+                    if (!o.checkExist()) {
+                        return
+                    }
+                }
                 val name = value.getNodeName()
                 append(" ")
-                val o: Any = if (value is DefaultMutableTreeNode) {
-                    value.userObject
-                } else {
-                    value
-                }
 
-//                // 当class是否存在，若不存在则删除节点
-//                if (o is PsiClass && !o.checkPsiClassExist()) {
-//                    if (value is MutableTreeNode) {
-//                        val path = TreePath(treeModel.getPathToRoot(value))
-//                        TreeUtil.removeLastPathComponent(tree, path)
-//                    }
-//                    return
-//                }
                 if (o is Project || o is Module || o is PsiClass) {
                     append(name, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
                 } else {
@@ -137,35 +148,39 @@ class RightSidebarToolWindow(project: Project) {
                     }
                 }
             })
-        // 增加节点增加事件监听，默认展开模块
-        treeModel.addTreeModelListener(TreeModelAdapter.create { event, type ->
-            if (type == TreeModelAdapter.EventType.NodesInserted) {
-                event.children.forEach { c ->
-                    if (c is DefaultMutableTreeNode) {
-                        val o = c.userObject
-                        if (o is Module || (o is PsiClass && c.parent.childCount == 1)) {
-                            val cPath = if (o is Module) TreePath(c.path) else TreePath(c.path).parentPath
-                            TreeUtil.expand(
-                                mainTree,
-                                { path ->
-                                    if (cPath == path)
-                                        TreeVisitor.Action.INTERRUPT
-                                    else
-                                        TreeVisitor.Action.CONTINUE
-                                },
-                                { }
-                            )
-                        }
-                    }
-                }
-            }
-        })
 
         // 工具栏
         val toolbarDecorator = ToolbarDecorator.createDecorator(mainTree)
         rootPanel = JPanel()
         rootPanel.layout = BorderLayout()
         rootPanel.add(toolbarDecorator.createPanel(), BorderLayout.CENTER)
+    }
+
+    /**
+     * 增加节点增加事件监听，默认展开模块
+     */
+    fun addDefaultExpandModuleListener() {
+        //
+        treeModel.addTreeModelListener(TreeModelAdapter.create { event, type ->
+            if (type == TreeModelAdapter.EventType.NodesInserted) {
+                event.children.forEach { c ->
+                    if (c is DefaultMutableTreeNode) {
+                        val o = c.userObject
+                        if (o is PsiClass && c.parent.childCount == 1) {
+                            val cPath = TreePath(c.path).parentPath
+                            TreeUtil.promiseExpand(mainTree, cPath)
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * 展开所有模块节点
+     */
+    fun expandModuleNode() {
+        TreeUtil.promiseExpand(mainTree, if (onlyOneModule) 1 else 2)
     }
 
     fun getContent(disposable: Disposable?): JPanel {
@@ -181,80 +196,138 @@ class RightSidebarToolWindow(project: Project) {
         return treeModel
     }
 
+    fun doScanClass(): Set<PsiClass> {
+        // 搜索lib包
+        val librariesScope = ProjectScope.getLibrariesScope(project)
+        // 搜索项目里
+        val inheritorsScope: SearchScope =
+            GlobalSearchScopesCore.projectProductionScope(project).union(librariesScope)
+        val facade: JavaPsiFacade = JavaPsiFacade.getInstance(project)
+        // 处理过的class
+        val pendingProcessClassSet = mutableSetOf<PsiClass>()
+        for (annotation in Annotation.FOREST_METHOD_ANNOTATION) {
+            // 获取forest注解类
+            val annotationClass = facade.findClass(annotation.qualifiedName, librariesScope) ?: continue
+            // 搜索被forest注解标记的类
+            val annotationTargets = AnnotationTargetsSearch.search(annotationClass, inheritorsScope)
+            val all = annotationTargets.findAll()
+            // 搜集搜索到的类
+            for (psiModifierListOwner in all) {
+                if (psiModifierListOwner is PsiClass) {
+                    pendingProcessClassSet.add(psiModifierListOwner)
+                } else if (psiModifierListOwner is PsiMethod) {
+                    pendingProcessClassSet.add(psiModifierListOwner.containingClass!!)
+                }
+            }
+        }
+        return pendingProcessClassSet
+    }
+
+    /**
+     * 扫描类并处理
+     */
+    fun doScanClassAndProcess() {
+        // 处理过的class
+        val pendingProcessClassSet = doScanClass()
+        // 处理class
+        pendingProcessClassSet.forEach { psiClass ->
+            // 处理
+            UiUtil.updateUi {
+                this.processClass(psiClass)
+            }
+        }
+    }
+
+    /**
+     * 重新扫描类并处理
+     */
+    fun doRescanClassAndProcess() {
+        // 清空树结构
+        mainTree.removeAll()
+        // 扫描并处理
+        doScanClassAndProcess()
+    }
+
     @Synchronized
     fun processClass(psiClass: PsiClass) {
-        if (!psiClass.checkPsiClassExist()) {
+        if (!psiClass.checkExist()) {
             deletePsiClass(psiClass)
             return
         }
-        val currentModule = ModuleUtil.findModuleForPsiElement(psiClass)
+        val currentModule = ReadActionUtil.findModuleForPsiElement(psiClass)
         val psiMethodList = methodsFilter(psiClass)
         if (currentModule == null) {
             return
         }
-        val rootModel = getTreeModel()
-        val root = rootModel.root as DefaultMutableTreeNode
+        val treeModel = getTreeModel()
+        val root = treeModel.root as DefaultMutableTreeNode
 
         val module: DefaultMutableTreeNode = if (onlyOneModule) {
             root
         } else {
-            root.findNodeOrNew(rootModel, currentModule, true)
+            root.findNodeOrNew(treeModel, currentModule)
         }
         // 若没有可用forest方法则清除接口类
         if (CollectionUtils.isEmpty(psiMethodList)) {
             val clazz = module.findNode(psiClass)
-            if (clazz != null) {
-                module.removeNode(rootModel, clazz)
+            clazz?.let {
+                TreeUtil.removeLastPathComponent(mainTree, TreePath(clazz.path))
             }
             // 若该模块下没有forest接口类，则清除该模块
             if (!onlyOneModule && module.childCount == 0) {
-                root.removeNode(rootModel, module)
+                TreeUtil.removeLastPathComponent(mainTree, TreePath(module.path))
             }
             return
         }
-        val clazz = module.findNodeOrNew(rootModel, psiClass, true)
+        val clazz = module.findNodeOrNew(treeModel, psiClass)
         // 清空接口类中原先的method,先增加新子节点，再删除旧子节点
         val methodList: MutableList<DefaultMutableTreeNode> = Lists.newArrayList()
         for (i in psiMethodList.indices) {
             val psiMethod = psiMethodList[i]
-            val method = clazz.moveOrInsert(rootModel, psiMethod, i)
+            var method = clazz.findNode(psiMethod)
+            if (method == null) {
+                method = DefaultMutableTreeNode(psiMethod)
+                treeModel.insertNodeInto(method, clazz, i)
+            }
             methodList.add(method)
         }
         val allChildren = clazz.getAllChildren()
         for (child in allChildren) {
-            if (!methodList.contains(child)) {
-                clazz.removeNode(rootModel, child)
+            if (child !in methodList) {
+                mainTree.removeNode(child)
             }
         }
     }
 
     private fun deletePsiClass(psiClass: PsiClass) {
         val clazz = mainTree.findNode(psiClass)
-        val root = treeModel.root as DefaultMutableTreeNode
         clazz?.let {
+            val modulePath = TreePath(clazz.path).parentPath
             val module = clazz.parent as DefaultMutableTreeNode
-            module.removeNode(treeModel, clazz)
+            TreeUtil.removeLastPathComponent(mainTree, TreePath(clazz.path))
             // 若该模块下没有forest接口类，则清除该模块
             if (!onlyOneModule && module.childCount == 0) {
-                root.removeNode(treeModel, module)
+                TreeUtil.removeLastPathComponent(mainTree, modulePath)
             }
         }
     }
 
     private fun methodsFilter(psiClass: PsiClass): List<PsiMethod> {
         // 非接口类或者final标记的直接跳过
-        if (!psiClass.isInterface || psiClass.modifierList?.hasModifierProperty(PsiModifier.FINAL) == true) {
+        if (!ReadActionUtil.isInterface(psiClass) ||
+            ReadActionUtil.hasModifierProperty(psiClass, PsiModifier.FINAL)
+        ) {
             return Lists.newArrayList()
         }
         val psiMethods: MutableList<PsiMethod> = Lists.newArrayList()
-        val methods = psiClass.methods
+        val methods = ReadActionUtil.runReadAction<Array<PsiMethod>> { psiClass.methods }
         methodForeach@ for (method in methods) {
             //　静态方法与默认方法跳过
             if (isStaticOrDefault(method)) {
                 continue
             }
             for (annotation in Annotation.FOREST_METHOD_ANNOTATION) {
-                val methodAnnotation = method.getAnnotation(annotation.qualifiedName)
+                val methodAnnotation = ReadActionUtil.findAnnotation(method, annotation.qualifiedName)
                 if (methodAnnotation != null) {
                     psiMethods.add(method)
                     //跳出多重循环
@@ -266,7 +339,7 @@ class RightSidebarToolWindow(project: Project) {
     }
 
     private fun isStaticOrDefault(method: PsiMethod): Boolean {
-        return method.hasModifierProperty(PsiModifier.STATIC) || method.hasModifierProperty(PsiModifier.DEFAULT)
+        return ReadActionUtil.hasAnyModifierProperty(method, PsiModifier.STATIC, PsiModifier.DEFAULT)
     }
 
 }

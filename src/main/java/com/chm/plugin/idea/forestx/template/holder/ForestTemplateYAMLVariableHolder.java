@@ -3,9 +3,6 @@ package com.chm.plugin.idea.forestx.template.holder;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
-import com.intellij.lang.properties.PropertiesHighlighter;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiType;
@@ -47,6 +44,10 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
     };
 
 
+    public ForestTemplateYAMLVariableHolder(String insertion, YAMLPsiElement element, PsiType type, boolean el) {
+        super(null, insertion, element, type, el);
+    }
+
     private static @NotNull String getSequenceItemText(final YAMLSequenceItem item) {
         final List<YAMLKeyValue> keysValues = new ArrayList<>();
         int count = 0;
@@ -77,11 +78,6 @@ public class ForestTemplateYAMLVariableHolder extends ForestTemplateVariableHold
     public boolean isMapping() {
         PsiElement[] children = element.getChildren();
         return children.length > 0 && children[0] instanceof YAMLMapping;
-    }
-
-
-    public ForestTemplateYAMLVariableHolder(String insertion, YAMLPsiElement element, PsiType type, boolean el) {
-        super(null, insertion, element, type, el);
     }
 
     @Override

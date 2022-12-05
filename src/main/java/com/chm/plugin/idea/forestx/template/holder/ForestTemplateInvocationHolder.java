@@ -1,7 +1,6 @@
 package com.chm.plugin.idea.forestx.template.holder;
 
 import com.intellij.codeInsight.completion.InsertHandler;
-import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
@@ -10,7 +9,6 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.util.PlatformIcons;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 

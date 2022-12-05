@@ -1,7 +1,7 @@
 package com.chm.plugin.idea.forestx.template;
 
-import com.chm.plugin.idea.forestx.template.psi.ForestTemplateLanguage;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateFileType;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplateLanguage;
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;

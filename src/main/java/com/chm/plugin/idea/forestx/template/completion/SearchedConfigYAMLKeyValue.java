@@ -4,9 +4,6 @@ import com.chm.plugin.idea.forestx.template.utils.SearchedConfigItem;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.codeInsight.lookup.LookupElementRenderer;
-import com.intellij.lang.properties.PropertiesHighlighter;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PlatformIcons;
 import com.intellij.util.SmartList;
@@ -45,6 +42,10 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
     };
 
 
+    public SearchedConfigYAMLKeyValue(String insertion, YAMLPsiElement element, boolean isEL) {
+        super(insertion, element, isEL);
+    }
+
     private static @NotNull String getSequenceItemText(YAMLSequenceItem item) {
         final List<YAMLKeyValue> keysValues = new SmartList();
         int count = 0;
@@ -67,13 +68,9 @@ public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElemen
 
         String result = StringUtil.join(
                 keysValues, (keyValue) ->
-                keyValue.getKeyText() + ": " + keyValue.getValueText(), ", ") +
+                        keyValue.getKeyText() + ": " + keyValue.getValueText(), ", ") +
                 suffix;
         return result;
-    }
-
-    public SearchedConfigYAMLKeyValue(String insertion, YAMLPsiElement element, boolean isEL) {
-        super(insertion, element, isEL);
     }
 
     @Override

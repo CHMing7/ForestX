@@ -1,5 +1,6 @@
 package com.chm.plugin.idea.forestx.template.completion;
 
+import com.chm.plugin.idea.forestx.extension.TreeNodeExtensionKt;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateFieldHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateInvocationHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplatePathElementHolder;
@@ -8,7 +9,6 @@ import com.chm.plugin.idea.forestx.template.holder.ForestTemplateVariableHolder;
 import com.chm.plugin.idea.forestx.template.holder.ForestTemplateYAMLVariableHolder;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement;
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil;
-import com.chm.plugin.idea.forestx.utils.TreeNodeUtilKt;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
@@ -18,7 +18,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.PsiClassImplUtil;
@@ -43,7 +42,7 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
         if (virtualFile == null) {
             return;
         }
-        TreeNodeUtilKt.resolveElement(project, virtualFile, element,
+        TreeNodeExtensionKt.resolveElement(project, virtualFile, element,
                 (javaVirtualFile, module, isTestSourceFile, hasSpringBootLib, defMethod) -> {
                     final ForestTemplatePathElement pathElement = PsiTreeUtil.getParentOfType(element, ForestTemplatePathElement.class);
                     final PsiElement prevElement = pathElement.getPrevSibling();
@@ -60,7 +59,7 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                     if (holder instanceof ForestTemplateYAMLVariableHolder) {
                         ForestTemplateYAMLVariableHolder yamlHolder = (ForestTemplateYAMLVariableHolder) holder;
                         if (yamlHolder.isMapping()) {
-                            final String pathExprText = TreeNodeUtilKt.getPathExpressionText(prevElement);
+                            final String pathExprText = TreeNodeExtensionKt.getPathExpressionText(prevElement);
                             final List<ForestTemplateVariableHolder> variableHolders = ForestTemplateUtil.findConfigHolders(
                                     project, isTestSourceFile, ForestTemplateUtil.FOREST_VARIABLES_PREFIX + pathExprText + ".", true);
                             for (final ForestTemplateVariableHolder varHolder : variableHolders) {
@@ -96,7 +95,7 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                         if (mtd.isConstructor()) {
                             continue;
                         }
-                        final String methodFullName = TreeNodeUtilKt.getMethodFullName(mtd);
+                        final String methodFullName = TreeNodeExtensionKt.getMethodFullName(mtd);
                         if (nameCache.contains(methodFullName)) {
                             continue;
                         }
@@ -104,8 +103,8 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                         if (methodName.startsWith("get") && methodName.length() > 3) {
                             final ForestTemplateFieldHolder fieldHolder = ForestTemplateFieldHolder.getHolder(mtd, type);
                             resultSet.addElement(LookupElementBuilder.create(fieldHolder)
-                                            .withLookupString(methodName)
-                                            .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
+                                    .withLookupString(methodName)
+                                    .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
                         } else {
                             final ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(
                                     mtd.getName(), mtd, type, Lists.newArrayList());
