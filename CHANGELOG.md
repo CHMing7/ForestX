@@ -5,7 +5,6 @@
 ### 1.0.6
 - fix: 修改平台api兼容性问题
 
-
 ### 1.0.5
 - fix: 修复启动报错问题 [#I64HIO](https://gitee.com/CHMing7/ForestX/issues/I64HIO)
 - fix: 修复2022.3线程与并发问题
