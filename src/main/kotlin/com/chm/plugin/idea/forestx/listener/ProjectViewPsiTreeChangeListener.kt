@@ -2,6 +2,7 @@ package com.chm.plugin.idea.forestx.listener
 
 import com.chm.plugin.idea.forestx.startup.getForestCheckTask
 import com.chm.plugin.idea.forestx.tw.getRightSidebar
+import com.chm.plugin.idea.forestx.utils.UiUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.util.Disposer
@@ -10,9 +11,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiTreeChangeAdapter
 import com.intellij.psi.PsiTreeChangeEvent
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 /**
  * @author CHMing
@@ -35,7 +33,6 @@ class ProjectViewPsiTreeChangeListener(val myProject: Project) : PsiTreeChangeAd
     /**
      * 递归处理新增节点
      */
-    @OptIn(DelicateCoroutinesApi::class)
     fun processElement(element: PsiElement) {
         if (element.project.getForestCheckTask()?.isCheckFinish != true) {
             // 初始化未完成
@@ -43,10 +40,8 @@ class ProjectViewPsiTreeChangeListener(val myProject: Project) : PsiTreeChangeAd
         }
         if (element is PsiClass) {
             val mainForm = myProject.getRightSidebar()
-            GlobalScope.launch {
-                mainForm.channel.send {
-                    mainForm.processClass(element)
-                }
+            UiUtil.updateUi {
+                mainForm.processClass(element)
             }
         }
         element.children.forEach { processElement(it) }

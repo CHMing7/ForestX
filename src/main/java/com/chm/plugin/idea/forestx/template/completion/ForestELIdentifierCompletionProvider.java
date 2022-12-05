@@ -19,7 +19,6 @@ import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class ForestELIdentifierCompletionProvider extends CompletionProvider<CompletionParameters> {
 

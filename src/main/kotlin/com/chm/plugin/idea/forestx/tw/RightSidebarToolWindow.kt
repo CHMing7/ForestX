@@ -19,10 +19,15 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
+import com.intellij.psi.search.GlobalSearchScopesCore
+import com.intellij.psi.search.ProjectScope
+import com.intellij.psi.search.SearchScope
+import com.intellij.psi.search.searches.AnnotationTargetsSearch
 import com.intellij.psi.util.PsiEditorUtil
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.SimpleTextAttributes
@@ -31,11 +36,6 @@ import com.intellij.ui.TreeSpeedSearch
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeModelAdapter
 import com.intellij.util.ui.tree.TreeUtil
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
-import kotlinx.coroutines.launch
 import org.apache.commons.collections.CollectionUtils
 import org.apache.commons.compress.utils.Lists
 import java.awt.BorderLayout
@@ -53,8 +53,7 @@ import javax.swing.tree.TreePath
  * @version v1.0
  * @since 2022-08-25
  **/
-@OptIn(DelicateCoroutinesApi::class)
-class RightSidebarToolWindow(project: Project) {
+class RightSidebarToolWindow(val project: Project) {
 
     //    val URL_BOLD_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_BOLD, Color(203, 150, 103))
     val TYPE_BOLD_ATTRIBUTES = SimpleTextAttributes(SimpleTextAttributes.STYLE_BOLD, Color(203, 150, 103))
@@ -69,8 +68,6 @@ class RightSidebarToolWindow(project: Project) {
     private var onlyOneModule = false
 
     private var treeModel: DefaultTreeModel
-
-    val channel = Channel<() -> Unit>(UNLIMITED)
 
     init {
         val modules = ModuleManager.getInstance(project).modules
@@ -157,19 +154,6 @@ class RightSidebarToolWindow(project: Project) {
         rootPanel = JPanel()
         rootPanel.layout = BorderLayout()
         rootPanel.add(toolbarDecorator.createPanel(), BorderLayout.CENTER)
-
-        UiUtil.updateUi {
-            GlobalScope.launch {
-                while (true) {
-                    try {
-                        val receive = channel.receive()
-                        receive.invoke()
-                    } catch (t: Throwable) {
-
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -210,6 +194,58 @@ class RightSidebarToolWindow(project: Project) {
 
     private fun getTreeModel(): DefaultTreeModel {
         return treeModel
+    }
+
+    fun doScanClass(): Set<PsiClass> {
+        // 搜索lib包
+        val librariesScope = ProjectScope.getLibrariesScope(project)
+        // 搜索项目里
+        val inheritorsScope: SearchScope =
+            GlobalSearchScopesCore.projectProductionScope(project).union(librariesScope)
+        val facade: JavaPsiFacade = JavaPsiFacade.getInstance(project)
+        // 处理过的class
+        val pendingProcessClassSet = mutableSetOf<PsiClass>()
+        for (annotation in Annotation.FOREST_METHOD_ANNOTATION) {
+            // 获取forest注解类
+            val annotationClass = facade.findClass(annotation.qualifiedName, librariesScope) ?: continue
+            // 搜索被forest注解标记的类
+            val annotationTargets = AnnotationTargetsSearch.search(annotationClass, inheritorsScope)
+            val all = annotationTargets.findAll()
+            // 搜集搜索到的类
+            for (psiModifierListOwner in all) {
+                if (psiModifierListOwner is PsiClass) {
+                    pendingProcessClassSet.add(psiModifierListOwner)
+                } else if (psiModifierListOwner is PsiMethod) {
+                    pendingProcessClassSet.add(psiModifierListOwner.containingClass!!)
+                }
+            }
+        }
+        return pendingProcessClassSet
+    }
+
+    /**
+     * 扫描类并处理
+     */
+    fun doScanClassAndProcess() {
+        // 处理过的class
+        val pendingProcessClassSet = doScanClass()
+        // 处理class
+        pendingProcessClassSet.forEach { psiClass ->
+            // 处理
+            UiUtil.updateUi {
+                this.processClass(psiClass)
+            }
+        }
+    }
+
+    /**
+     * 重新扫描类并处理
+     */
+    fun doRescanClassAndProcess() {
+        // 清空树结构
+        mainTree.removeAll()
+        // 扫描并处理
+        doScanClassAndProcess()
     }
 
     @Synchronized

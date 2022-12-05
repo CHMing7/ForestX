@@ -1,42 +1,42 @@
 // This is a generated file. Not intended for manual editing.
 package com.chm.plugin.idea.forestx.template.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import static com.chm.plugin.idea.forestx.template.psi.TemplateTypes.*;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplateElBlock;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePropertyBlock;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplateStringBlockContent;
+import com.chm.plugin.idea.forestx.template.psi.ForestTemplateVisitor;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import com.chm.plugin.idea.forestx.template.psi.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElementVisitor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ForestTemplateStringBlockContentImpl extends ASTWrapperPsiElement implements ForestTemplateStringBlockContent {
 
-  public ForestTemplateStringBlockContentImpl(@NotNull ASTNode node) {
-    super(node);
-  }
+    public ForestTemplateStringBlockContentImpl(@NotNull ASTNode node) {
+        super(node);
+    }
 
-  public void accept(@NotNull ForestTemplateVisitor visitor) {
-    visitor.visitStringBlockContent(this);
-  }
+    public void accept(@NotNull ForestTemplateVisitor visitor) {
+        visitor.visitStringBlockContent(this);
+    }
 
-  @Override
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ForestTemplateVisitor) accept((ForestTemplateVisitor)visitor);
-    else super.accept(visitor);
-  }
+    @Override
+    public void accept(@NotNull PsiElementVisitor visitor) {
+        if (visitor instanceof ForestTemplateVisitor) accept((ForestTemplateVisitor) visitor);
+        else super.accept(visitor);
+    }
 
-  @Override
-  @Nullable
-  public ForestTemplateElBlock getElBlock() {
-    return findChildByClass(ForestTemplateElBlock.class);
-  }
+    @Override
+    @Nullable
+    public ForestTemplateElBlock getElBlock() {
+        return findChildByClass(ForestTemplateElBlock.class);
+    }
 
-  @Override
-  @Nullable
-  public ForestTemplatePropertyBlock getPropertyBlock() {
-    return findChildByClass(ForestTemplatePropertyBlock.class);
-  }
+    @Override
+    @Nullable
+    public ForestTemplatePropertyBlock getPropertyBlock() {
+        return findChildByClass(ForestTemplatePropertyBlock.class);
+    }
 
 }

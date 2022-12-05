@@ -3,11 +3,14 @@
 -------------------------------------------------------------------------------
 
 ## 📚 Introduction
+
 <!-- Plugin description -->
 <h3>ForestX is an IDEA plugin designed to support Forest</h3>
-<h3>It greatly improves your development experience when using the <a href="https://forest.dtflyx.com/">Forest framework</a></h2>
+<h3>It greatly improves your development experience when using the <a href="https://forest.dtflyx.com/">Forest
+framework</a></h2>
 
 ## 🎁 ForestX Features
+
 - Forest template expression syntax is supported (Grammar highlighting、Smart Tips)
 - Provides the Forest tool window to quickly browse the Forest interface in your project
 - In the tool window, different types of requests have different ICONS (e.g.: `GET`、`POST`)
@@ -35,7 +38,9 @@ Environment: Intellij IDEA >= `2021.3`
 
 ![tools-windows](/img/tools-window.gif)
 
-Click the 'Forest' logo bird icon on the right to open the navigation toolbar of 'ForestX', which will list the Forest interfaces defined in the project together for easy management
+Click the 'Forest' logo bird icon on the right to open the navigation toolbar of 'ForestX', which will list the Forest
+interfaces defined in the project together for easy management
+
 ### Completion Of Code
 
 1. The code is completed according to the global variables defined under 'forest.variables' in the configuration file
@@ -62,7 +67,9 @@ However, currently only 'Forest.get', 'Forest.post' and other request methods op
 
 ### Jump Of Code
 
-Hold down the keyboard 'Ctrl' key, move the mouse over an identifier (e.g. variable name) in the Forest template expression, and hover for a short time to pop up a short message about the configuration variable or Java property that the identifier refers to
+Hold down the keyboard 'Ctrl' key, move the mouse over an identifier (e.g. variable name) in the Forest template
+expression, and hover for a short time to pop up a short message about the configuration variable or Java property that
+the identifier refers to
 
 Click the left mouse button to jump to the definition code of the variable/configuration referenced by the identifier
 

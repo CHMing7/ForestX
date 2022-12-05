@@ -40,7 +40,8 @@
                     factoryClass="com.chm.plugin.idea.forestx.tw.RightSidebarToolWindowFactory"/>
 
         <postStartupActivity implementation="com.chm.plugin.idea.forestx.startup.MyStartupActivity"/>
-        <postStartupActivity implementation="com.chm.plugin.idea.forestx.listener.ProjectViewPsiTreeChangeListener$MyStartupActivity"/>
+        <postStartupActivity
+                implementation="com.chm.plugin.idea.forestx.listener.ProjectViewPsiTreeChangeListener$MyStartupActivity"/>
 
         <!-- Forest模板语言解析器定义 -->
         <lang.parserDefinition language="ForestTemplate"

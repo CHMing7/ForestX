@@ -25,7 +25,12 @@ public class ForestTemplateParameterVariableHolder extends ForestTemplateVariabl
             presentation.setTypeText(varType.getPresentableText());
         }
     };
+    private PsiAnnotation varAnnotation;
 
+
+    public ForestTemplateParameterVariableHolder(String varName, PsiType type, PsiParameter parameter) {
+        super(null, varName, parameter, type, false);
+    }
 
     public static ForestTemplateParameterVariableHolder findVariable(PsiParameter parameter) {
         final PsiAnnotation[] annotations = parameter.getAnnotations();
@@ -48,20 +53,12 @@ public class ForestTemplateParameterVariableHolder extends ForestTemplateVariabl
         return null;
     }
 
-
-    public ForestTemplateParameterVariableHolder(String varName, PsiType type, PsiParameter parameter) {
-        super(null, varName, parameter, type, false);
+    public PsiAnnotation getVarAnnotation() {
+        return varAnnotation;
     }
-
-
-    private PsiAnnotation varAnnotation;
 
     public void setVarAnnotation(PsiAnnotation varAnnotation) {
         this.varAnnotation = varAnnotation;
-    }
-
-    public PsiAnnotation getVarAnnotation() {
-        return varAnnotation;
     }
 
     @Override

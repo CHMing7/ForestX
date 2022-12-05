@@ -1,6 +1,5 @@
 package com.chm.plugin.idea.forestx.template.holder;
 
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiType;
 
 public abstract class ForestTemplateVariableHolder<T> extends ForestTemplatePathElementHolder<T> {

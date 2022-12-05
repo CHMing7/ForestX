@@ -13,7 +13,7 @@ import com.intellij.util.concurrency.AppExecutorUtil
  * @version v1.0
  * @since 2022-08-25
  **/
-class MyStartupActivity : StartupActivity{
+class MyStartupActivity : StartupActivity {
 
     override fun runActivity(project: Project) {
         val application = ApplicationManager.getApplication()

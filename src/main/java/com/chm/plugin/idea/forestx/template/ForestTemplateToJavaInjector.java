@@ -29,6 +29,7 @@ import java.util.Set;
 public class ForestTemplateToJavaInjector implements MultiHostInjector {
 
     private final static Set<String> FOREST_METHODS = new HashSet<>();
+    private final static Set<String> FOREST_REQUEST_METHODS = new HashSet<>();
 
     static {
         FOREST_METHODS.add("get");
@@ -41,13 +42,37 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
         FOREST_METHODS.add("trace");
     }
 
-    private final static Set<String> FOREST_REQUEST_METHODS = new HashSet<>();
-
     static {
         FOREST_METHODS.add("url");
         FOREST_METHODS.add("setUrl");
     }
 
+    private static boolean containsELScript(String text) {
+        return text.matches(".*(\\{|\\$).*");
+    }
+
+    private static boolean isForestOfConfigurationClass(PsiClass clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        return "com.dtflys.forest.Forest".equals(clazz.getQualifiedName()) ||
+                "com.dtflys.forest.config.ForestConfiguration".equals(clazz.getQualifiedName());
+    }
+
+    private static boolean isForestRequestClass(PsiClass clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        return "com.dtflys.forest.http.ForestRequest".equals(clazz.getQualifiedName());
+    }
+
+    private static boolean isForestInjectionMethods(PsiMethod method) {
+        return FOREST_METHODS.contains(method.getName());
+    }
+
+    private static boolean isForestRequestInjectionMethods(PsiMethod method) {
+        return FOREST_REQUEST_METHODS.contains(method.getName());
+    }
 
     @Override
     public void getLanguagesToInject(@NotNull MultiHostRegistrar registrar, @NotNull PsiElement host) {
@@ -112,35 +137,6 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
             }
         }
         return false;
-    }
-
-
-    private static boolean containsELScript(String text) {
-        return text.matches(".*(\\{|\\$).*");
-    }
-
-    private static boolean isForestOfConfigurationClass(PsiClass clazz) {
-        if (clazz == null) {
-            return false;
-        }
-        return "com.dtflys.forest.Forest".equals(clazz.getQualifiedName()) ||
-                "com.dtflys.forest.config.ForestConfiguration".equals(clazz.getQualifiedName());
-    }
-
-    private static boolean isForestRequestClass(PsiClass clazz) {
-        if (clazz == null) {
-            return false;
-        }
-        return "com.dtflys.forest.http.ForestRequest".equals(clazz.getQualifiedName());
-    }
-
-
-    private static boolean isForestInjectionMethods(PsiMethod method) {
-        return FOREST_METHODS.contains(method.getName());
-    }
-
-    private static boolean isForestRequestInjectionMethods(PsiMethod method) {
-        return FOREST_REQUEST_METHODS.contains(method.getName());
     }
 
 }

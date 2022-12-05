@@ -18,7 +18,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.PsiClassImplUtil;
@@ -104,8 +103,8 @@ public class ForestELPathElementCompletionProvider extends CompletionProvider<Co
                         if (methodName.startsWith("get") && methodName.length() > 3) {
                             final ForestTemplateFieldHolder fieldHolder = ForestTemplateFieldHolder.getHolder(mtd, type);
                             resultSet.addElement(LookupElementBuilder.create(fieldHolder)
-                                            .withLookupString(methodName)
-                                            .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
+                                    .withLookupString(methodName)
+                                    .withRenderer(ForestTemplateFieldHolder.FIELD_RENDER));
                         } else {
                             final ForestTemplateInvocationHolder invocationHolder = new ForestTemplateInvocationHolder(
                                     mtd.getName(), mtd, type, Lists.newArrayList());
