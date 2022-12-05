@@ -7,6 +7,7 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiUtil
 
 /**
  * @author CHMing
@@ -22,7 +23,7 @@ class ForestMethodProvider : RelatedItemLineMarkerProvider() {
         if (element !is PsiClass) {
             return
         }
-        if (element.project.getForestCheckTask()?.isCheckFinish != true) {
+        if (PsiUtil.getProjectInReadAction(element).getForestCheckTask()?.isCheckFinish != true) {
             // 初始化未完成
             return
         }

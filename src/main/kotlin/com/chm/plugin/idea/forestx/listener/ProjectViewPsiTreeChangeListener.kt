@@ -16,15 +16,33 @@ import com.intellij.psi.PsiTreeChangeEvent
  * @author CHMing
  * @date 2022-11-30
  **/
-class ProjectViewPsiTreeChangeListener(val myProject: Project) : PsiTreeChangeAdapter() {
+class ProjectViewPsiTreeChangeListener(private val myProject: Project) : PsiTreeChangeAdapter() {
 
     override fun childAdded(event: PsiTreeChangeEvent) {
-        event.child?.let {
-            processElement(it)
-        }
+        onChange(event)
     }
 
     override fun childRemoved(event: PsiTreeChangeEvent) {
+        onChange(event)
+    }
+
+    override fun childReplaced(event: PsiTreeChangeEvent) {
+        onChange(event)
+    }
+
+    override fun childMoved(event: PsiTreeChangeEvent) {
+        onChange(event)
+    }
+
+    override fun childrenChanged(event: PsiTreeChangeEvent) {
+        onChange(event)
+    }
+
+    override fun propertyChanged(event: PsiTreeChangeEvent) {
+        onChange(event)
+    }
+
+    private fun onChange(event: PsiTreeChangeEvent) {
         event.child?.let {
             processElement(it)
         }
@@ -33,8 +51,8 @@ class ProjectViewPsiTreeChangeListener(val myProject: Project) : PsiTreeChangeAd
     /**
      * 递归处理新增节点
      */
-    fun processElement(element: PsiElement) {
-        if (element.project.getForestCheckTask()?.isCheckFinish != true) {
+    private fun processElement(element: PsiElement) {
+        if (myProject.getForestCheckTask()?.isCheckFinish != true) {
             // 初始化未完成
             return
         }
