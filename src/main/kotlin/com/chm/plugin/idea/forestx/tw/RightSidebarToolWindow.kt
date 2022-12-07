@@ -33,6 +33,7 @@ import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.SimpleTextAttributes
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.TreeSpeedSearch
+import com.intellij.ui.tree.TreeVisitor.ByTreePath
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeModelAdapter
 import com.intellij.util.ui.tree.TreeUtil
@@ -168,7 +169,7 @@ class RightSidebarToolWindow(val project: Project) {
                         val o = c.userObject
                         if (o is PsiClass && c.parent.childCount == 1) {
                             val cPath = TreePath(c.path).parentPath
-                            TreeUtil.promiseExpand(mainTree, cPath)
+                            TreeUtil.promiseExpand(mainTree, ByTreePath(cPath) { node: Any? -> node })
                         }
                     }
                 }
