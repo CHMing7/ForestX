@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### 1.0.7
-- fix: 修复删除.log文件导致插件报错问题
+- fix: 修复删除.log文件导致插件报错问题 [#I64VJD](https://gitee.com/CHMing7/ForestX/issues/I64VJD)
 
 ### 1.0.6
 - fix: 修改平台api兼容性问题
