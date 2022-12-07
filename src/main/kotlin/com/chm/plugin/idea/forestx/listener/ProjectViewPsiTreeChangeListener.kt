@@ -62,7 +62,10 @@ class ProjectViewPsiTreeChangeListener(private val myProject: Project) : PsiTree
                 mainForm.processClass(element)
             }
         }
-        element.children.forEach { processElement(it) }
+        element.runCatching {
+            // 检查节点是否有效
+            element.children.forEach { processElement(it) }
+        }
     }
 
     internal class MyStartupActivity : StartupActivity {
