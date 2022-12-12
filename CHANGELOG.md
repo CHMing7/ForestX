@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### 1.0.8
+- fix: 修复因为使用jdk17编译插件导致低版本idea启动失败问题 [#I65DOY](https://gitee.com/CHMing7/ForestX/issues/I65DOY)
+- fix: 修复启动报错问题 [#I65ICW](https://gitee.com/CHMing7/ForestX/issues/I65ICW)
+- fix: 修复因为同一模块类名相同导致插件报错问题 [#I65BHW](https://gitee.com/CHMing7/ForestX/issues/I65BHW)
+
 ### 1.0.7
 - fix: 修复删除.log文件导致插件报错问题 [#I64VJD](https://gitee.com/CHMing7/ForestX/issues/I64VJD)
 

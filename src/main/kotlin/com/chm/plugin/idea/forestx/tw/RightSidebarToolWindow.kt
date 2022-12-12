@@ -70,6 +70,8 @@ class RightSidebarToolWindow(val project: Project) {
 
     private var treeModel: DefaultTreeModel
 
+    private val psiClassCacheMap = mutableMapOf<String, PsiClass>()
+
     init {
         val modules = ModuleManager.getInstance(project).modules
         val root: DefaultMutableTreeNode
@@ -197,6 +199,10 @@ class RightSidebarToolWindow(val project: Project) {
         return treeModel
     }
 
+    fun findCachePsiClass(qualifiedName: String): PsiClass? {
+        return psiClassCacheMap[qualifiedName]
+    }
+
     fun doScanClass(): Set<PsiClass> {
         // 搜索lib包
         val librariesScope = ProjectScope.getLibrariesScope(project)
@@ -249,11 +255,23 @@ class RightSidebarToolWindow(val project: Project) {
         doScanClassAndProcess()
     }
 
+    /**
+     * 处理class
+     *
+     * @param psiClass 待处理的class
+     * @param deleteInOtherModule 是否删除其他module中的此class
+     */
     @Synchronized
-    fun processClass(psiClass: PsiClass) {
+    fun processClass(
+        psiClass: PsiClass,
+        deleteInOtherModule: Boolean = false
+    ) {
         if (!psiClass.checkExist()) {
             deletePsiClass(psiClass)
             return
+        }
+        psiClass.qualifiedName?.let {
+            psiClassCacheMap[it] = psiClass
         }
         val currentModule = ReadActionUtil.findModuleForPsiElement(psiClass)
         val psiMethodList = methodsFilter(psiClass)
@@ -296,6 +314,21 @@ class RightSidebarToolWindow(val project: Project) {
         for (child in allChildren) {
             if (child !in methodList) {
                 mainTree.removeNode(child)
+            }
+        }
+        // 可能class在其他module中存在，删除
+        if (deleteInOtherModule) {
+            // all module
+            val modules = ModuleManager.getInstance(project).modules
+            modules.filter { it != currentModule }.forEach {
+                // find module
+                val otherModule = root.findNode(it) ?: return@forEach
+                // find class in module
+                val findClass = otherModule.findNode(psiClass)
+                // delete class in other module
+                findClass?.let {
+                    TreeUtil.removeLastPathComponent(mainTree, TreePath(findClass.path))
+                }
             }
         }
     }

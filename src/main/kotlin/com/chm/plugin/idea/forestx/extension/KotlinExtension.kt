@@ -1,6 +1,7 @@
 package com.chm.plugin.idea.forestx.utils
 
 import com.chm.plugin.idea.forestx.annotation.Annotation
+import com.chm.plugin.idea.forestx.tw.getRightSidebar
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -23,10 +24,9 @@ import java.util.*
  * @param clazzName the clazz name
  * @return the optional
  */
-fun Project.findClazz(clazzName: String): Optional<PsiClass> {
-    return Optional.ofNullable(
-        JavaPsiFacade.getInstance(this).findClass(clazzName, GlobalSearchScope.allScope(this))
-    )
+fun Project.findClazz(clazzName: String): PsiClass? {
+    return JavaPsiFacade.getInstance(this).findClass(clazzName, GlobalSearchScope.allScope(this))
+        ?: this.getRightSidebar().findCachePsiClass(clazzName)
 }
 
 /**
@@ -35,7 +35,7 @@ fun Project.findClazz(clazzName: String): Optional<PsiClass> {
  * @param project   the project
  * @return the optional
  */
-fun String.findClazz(project: Project): Optional<PsiClass> {
+fun String.findClazz(project: Project): PsiClass? {
     return project.findClazz(this)
 }
 
@@ -83,9 +83,15 @@ fun Annotation.getPsiAnnotation(target: PsiModifierListOwner): Optional<PsiAnnot
 }
 
 /**
+ * 检查是否可能被删除或转移位置
+ */
+fun PsiClass.checkExist(): Boolean {
+    return ApplicationManager.getApplication().runReadAction<Boolean> { this.containingFile.isValid }
+}
+
+/**
  * 检查是否可能被删除
  */
 fun PsiElement.checkExist(): Boolean {
-    //return File(this.containingFile.virtualFile.path).exists()
     return ApplicationManager.getApplication().runReadAction<Boolean> { this.isValid }
 }

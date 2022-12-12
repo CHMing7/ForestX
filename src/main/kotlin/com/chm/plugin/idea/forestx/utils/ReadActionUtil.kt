@@ -26,37 +26,39 @@ object ReadActionUtil {
         inHierarchy: Boolean,
         visited: MutableSet<in PsiModifierListOwner>?
     ): Array<PsiAnnotation> {
-        return runReadAction<Array<PsiAnnotation>> {
+        return runReadAction {
             AnnotationUtil.getAllAnnotations(owner, inHierarchy, visited)
         }
     }
 
     fun findAnnotation(listOwner: PsiModifierListOwner, vararg annotationNames: String): PsiAnnotation? {
-        return runReadAction<PsiAnnotation?> {
+        return runReadAction {
             AnnotationUtil.findAnnotation(listOwner, *annotationNames)
         }
     }
 
     fun getStringAttributeValue(anno: PsiAnnotation, attributeName: String): String? {
-        return runReadAction<String?> {
+        return runReadAction {
             AnnotationUtil.getStringAttributeValue(anno, attributeName)
         }
     }
 
     fun findModuleForPsiElement(element: PsiElement): Module? {
-        return runReadAction<Module?> {
-            ModuleUtil.findModuleForPsiElement(element)
+        return runReadAction {
+            element.runCatching {
+                ModuleUtil.findModuleForPsiElement(element)
+            }.getOrElse { null }
         }
     }
 
     fun hasModifierProperty(owner: PsiModifierListOwner, modifier: String): Boolean {
-        return ApplicationManager.getApplication().runReadAction<Boolean> {
+        return runReadAction {
             owner.hasModifierProperty(modifier)
         }
     }
 
     fun hasAnyModifierProperty(owner: PsiModifierListOwner, vararg modifiers: String): Boolean {
-        return ApplicationManager.getApplication().runReadAction<Boolean> {
+        return runReadAction {
             modifiers.any {
                 owner.hasModifierProperty(it)
             }
@@ -64,13 +66,13 @@ object ReadActionUtil {
     }
 
     fun getMethods(psiClass: PsiClass): Array<PsiMethod> {
-        return ApplicationManager.getApplication().runReadAction<Array<PsiMethod>> {
+        return runReadAction {
             psiClass.methods
         }
     }
 
     fun isInterface(psiClass: PsiClass): Boolean {
-        return ApplicationManager.getApplication().runReadAction<Boolean> {
+        return runReadAction {
             psiClass.isInterface
         }
     }
