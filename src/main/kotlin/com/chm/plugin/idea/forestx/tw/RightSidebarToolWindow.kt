@@ -318,14 +318,14 @@ class RightSidebarToolWindow(val project: Project) {
         }
         // 可能class在其他module中存在，删除
         if (deleteInOtherModule) {
-            // all module
+            // 所有模块
             val modules = ModuleManager.getInstance(project).modules
             modules.filter { it != currentModule }.forEach {
-                // find module
+                // 在侧边栏结构中找到此模块所在节点
                 val otherModule = root.findNode(it) ?: return@forEach
-                // find class in module
+                // 找到class在这模块中的节点
                 val findClass = otherModule.findNode(psiClass)
-                // delete class in other module
+                // 在这模块中删除class节点
                 findClass?.let {
                     TreeUtil.removeLastPathComponent(mainTree, TreePath(findClass.path))
                 }
