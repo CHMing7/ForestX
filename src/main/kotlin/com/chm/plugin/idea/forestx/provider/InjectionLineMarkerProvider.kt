@@ -36,11 +36,7 @@ class InjectionLineMarkerProvider : RelatedItemLineMarkerProvider() {
             return
         }
         val type = field.type as? PsiClassReferenceType ?: return
-        val clazz = element.getProject().findClazz(type.canonicalText)
-        if (!clazz.isPresent) {
-            return
-        }
-        val psiClass = clazz.get()
+        val psiClass = element.getProject().findClazz(type.canonicalText) ?: return
         if (!interfaceFilter(psiClass)) {
             return
         }

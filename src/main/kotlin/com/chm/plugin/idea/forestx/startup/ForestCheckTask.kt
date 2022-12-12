@@ -34,17 +34,17 @@ class ForestCheckTask(project: Project) : Backgroundable(project, "Forest check"
     }
 
     private fun runCollectors(indicator: ProgressIndicator) {
-        val mainForm = project.getRightSidebar()
-        // 处理过的class
-        val pendingProcessClassSet = mainForm.doScanClass()
-        // 处理class
-        pendingProcessClassSet.forEachIndexed { i, psiClass ->
-            // 处理
-            UiUtil.updateUi {
+        UiUtil.updateUi {
+            val mainForm = project.getRightSidebar()
+            // 处理过的class
+            val pendingProcessClassSet = mainForm.doScanClass()
+            // 处理class
+            pendingProcessClassSet.forEachIndexed { i, psiClass ->
+                // 处理
                 mainForm.processClass(psiClass)
+                indicator.isIndeterminate = false
+                indicator.fraction = i.toDouble() / pendingProcessClassSet.size.toDouble()
             }
-            indicator.isIndeterminate = false
-            indicator.fraction = i.toDouble() / pendingProcessClassSet.size.toDouble()
         }
 //        // 展开所有模块节点
 //        mainForm.expandModuleNode()

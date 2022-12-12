@@ -10,6 +10,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.util.Comparing
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
@@ -71,9 +72,44 @@ private val REQUEST_TYPE_ICON_MAP: MutableMap<String, Icon> = mutableMapOf(
     "TRACE" to Icons.TRACE
 )
 
-val NAME_SORTED: Comparator<Any> = Comparator { o1: Any, o2: Any ->
-    val name1 = o1.getNodeName()
-    val name2 = o2.getNodeName()
+val NAME_SORTED: Comparator<DefaultMutableTreeNode> = Comparator { o1, o2 ->
+    fun Any.getName(): String {
+        val o = if (this is DefaultMutableTreeNode) {
+            this.userObject
+        } else {
+            this
+        }
+        return ReadActionUtil.runReadAction<String> {
+            when (o) {
+                is Project -> {
+                    o.name
+                }
+
+                is Module -> {
+                    o.name
+                }
+
+                is PsiClass -> {
+                    o.qualifiedName ?: ""
+                }
+
+                is PsiMethod -> {
+                    o.name
+                }
+
+                else -> {
+                    o?.toString() ?: "null"
+                }
+
+            }
+        }
+    }
+
+    if (o1.equalNode(o2)) {
+        return@Comparator 0
+    }
+    val name1 = o1.getName()
+    val name2 = o2.getName()
     name1.compareTo(name2)
 }
 
@@ -259,21 +295,83 @@ fun DefaultMutableTreeNode.findNode(
 ): DefaultMutableTreeNode? {
     val aObject = if (o is DefaultMutableTreeNode) o.userObject else o
     if (checkChild) {
-        return TreeUtil.findNodeWithObject(this, aObject)
+        return TreeUtil.findNode(this) returnFind@{
+            it.equalNode(aObject)
+        }
     }
     for (i in 0 until this.childCount) {
         val child = this.getChildAt(i) as DefaultMutableTreeNode
-        if (child.userObject == aObject) {
+        if (child.equalNode(aObject)) {
             return child
         }
     }
     return null
 }
 
+fun DefaultMutableTreeNode.equalNode(aObject: Any): Boolean {
+    val userObject = this.userObject
+    if (Comparing.equal(userObject, aObject)) {
+        return true
+    }
+    if (userObject::class.java == aObject::class.java) {
+        when (aObject) {
+            is Project -> {
+                userObject as Project
+                return aObject.equalProject(userObject)
+            }
+
+            is Module -> {
+                userObject as Module
+                return aObject.equalModule(userObject)
+            }
+
+            is PsiClass -> {
+                userObject as PsiClass
+                return aObject.equalPsiClass(userObject)
+            }
+
+            is PsiMethod -> {
+                userObject as PsiMethod
+                return aObject.equalPsiMethod(userObject)
+            }
+        }
+    }
+    return false
+}
+
+fun Project.equalProject(otherProject: Project): Boolean {
+    return this.name == otherProject.name &&
+            this.projectFilePath == otherProject.projectFilePath
+}
+
+fun Module.equalModule(otherModule: Module): Boolean {
+    return this.name == otherModule.name &&
+            this.project.equalProject(otherModule.project)
+}
+
+fun PsiClass.equalPsiClass(otherPsiClass: PsiClass): Boolean {
+    val thisModule = ReadActionUtil.findModuleForPsiElement(this)
+    val otherModule = ReadActionUtil.findModuleForPsiElement(otherPsiClass)
+    return this.qualifiedName == otherPsiClass.qualifiedName &&
+            (thisModule?.let {
+                otherModule?.equalModule(it)
+            } ?: thisModule) == otherModule
+}
+
+fun PsiMethod.equalPsiMethod(otherPsiMethod: PsiMethod): Boolean {
+    val thisPsiClass = this.containingClass
+    val otherPsiClass = otherPsiMethod.containingClass
+    return this.name == otherPsiMethod.name &&
+            this.parameterList == otherPsiMethod.parameterList &&
+            (thisPsiClass?.let {
+                otherPsiClass?.equalPsiClass(it)
+            } ?: thisPsiClass) == otherPsiClass
+}
+
 fun DefaultMutableTreeNode.findNodeOrNew(
     model: DefaultTreeModel?,
     o: Any,
-    comparator: Comparator<Any> = NAME_SORTED
+    comparator: Comparator<DefaultMutableTreeNode> = NAME_SORTED
 ): DefaultMutableTreeNode {
     val node = this.findNode(o)
     if (node != null) {
@@ -300,8 +398,7 @@ fun JTree.removeNode(
 }
 
 fun Any.getNodeName(): String {
-    val o: Any?
-    o = if (this is DefaultMutableTreeNode) {
+    val o = if (this is DefaultMutableTreeNode) {
         this.userObject
     } else {
         this
@@ -311,15 +408,19 @@ fun Any.getNodeName(): String {
             is Project -> {
                 o.name
             }
+
             is Module -> {
                 o.name
             }
+
             is PsiClass -> {
                 o.name ?: ""
             }
+
             is PsiMethod -> {
                 o.name
             }
+
             else -> {
                 o?.toString() ?: "null"
             }
@@ -421,12 +522,15 @@ fun Any.getNodeIcon(): Icon {
         is Project -> {
             AllIcons.Nodes.Folder
         }
+
         is Module -> {
             AllIcons.Nodes.Folder
         }
+
         is PsiClass -> {
             Icons.INTERFACE_18
         }
+
         is PsiMethod -> {
             for ((forestMethodAnnotationName, icon) in METHOD_ICON_MAP) {
                 val annotation = ReadActionUtil.findAnnotation(o, forestMethodAnnotationName)
@@ -444,6 +548,7 @@ fun Any.getNodeIcon(): Icon {
 
             Icons.GET
         }
+
         else -> {
             Icons.ICON_16
         }

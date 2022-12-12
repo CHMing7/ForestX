@@ -44,8 +44,7 @@ public abstract class ForestTemplatePathElementHolder<T> {
 
     public PsiClass getPsiClass() {
         if (element instanceof PsiElement) {
-            final Optional<PsiClass> clazz = KotlinExtensionKt.findClazz(((PsiElement) element).getProject(), type.getCanonicalText());
-            return clazz.get();
+            return KotlinExtensionKt.findClazz(((PsiElement) element).getProject(), type.getCanonicalText());
         }
         return null;
     }
