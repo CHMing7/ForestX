@@ -35,7 +35,7 @@
 
 #### 2. 本地安装
 
-到如下地址中，寻找最新版本的 jar包进行下载，并在 IDEA 中以 Jar 包方式安装插件
+到如下地址中，寻找最新版本的 jar 包进行下载，并在 IDEA 中以 Jar 包方式安装插件
 
 [https://gitee.com/CHMing7/ForestX/releases](https://gitee.com/CHMing7/ForestX/releases)
 
