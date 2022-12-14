@@ -25,11 +25,19 @@
 
 ## 🛍 安装
 
+#### 1. 从 Marketplace 下载
+
 点开 Intellij IDEA 菜单中的 `File`->`Settings`->`Plugins`
 
 选择`Marketplace`选项卡，搜索`ForestX`，然后点击`install`进行安装
 
 环境要求: Intellij IDEA >= `2021.3`
+
+#### 2. 本地安装
+
+到如下地址中，寻找最新版本的 jar包进行下载，并在 IDEA 中以 Jar 包方式安装插件
+
+[https://gitee.com/CHMing7/ForestX/releases](https://gitee.com/CHMing7/ForestX/releases)
 
 ## 🎨 功能展示
 
