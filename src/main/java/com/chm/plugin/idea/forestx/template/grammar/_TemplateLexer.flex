@@ -5,7 +5,8 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.TokenType;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
-import static com.chm.plugin.idea.forestx.template.psi.TemplateTypes.*;import static com.intellij.psi.TokenType.WHITE_SPACE;
+import static com.chm.plugin.idea.forestx.template.psi.TemplateTypes.*;
+import static com.intellij.psi.TokenType.WHITE_SPACE;
 
 %%
 

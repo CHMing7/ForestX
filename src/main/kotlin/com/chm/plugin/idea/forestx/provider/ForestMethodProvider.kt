@@ -30,7 +30,9 @@ class ForestMethodProvider : RelatedItemLineMarkerProvider() {
         val project = element.getProject()
         val mainForm = project.getRightSidebar()
         UiUtil.updateUi {
-            mainForm.processClass(element)
+            mainForm.runCatching {
+                processClass(element)
+            }
         }
     }
 }

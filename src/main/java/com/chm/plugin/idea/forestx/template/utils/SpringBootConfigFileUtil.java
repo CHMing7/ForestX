@@ -11,11 +11,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SpringBootConfigFileUtil {
 
+    private static final Map<Project, List<VirtualFile>> CACHE_CONFIG_FILES_MAP = new ConcurrentHashMap<>();
 
-    public static List<VirtualFile> findSpringBootConfigFiles(final Project project, final boolean needTestFile) {
+    private static final Map<Project, List<VirtualFile>> CACHE_TEST_CONFIG_FILES_MAP = new ConcurrentHashMap<>();
+
+
+    public static List<VirtualFile> findSpringBootConfigFiles(final Project project,
+                                                              final boolean needTestFile) {
+        if (!needTestFile && CACHE_CONFIG_FILES_MAP.containsKey(project)) {
+            // 检查本地缓存是否已加载过配置文件
+            return CACHE_CONFIG_FILES_MAP.get(project);
+        } else if (needTestFile && CACHE_TEST_CONFIG_FILES_MAP.containsKey(project)) {
+            // 检查本地缓存是否已加载过测试配置文件
+            return CACHE_TEST_CONFIG_FILES_MAP.get(project);
+        }
         final List<VirtualFile> fileList = new ArrayList<>();
         Collection<VirtualFile> virtualYAMLFiles = null;
         try {
@@ -114,7 +128,26 @@ public class SpringBootConfigFileUtil {
         if (!otherFiles.isEmpty()) {
             return otherFiles;
         }
+
+        if (!needTestFile) {
+            // 将文件列表存入本地缓存
+            CACHE_CONFIG_FILES_MAP.put(project, fileList);
+        } else {
+            // 将测试文件列表存入本地缓存
+            CACHE_TEST_CONFIG_FILES_MAP.put(project, fileList);
+        }
+
         return fileList;
+    }
+
+    public static void reloadSpringBootConfigFiles(final Project project,
+                                                   final boolean needTestFile) {
+        if (!needTestFile) {
+            CACHE_CONFIG_FILES_MAP.remove(project);
+        } else {
+            CACHE_TEST_CONFIG_FILES_MAP.remove(project);
+        }
+        findSpringBootConfigFiles(project, needTestFile);
     }
 
 }

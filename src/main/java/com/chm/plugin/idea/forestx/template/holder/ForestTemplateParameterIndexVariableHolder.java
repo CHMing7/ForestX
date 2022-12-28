@@ -9,7 +9,7 @@ import com.intellij.util.PlatformIcons;
 
 public class ForestTemplateParameterIndexVariableHolder extends ForestTemplateParameterVariableHolder {
 
-    public final static LookupElementRenderer<LookupElement> PARAMETER_INDEX_VAR_RENDER = new LookupElementRenderer<LookupElement>() {
+    public final static LookupElementRenderer<LookupElement> PARAMETER_INDEX_VAR_RENDER = new LookupElementRenderer<>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
             final ForestTemplateParameterIndexVariableHolder forestVariable = (ForestTemplateParameterIndexVariableHolder) element.getObject();

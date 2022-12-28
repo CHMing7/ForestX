@@ -114,6 +114,12 @@ class RightSidebarToolWindow(val project: Project) {
                 } else {
                     append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
                 }
+
+                if (o is PsiClass) {
+                    // 类增加鼠标悬停显示全路径名
+                    toolTipText = o.qualifiedName
+                }
+
                 val forestAnnotationUrl = value.getForestAnnotationUrl()
                 if (forestAnnotationUrl.isNotBlank()) {
                     // 节点名跟url之间增加空格
@@ -240,7 +246,9 @@ class RightSidebarToolWindow(val project: Project) {
         pendingProcessClassSet.forEach { psiClass ->
             // 处理
             UiUtil.updateUi {
-                this.processClass(psiClass)
+                this.runCatching {
+                    processClass(psiClass)
+                }
             }
         }
     }

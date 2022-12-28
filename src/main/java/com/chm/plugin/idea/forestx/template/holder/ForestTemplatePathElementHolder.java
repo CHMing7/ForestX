@@ -5,8 +5,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiType;
 
-import java.util.Optional;
-
 public abstract class ForestTemplatePathElementHolder<T> {
 
     protected final ForestTemplatePathElementHolder prevHolder;

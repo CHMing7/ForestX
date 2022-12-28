@@ -41,7 +41,9 @@ class ForestCheckTask(project: Project) : Backgroundable(project, "Forest check"
             // 处理class
             pendingProcessClassSet.forEachIndexed { i, psiClass ->
                 // 处理
-                mainForm.processClass(psiClass)
+                mainForm.runCatching {
+                    processClass(psiClass)
+                }
                 indicator.isIndeterminate = false
                 indicator.fraction = i.toDouble() / pendingProcessClassSet.size.toDouble()
             }

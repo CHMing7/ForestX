@@ -83,13 +83,6 @@ fun Annotation.getPsiAnnotation(target: PsiModifierListOwner): Optional<PsiAnnot
 }
 
 /**
- * 检查是否可能被删除或转移位置
- */
-fun PsiClass.checkExist(): Boolean {
-    return ApplicationManager.getApplication().runReadAction<Boolean> { this.containingFile.isValid }
-}
-
-/**
  * 检查是否可能被删除
  */
 fun PsiElement.checkExist(): Boolean {

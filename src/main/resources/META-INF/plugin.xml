@@ -1,8 +1,5 @@
 <idea-plugin require-restart="false" allow-bundled-update="true" url="https://gitee.com/CHMing7/ForestX">
     <id>com.chm.plugin.idea.ForestX</id>
-    <name>ForestX</name>
-    <!-- 插件版本号 -->
-    <version>1.0</version>
     <vendor email="654849388@qq.com" url="https://gitee.com/chming7/ForestX">ForestX</vendor>
 
     <description><![CDATA[
@@ -42,6 +39,8 @@
         <postStartupActivity implementation="com.chm.plugin.idea.forestx.startup.MyStartupActivity"/>
         <postStartupActivity
                 implementation="com.chm.plugin.idea.forestx.listener.ProjectViewPsiTreeChangeListener$MyStartupActivity"/>
+        <postStartupActivity
+                implementation="com.chm.plugin.idea.forestx.listener.SpringBootConfigFileListener$MyStartupActivity"/>
 
         <!-- Forest模板语言解析器定义 -->
         <lang.parserDefinition language="ForestTemplate"

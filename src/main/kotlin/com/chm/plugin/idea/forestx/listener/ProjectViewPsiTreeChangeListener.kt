@@ -77,12 +77,16 @@ class ProjectViewPsiTreeChangeListener(private val myProject: Project) : PsiTree
         if (element is PsiClass) {
             val mainForm = myProject.getRightSidebar()
             UiUtil.updateUi {
-                mainForm.processClass(element, deleteInOtherModule)
+                mainForm.runCatching {
+                    processClass(element, deleteInOtherModule)
+                }
             }
         }
         element.runCatching {
             // 检查节点是否有效
-            element.children.forEach { processElement(it, deleteInOtherModule) }
+            element.children.forEach {
+                processElement(it, deleteInOtherModule)
+            }
         }
     }
 

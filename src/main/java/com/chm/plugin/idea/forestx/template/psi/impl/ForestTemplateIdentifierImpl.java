@@ -20,8 +20,11 @@ public class ForestTemplateIdentifierImpl extends ASTWrapperPsiElement implement
 
     @Override
     public void accept(@NotNull PsiElementVisitor visitor) {
-        if (visitor instanceof ForestTemplateVisitor) accept((ForestTemplateVisitor) visitor);
-        else super.accept(visitor);
+        if (visitor instanceof ForestTemplateVisitor) {
+            accept((ForestTemplateVisitor) visitor);
+        } else {
+            super.accept(visitor);
+        }
     }
 
 }
