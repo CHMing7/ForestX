@@ -19,7 +19,7 @@ import java.util.Objects;
 
 public class SearchedConfigYAMLKeyValue extends SearchedConfigItem<YAMLPsiElement> {
 
-    public final static LookupElementRenderer<LookupElement> YAML_KEY_VALUE_CONFIG_RENDER = new LookupElementRenderer<LookupElement>() {
+    public final static LookupElementRenderer<LookupElement> YAML_KEY_VALUE_CONFIG_RENDER = new LookupElementRenderer<>() {
         @Override
         public void renderElement(LookupElement element, LookupElementPresentation presentation) {
             final SearchedConfigYAMLKeyValue searchedYAMLKeyValue = (SearchedConfigYAMLKeyValue) element.getObject();

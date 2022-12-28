@@ -7,6 +7,11 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author dt_flys
+ * @version v1.0
+ * @since 2022-08-25
+ **/
 public class ForestTemplateFile extends PsiFileBase {
 
     protected ForestTemplateFile(@NotNull FileViewProvider viewProvider) {

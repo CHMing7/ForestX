@@ -20,11 +20,11 @@ StringTemplate ::= FT_DQ FT_JSTRING? StringBlockContent* FT_DQ
 // 字符串模板的代码块
 StringBlockContent ::= (PropertyBlock | ElBlock) FT_JSTRING?
 
-// 配置属性代码块
+// 配置属性代码块 #{prop.code}
 PropertyBlock ::= PROP_BLOCK_BEGIN PROP_REFERENCE PROP_BLOCK_END
 
 
-// EL表达式代码块
+// EL表达式代码块 ${el.code} or {el.code}
 ElBlock ::= EL_BLOCK_BEGIN ElExpress EL_BLOCK_END
 
 // EL表达式

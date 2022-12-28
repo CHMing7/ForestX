@@ -1,7 +1,6 @@
 package com.chm.plugin.idea.forestx.template;
 
 import com.chm.plugin.idea.forestx.annotation.Annotation;
-import com.chm.plugin.idea.forestx.template.context.ForestTemplateContextProvider;
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplateLanguage;
 import com.intellij.lang.injection.MultiHostInjector;
 import com.intellij.lang.injection.MultiHostRegistrar;
@@ -83,8 +82,6 @@ public class ForestTemplateToJavaInjector implements MultiHostInjector {
                     .startInjecting(ForestTemplateLanguage.INSTANCE)
                     .addPlace(null, null, expr, innerRangeStrippingQuotes(expr))
                     .doneInjecting();
-
-            host.putUserData(ForestTemplateContextProvider.TemplateContextKey, new ForestTemplateContextProvider(host));
         }
     }
 

@@ -19,36 +19,151 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 
+/**
+ * @author dt_flys
+ * @version v1.0
+ * @since 2022-08-24
+ **/
 public interface TemplateTypes {
 
+    /**
+     * 参数
+     */
     IElementType ARGUMENTS = new ForestTemplateElementType("ARGUMENTS");
+
+    /**
+     * 参数列表
+     */
     IElementType ARGUMENT_LIST = new ForestTemplateElementType("ARGUMENT_LIST");
+
+    /**
+     * 参数列表元素
+     */
     IElementType ARGUMENT_LIST_ELEMENT = new ForestTemplateElementType("ARGUMENT_LIST_ELEMENT");
+
+    /**
+     * 数值
+     */
     IElementType DECIMAL = new ForestTemplateElementType("DECIMAL");
+
+    /**
+     * EL表达式代码块
+     */
     IElementType EL_BLOCK = new ForestTemplateElementType("EL_BLOCK");
+
+    /**
+     * EL表达式
+     */
     IElementType EL_EXPRESS = new ForestTemplateElementType("EL_EXPRESS");
+
+    /**
+     * 标识符
+     */
     IElementType IDENTIFIER = new ForestTemplateElementType("IDENTIFIER");
+
+    /**
+     * 整数
+     */
     IElementType INTEGER = new ForestTemplateElementType("INTEGER");
+
+    /**
+     * 名字部分
+     */
     IElementType NAME_PART = new ForestTemplateElementType("NAME_PART");
+
+    /**
+     * 链路元素: 点、名字、参数
+     */
     IElementType PATH_ELEMENT = new ForestTemplateElementType("PATH_ELEMENT");
+
+    /**
+     * 链路表达式
+     */
     IElementType PATH_EXPRESS = new ForestTemplateElementType("PATH_EXPRESS");
+
+    /**
+     * 基本计算要素
+     */
     IElementType PRIMARY = new ForestTemplateElementType("PRIMARY");
+
+    /**
+     * 配置属性代码块
+     */
     IElementType PROPERTY_BLOCK = new ForestTemplateElementType("PROPERTY_BLOCK");
+
+    /**
+     * 字符串模板的代码块
+     */
     IElementType STRING_BLOCK_CONTENT = new ForestTemplateElementType("STRING_BLOCK_CONTENT");
 
+    /**
+     * EL表达式代码块开始 ${ 或 {
+     */
     IElementType EL_BLOCK_BEGIN = new ForestTemplateTokenType("EL_BLOCK_BEGIN");
+
+    /**
+     * EL表达式代码块结束 }
+     */
     IElementType EL_BLOCK_END = new ForestTemplateTokenType("EL_BLOCK_END");
+
+    /**
+     * EL表达式中的逗号 ,
+     */
     IElementType EL_COMMA = new ForestTemplateTokenType("EL_COMMA");
+
+    /**
+     * EL表达式中的数值
+     */
     IElementType EL_DECIMAL = new ForestTemplateTokenType("EL_DECIMAL");
+
+    /**
+     * EL表达式中的点 .
+     */
     IElementType EL_DOT = new ForestTemplateTokenType("EL_DOT");
+
+    /**
+     * EL表达式中的标识符
+     */
     IElementType EL_IDENTIFIER = new ForestTemplateTokenType("EL_IDENTIFIER");
+
+    /**
+     * EL表达式中的整数
+     */
     IElementType EL_INT = new ForestTemplateTokenType("EL_INT");
+
+    /**
+     * EL表达式中的左括号 (
+     */
     IElementType EL_LPAREN = new ForestTemplateTokenType("EL_LPAREN");
+
+    /**
+     * EL表达式中的右括号 )
+     */
     IElementType EL_RPAREN = new ForestTemplateTokenType("EL_RPAREN");
+
+    /**
+     * 字符串开始标识符(双引号) "
+     */
     IElementType FT_DQ = new ForestTemplateTokenType("FT_DQ");
+
+    /**
+     * Java字符串字符
+     */
     IElementType FT_JSTRING = new ForestTemplateTokenType("FT_JSTRING");
+
+    /**
+     * 配置属性代码块开始 #{
+     */
     IElementType PROP_BLOCK_BEGIN = new ForestTemplateTokenType("PROP_BLOCK_BEGIN");
+
+    /**
+     * 配置属性代码块结束 }
+     */
     IElementType PROP_BLOCK_END = new ForestTemplateTokenType("PROP_BLOCK_END");
+
+    /**
+     * 配置属性代码块内容
+     */
     IElementType PROP_REFERENCE = new ForestTemplateTokenType("PROP_REFERENCE");
 
     class Factory {
