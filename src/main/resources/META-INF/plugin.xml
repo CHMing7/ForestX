@@ -41,7 +41,7 @@
 
         <postStartupActivity implementation="com.chm.plugin.idea.forestx.startup.MyStartupActivity"/>
         <postStartupActivity
-                implementation="com.chm.plugin.idea.forestx.listener.ProjectViewPsiTreeChangeListener$MyStartupActivity"/>
+                implementation="com.chm.plugin.idea.forestx.listener.ProjectViewChangeListener$MyStartupActivity"/>
         <postStartupActivity
                 implementation="com.chm.plugin.idea.forestx.listener.SpringBootConfigFileListener$MyStartupActivity"/>
 

@@ -5,13 +5,12 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    idea
-    // Kotlin Support 太高版本的kotlin jvm需要高版本的idea支持，切换到1.6.10 idea2021.2.2也能运行项目
-    kotlin("jvm") version "1.6.10"
+    // Kotlin Support
+    kotlin("jvm") version "1.8.0"
     // Intellij Support
-    id("org.jetbrains.intellij") version "1.9.0"
+    id("org.jetbrains.intellij") version "1.12.0"
     // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "1.3.1"
+    id("org.jetbrains.changelog") version "2.0.0"
 }
 
 
@@ -25,6 +24,10 @@ repositories {
     mavenCentral()
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     pluginName.set(properties("pluginName"))
@@ -33,12 +36,6 @@ intellij {
     plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
 //    plugins = properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty)
-}
-
-
-dependencies {
-    testImplementation(kotlin("test"))
-    api(kotlin("stdlib"))
 }
 
 tasks {

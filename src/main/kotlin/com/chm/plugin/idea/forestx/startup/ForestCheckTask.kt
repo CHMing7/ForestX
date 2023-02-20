@@ -35,6 +35,7 @@ class ForestCheckTask(project: Project) : Backgroundable(project, "Forest check"
 
     private fun runCollectors(indicator: ProgressIndicator) {
         UiUtil.updateUi {
+            isCheckFinish = false
             val mainForm = project.getRightSidebar()
             // 处理过的class
             val pendingProcessClassSet = mainForm.doScanClass()
@@ -47,12 +48,8 @@ class ForestCheckTask(project: Project) : Backgroundable(project, "Forest check"
                 indicator.isIndeterminate = false
                 indicator.fraction = i.toDouble() / pendingProcessClassSet.size.toDouble()
             }
+            isCheckFinish = true
         }
-//        // 展开所有模块节点
-//        mainForm.expandModuleNode()
-//        // 添加默认展开模块节点监听器
-//        mainForm.addDefaultExpandModuleListener()
-        isCheckFinish = true
     }
 }
 
