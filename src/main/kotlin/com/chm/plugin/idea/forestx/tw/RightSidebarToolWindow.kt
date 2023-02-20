@@ -96,38 +96,41 @@ class RightSidebarToolWindow(val project: Project) {
                 row: Int,
                 hasFocus: Boolean
             ) {
-                if (value !is DefaultMutableTreeNode) {
-                    return
-                }
-                val o: Any = value.userObject
-                if (o is PsiClass || o is PsiMethod) {
-                    o as PsiElement
-                    if (!o.checkExist()) {
+                runCatching {
+                    if (value !is DefaultMutableTreeNode) {
                         return
                     }
-                }
-                val name = value.getNodeName()
-                append(" ")
+                    val o: Any = value.userObject
+                    if (o is PsiClass || o is PsiMethod) {
+                        o as PsiElement
+                        if (!o.checkExist()) {
+                            return
+                        }
+                    }
 
-                if (o is Project || o is Module || o is PsiClass) {
-                    append(name, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
-                } else {
-                    append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
-                }
+                    val name = value.getNodeName()
+                    append(" ")
 
-                if (o is PsiClass) {
-                    // 类增加鼠标悬停显示全路径名
-                    toolTipText = o.qualifiedName
-                }
+                    if (o is Project || o is Module || o is PsiClass) {
+                        append(name, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
+                    } else {
+                        append(name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                    }
 
-                val forestAnnotationUrl = value.getForestAnnotationUrl()
-                if (forestAnnotationUrl.isNotBlank()) {
-                    // 节点名跟url之间增加空格
-                    append("  ")
-                    append(forestAnnotationUrl, SimpleTextAttributes.GRAYED_BOLD_ATTRIBUTES)
+                    if (o is PsiClass) {
+                        // 类增加鼠标悬停显示全路径名
+                        toolTipText = o.qualifiedName
+                    }
+
+                    val forestAnnotationUrl = value.getForestAnnotationUrl()
+                    if (forestAnnotationUrl.isNotBlank()) {
+                        // 节点名跟url之间增加空格
+                        append("  ")
+                        append(forestAnnotationUrl, SimpleTextAttributes.GRAYED_BOLD_ATTRIBUTES)
+                    }
+                    val icon = value.getNodeIcon()
+                    setIcon(icon)
                 }
-                val icon = value.getNodeIcon()
-                setIcon(icon)
             }
         }
         mainTree.cellRenderer = coloredTreeCellRenderer
@@ -239,7 +242,7 @@ class RightSidebarToolWindow(val project: Project) {
     /**
      * 扫描类并处理
      */
-    fun doScanClassAndProcess() {
+    private fun doScanClassAndProcess() {
         // 处理过的class
         val pendingProcessClassSet = doScanClass()
         // 处理class
@@ -257,8 +260,13 @@ class RightSidebarToolWindow(val project: Project) {
      * 重新扫描类并处理
      */
     fun doRescanClassAndProcess() {
+        val root = this.treeModel.root as DefaultMutableTreeNode
         // 清空树结构
-        mainTree.removeAll()
+        val listChildren = TreeUtil.listChildren(root)
+        listChildren.forEach {
+            TreeUtil.removeLastPathComponent(mainTree, TreeUtil.getPath(root, it))
+        }
+        // mainTree.removeAll()
         // 扫描并处理
         doScanClassAndProcess()
     }
@@ -318,6 +326,7 @@ class RightSidebarToolWindow(val project: Project) {
             }
             methodList.add(method)
         }
+
         val allChildren = clazz.getAllChildren()
         for (child in allChildren) {
             if (child !in methodList) {
