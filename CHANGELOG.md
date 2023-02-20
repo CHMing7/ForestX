@@ -1,6 +1,9 @@
 # ForestX Changelog
 
-## [Unreleased]
+## 1.0.10
+
+- fix: 修复切换分支插件报错问题 [#I6B0Y2](https://gitee.com/CHMing7/ForestX/issues/I6BOY2)
+- fix: 修复插件报错问题 [#I6DPCK](https://gitee.com/CHMing7/ForestX/issues/I6DPCK)
 
 ## 1.0.9
 
