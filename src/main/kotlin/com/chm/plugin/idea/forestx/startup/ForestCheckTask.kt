@@ -1,7 +1,8 @@
 package com.chm.plugin.idea.forestx.startup
 
-import com.chm.plugin.idea.forestx.tw.getRightSidebar
-import com.chm.plugin.idea.forestx.utils.UiUtil
+import com.chm.plugin.idea.forestx.tw.RightSidebarToolWindow
+import com.chm.plugin.idea.forestx.tw.RightSidebarUpdater
+import com.google.common.collect.Maps
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicatorProvider
@@ -16,14 +17,21 @@ import com.intellij.openapi.project.Project
 class ForestCheckTask(project: Project) : Backgroundable(project, "Forest check") {
 
     companion object {
-        val TaskMap = mutableMapOf<Project, ForestCheckTask>()
+        val TaskMap: MutableMap<Project, ForestCheckTask> = Maps.newConcurrentMap()
+
+        @JvmStatic
+        fun getInstance(project: Project): ForestCheckTask? {
+            return TaskMap[project]
+        }
     }
 
     init {
         TaskMap[project] = this
     }
 
-    var isCheckFinish = false
+    private var checkFinish = false
+
+    private val updater = RightSidebarUpdater.getInstance(project)
 
 
     override fun run(indicator: ProgressIndicator) {
@@ -34,25 +42,19 @@ class ForestCheckTask(project: Project) : Backgroundable(project, "Forest check"
     }
 
     private fun runCollectors(indicator: ProgressIndicator) {
-        UiUtil.updateUi {
-            isCheckFinish = false
-            val mainForm = project.getRightSidebar()
-            // 处理过的class
-            val pendingProcessClassSet = mainForm.doScanClass()
-            // 处理class
-            pendingProcessClassSet.forEachIndexed { i, psiClass ->
-                // 处理
-                mainForm.runCatching {
-                    processClass(psiClass)
-                }
-                indicator.isIndeterminate = false
-                indicator.fraction = i.toDouble() / pendingProcessClassSet.size.toDouble()
-            }
-            isCheckFinish = true
+        checkFinish = false
+        // 处理过的class
+        val pendingProcessClassSet = updater.doScanClass()
+        // 处理class
+        pendingProcessClassSet.forEachIndexed { i, psiClass ->
+            // 处理
+            updater.updateFromElement(psiClass)
+            indicator.isIndeterminate = false
+            indicator.fraction = i.toDouble() / pendingProcessClassSet.size.toDouble()
         }
+        checkFinish = true
     }
+
+    fun isCheckFinish() = checkFinish
 }
 
-fun Project.getForestCheckTask(): ForestCheckTask? {
-    return ForestCheckTask.TaskMap[this]
-}

@@ -1,8 +1,7 @@
 package com.chm.plugin.idea.forestx.provider
 
-import com.chm.plugin.idea.forestx.startup.getForestCheckTask
-import com.chm.plugin.idea.forestx.tw.getRightSidebar
-import com.chm.plugin.idea.forestx.utils.UiUtil
+import com.chm.plugin.idea.forestx.startup.ForestCheckTask
+import com.chm.plugin.idea.forestx.tw.RightSidebarUpdater
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.psi.PsiClass
@@ -23,16 +22,12 @@ class ForestMethodProvider : RelatedItemLineMarkerProvider() {
         if (element !is PsiClass) {
             return
         }
-        if (PsiUtil.getProjectInReadAction(element).getForestCheckTask()?.isCheckFinish != true) {
+        if (ForestCheckTask.getInstance(PsiUtil.getProjectInReadAction(element))?.isCheckFinish() != true) {
             // 初始化未完成
             return
         }
         val project = element.getProject()
-        val mainForm = project.getRightSidebar()
-        UiUtil.updateUi {
-            mainForm.runCatching {
-                processClass(element)
-            }
-        }
+        val updater = RightSidebarUpdater.getInstance(project)
+        updater.updateFromElement(element)
     }
 }

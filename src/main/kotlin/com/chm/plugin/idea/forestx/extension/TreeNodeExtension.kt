@@ -5,9 +5,10 @@ import com.chm.plugin.idea.forestx.annotation.Annotation
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePathElement
 import com.chm.plugin.idea.forestx.template.psi.ForestTemplatePrimary
 import com.chm.plugin.idea.forestx.template.utils.ForestTemplateUtil
-import com.chm.plugin.idea.forestx.utils.ReadActionUtil
+import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Comparing
@@ -79,29 +80,27 @@ val NAME_SORTED: Comparator<DefaultMutableTreeNode> = Comparator { o1, o2 ->
         } else {
             this
         }
-        return ReadActionUtil.runReadAction<String> {
-            when (o) {
-                is Project -> {
-                    o.name
-                }
-
-                is Module -> {
-                    o.name
-                }
-
-                is PsiClass -> {
-                    o.qualifiedName ?: ""
-                }
-
-                is PsiMethod -> {
-                    o.name
-                }
-
-                else -> {
-                    o?.toString() ?: "null"
-                }
-
+        return when (o) {
+            is Project -> {
+                o.name
             }
+
+            is Module -> {
+                o.name
+            }
+
+            is PsiClass -> {
+                o.qualifiedName ?: ""
+            }
+
+            is PsiMethod -> {
+                o.name
+            }
+
+            else -> {
+                o?.toString() ?: "null"
+            }
+
         }
     }
 
@@ -350,8 +349,8 @@ fun Module.equalModule(otherModule: Module): Boolean {
 }
 
 fun PsiClass.equalPsiClass(otherPsiClass: PsiClass): Boolean {
-    val thisModule = ReadActionUtil.findModuleForPsiElement(this)
-    val otherModule = ReadActionUtil.findModuleForPsiElement(otherPsiClass)
+    val thisModule = ModuleUtil.findModuleForPsiElement(this)
+    val otherModule = ModuleUtil.findModuleForPsiElement(otherPsiClass)
     return this.qualifiedName == otherPsiClass.qualifiedName &&
             (thisModule?.let {
                 otherModule?.equalModule(it)
@@ -403,27 +402,25 @@ fun Any.getNodeName(): String {
     } else {
         this
     }
-    return ReadActionUtil.runReadAction<String> {
-        when (o) {
-            is Project -> {
-                o.name
-            }
+    return when (o) {
+        is Project -> {
+            o.name
+        }
 
-            is Module -> {
-                o.name
-            }
+        is Module -> {
+            o.name
+        }
 
-            is PsiClass -> {
-                o.name ?: ""
-            }
+        is PsiClass -> {
+            o.name ?: ""
+        }
 
-            is PsiMethod -> {
-                o.name
-            }
+        is PsiMethod -> {
+            o.name
+        }
 
-            else -> {
-                o?.toString() ?: "null"
-            }
+        else -> {
+            o?.toString() ?: "null"
         }
     }
 }
@@ -436,34 +433,34 @@ fun Any.getForestAnnotationUrl(): String {
     }
     return when (o) {
         is PsiClass -> {
-            val baseRequest = ReadActionUtil.findAnnotation(o, Annotation.BASE_REQUEST.qualifiedName)
+            val baseRequest = AnnotationUtil.findAnnotation(o, Annotation.BASE_REQUEST.qualifiedName)
             baseRequest?.let {
                 // 存在@BaseRequest注解，拼接basePath
-                val baseURLText = ReadActionUtil.getStringAttributeValue(it, "baseURL")
+                val baseURLText = AnnotationUtil.getStringAttributeValue(it, "baseURL")
                 if (!baseURLText.isNullOrBlank()) {
                     return baseURLText
                 }
             }
 
-            val baseURL = ReadActionUtil.findAnnotation(o, Annotation.BASE_URL.qualifiedName)
+            val baseURL = AnnotationUtil.findAnnotation(o, Annotation.BASE_URL.qualifiedName)
             baseURL?.let {
-                val valueText = ReadActionUtil.getStringAttributeValue(it, "value")
+                val valueText = AnnotationUtil.getStringAttributeValue(it, "value")
                 if (!valueText.isNullOrBlank()) {
                     return valueText
                 }
             }
 
-            val address = ReadActionUtil.findAnnotation(o, Annotation.ADDRESS.qualifiedName)
+            val address = AnnotationUtil.findAnnotation(o, Annotation.ADDRESS.qualifiedName)
             address?.let {
                 // 存在@Address注解，拼接basePath
-                val schemeText = ReadActionUtil.getStringAttributeValue(it, "scheme")
-                val hostText = ReadActionUtil.getStringAttributeValue(it, "host")
-                val portText = ReadActionUtil.getStringAttributeValue(it, "port")
+                val schemeText = AnnotationUtil.getStringAttributeValue(it, "scheme")
+                val hostText = AnnotationUtil.getStringAttributeValue(it, "host")
+                val portText = AnnotationUtil.getStringAttributeValue(it, "port")
                 if (!schemeText.isNullOrBlank() && !hostText.isNullOrBlank() && !portText.isNullOrBlank()) {
                     return "$schemeText://$hostText:$portText"
                 }
 
-                val basePathText = ReadActionUtil.getStringAttributeValue(it, "basePath")
+                val basePathText = AnnotationUtil.getStringAttributeValue(it, "basePath")
                 if (!basePathText.isNullOrBlank()) {
                     return basePathText
                 }
@@ -474,14 +471,14 @@ fun Any.getForestAnnotationUrl(): String {
 
         is PsiMethod -> {
             for ((forestMethodAnnotationName, _) in METHOD_ICON_MAP) {
-                val annotation = ReadActionUtil.findAnnotation(o, forestMethodAnnotationName)
+                val annotation = AnnotationUtil.findAnnotation(o, forestMethodAnnotationName)
                 annotation?.let {
-                    val urlText = ReadActionUtil.getStringAttributeValue(it, "url")
+                    val urlText = AnnotationUtil.getStringAttributeValue(it, "url")
                     if (!urlText.isNullOrBlank()) {
                         return urlText
                     }
 
-                    val valueText = ReadActionUtil.getStringAttributeValue(it, "value")
+                    val valueText = AnnotationUtil.getStringAttributeValue(it, "value")
                     if (!valueText.isNullOrBlank()) {
                         return valueText
                     }
@@ -489,14 +486,14 @@ fun Any.getForestAnnotationUrl(): String {
 
             }
 
-            val requestAnnotation = ReadActionUtil.findAnnotation(o, Annotation.REQUEST.qualifiedName)
+            val requestAnnotation = AnnotationUtil.findAnnotation(o, Annotation.REQUEST.qualifiedName)
             if (requestAnnotation != null) {
-                val urlText = ReadActionUtil.getStringAttributeValue(requestAnnotation, "url")
+                val urlText = AnnotationUtil.getStringAttributeValue(requestAnnotation, "url")
                 if (!urlText.isNullOrBlank()) {
                     return urlText
                 }
 
-                val valueText = ReadActionUtil.getStringAttributeValue(requestAnnotation, "value")
+                val valueText = AnnotationUtil.getStringAttributeValue(requestAnnotation, "value")
                 if (!valueText.isNullOrBlank()) {
                     return valueText
                 }
@@ -533,15 +530,15 @@ fun Any.getNodeIcon(): Icon {
 
         is PsiMethod -> {
             for ((forestMethodAnnotationName, icon) in METHOD_ICON_MAP) {
-                val annotation = ReadActionUtil.findAnnotation(o, forestMethodAnnotationName)
+                val annotation = AnnotationUtil.findAnnotation(o, forestMethodAnnotationName)
                 if (annotation != null) {
                     return icon
                 }
             }
 
-            val requestAnnotation = ReadActionUtil.findAnnotation(o, Annotation.REQUEST.qualifiedName)
+            val requestAnnotation = AnnotationUtil.findAnnotation(o, Annotation.REQUEST.qualifiedName)
             if (requestAnnotation != null) {
-                val type = ReadActionUtil.getStringAttributeValue(requestAnnotation, "type")
+                val type = AnnotationUtil.getStringAttributeValue(requestAnnotation, "type")
                 val icon2 = REQUEST_TYPE_ICON_MAP[StringUtil.toUpperCase(type)]
                 return icon2 ?: Icons.GET
             }
