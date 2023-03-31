@@ -8,6 +8,7 @@ import com.chm.plugin.idea.forestx.extension.removeNode
 import com.chm.plugin.idea.forestx.utils.checkExist
 import com.google.common.collect.Maps
 import com.intellij.codeInsight.AnnotationUtil
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
@@ -54,14 +55,14 @@ class RightSidebarUpdater(private val project: Project) {
     private val psiClassCacheMap = mutableMapOf<String, PsiClass>()
 
     fun updateFromRoot() {
-        invoker.invokeLater {
+        ApplicationManager.getApplication().invokeLater {
             doRescanClassAndProcess()
         }
     }
 
     fun updateFromElement(element: PsiElement) {
         if (element is PsiClass) {
-            invoker.invokeLater {
+            ApplicationManager.getApplication().invokeLater {
                 processClass(element)
                 element.runCatching {
                     // 检查节点是否有效

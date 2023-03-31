@@ -1,5 +1,13 @@
 # ForestX Changelog
 
+## [Unreleased]
+
+## 1.0.11
+
+- fix: 修复2022.3.x卡死问题[#I6JMBH](https://gitee.com/CHMing7/ForestX/issues/I6JMBH)
+- fix: 修复2022.2.1菜单无法呼出问题[#I6IFUM](https://gitee.com/CHMing7/ForestX/issues/I6IFUM)
+- perf: 兼容2023.1 [#I6RGJ0](https://gitee.com/CHMing7/ForestX/issues/I6RGJ0)
+
 ## 1.0.10
 
 - fix: 修复切换分支插件报错问题 [#I6B0Y2](https://gitee.com/CHMing7/ForestX/issues/I6BOY2)
