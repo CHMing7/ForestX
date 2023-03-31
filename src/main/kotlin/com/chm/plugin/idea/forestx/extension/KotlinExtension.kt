@@ -1,7 +1,7 @@
 package com.chm.plugin.idea.forestx.utils
 
 import com.chm.plugin.idea.forestx.annotation.Annotation
-import com.chm.plugin.idea.forestx.tw.getRightSidebar
+import com.chm.plugin.idea.forestx.tw.RightSidebarUpdater
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -26,7 +26,7 @@ import java.util.*
  */
 fun Project.findClazz(clazzName: String): PsiClass? {
     return JavaPsiFacade.getInstance(this).findClass(clazzName, GlobalSearchScope.allScope(this))
-        ?: this.getRightSidebar().findCachePsiClass(clazzName)
+        ?: RightSidebarUpdater.getInstance(this).findCachePsiClass(clazzName)
 }
 
 /**

@@ -16,8 +16,8 @@ class RightSidebarToolWindowFactory : ToolWindowFactory, DumbAware {
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val disposable = Disposer.newDisposable()
-        val mainForm = project.getRightSidebar()
-        val content = ContentFactory.SERVICE.getInstance().createContent(mainForm.getContent(disposable), "", false)
+        val mainForm = RightSidebarToolWindow.getInstance(project, disposable)
+        val content = ContentFactory.SERVICE.getInstance().createContent(mainForm.getContent(), "", false)
         content.setDisposer(disposable)
         toolWindow.contentManager.addContent(content)
     }
